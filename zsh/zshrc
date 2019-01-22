@@ -75,8 +75,8 @@ declare -x PAGER=less
 declare -x MAILFOLDER=$HOME/Private/Mail
 
 declare -x DEBFULLNAME="Danny O'Brien"
-declare -x DEBEMAIL=danny@spesh.com
-declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
+declare -x EMAIL=danny@spesh.com
+declare -x DEBEMAIL="$DEBFULLNAME <EMAIL>"
 declare -x SHORTHOST=`hostname -s`
 
 PATH=$HOME/.local/bin:$PATH
