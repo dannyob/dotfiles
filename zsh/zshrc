@@ -49,8 +49,15 @@ alias   clipout='xclip -out -selection clipboard'
 # FUNCTIONS
 ###
 
+# add to path without repeating yourself
+pathadd() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+	PATH="$1${PATH:+":$PATH"}"
+    fi
+}
+
 # Quickly edit executable scripts
-function vimbin {
+vimbin() {
 $EDITOR `which $1`
 }
 
@@ -79,7 +86,7 @@ declare -x EMAIL=danny@spesh.com
 declare -x DEBEMAIL="$DEBFULLNAME <EMAIL>"
 declare -x SHORTHOST=`hostname -s`
 
-PATH=$HOME/.local/bin:$PATH
+pathadd $HOME/.local/bin
 
  # 10ms for key sequences
 KEYTIMEOUT=1

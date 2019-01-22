@@ -55,8 +55,9 @@ antigen apply
 # GUIX
 ###
 
-declare -x GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
-declare -x PATH="/home/danny/.config/guix/current/bin${PATH:+:}$PATH"
+export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
+pathadd /home/danny/.config/guix/current/bin
+pathadd /home/danny/.guix-profile/bin
 
 # zsh-history-substring-search
 bindkey -M vicmd 'k' history-substring-search-up
