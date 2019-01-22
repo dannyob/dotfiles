@@ -51,6 +51,12 @@ antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search
 antigen apply
 
+###
+# GUIX
+###
+
+declare -x GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
+declare -x PATH="/home/danny/.config/guix/current/bin${PATH:+:}$PATH"
 
 # zsh-history-substring-search
 bindkey -M vicmd 'k' history-substring-search-up
