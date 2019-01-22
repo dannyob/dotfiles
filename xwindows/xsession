@@ -1,3 +1,7 @@
+export GUIX_PROFILE=$HOME/.guix-profile/
+export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
+. $GUIX_PROFILE/etc/profile
+
 xrdb -merge .Xresources
 setxkbmap -option caps:hyper
 xmodmap -e 'clear Mod4'
