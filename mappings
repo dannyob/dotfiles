@@ -1,0 +1,14 @@
+.bash_logout	Public/dotfiles/bash
+.bashrc		Public/dotfiles/bash
+.cache		:keep
+.config		:keep
+.dmrc		Public/dotfiles/xwindows
+.fonts		Public/dotfiles/xwindows
+.guile		Public/dotfiles/guile
+.local		:keep
+.profile        Public/dotfiles/bash
+.xbindkeysrc.scm	Public/dotfiles/xbindkeys
+.Xresources	Public/dotfiles/xwindows
+.xsession	Public/dotfiles/xwindows
+.zshrc		Public/dotfiles/zsh
+.zshrc-yacht	Public/dotfiles/zsh
