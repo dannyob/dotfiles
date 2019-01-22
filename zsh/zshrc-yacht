@@ -11,16 +11,13 @@ GPG_TTY=$(tty)
 export GPG_TTY
 
 ###
-# FASD
+# GUIX
 ###
 
-#eval "$(fasd --init auto)"
-#bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
-#bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
-#bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
-#alias c='fasd_cd -d'
-#alias cc='fasd_cd -d -i'
-#alias v='f -e nvim' 
+export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
+pathadd /home/danny/.config/guix/current/bin
+pathadd /home/danny/.guix-profile/bin
+
 
 ###
 # LOCAL FUNCTIONS
@@ -48,16 +45,21 @@ EOF
 
 source /usr/share/zsh-antigen/antigen.zsh
 antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle twang817/zsh-fasd
 antigen bundle zsh-users/zsh-history-substring-search
 antigen apply
 
 ###
-# GUIX
+# FASD
 ###
 
-export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
-pathadd /home/danny/.config/guix/current/bin
-pathadd /home/danny/.guix-profile/bin
+eval "$(fasd --init auto)"
+bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
+bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
+bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
+alias c='fasd_cd -d'
+alias cc='fasd_cd -d -i'
+alias v='f -e nvim' 
 
 # zsh-history-substring-search
 bindkey -M vicmd 'k' history-substring-search-up
