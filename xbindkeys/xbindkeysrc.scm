@@ -30,7 +30,7 @@
 ;; By defaults, xbindkeys does not pay attention to modifiers
 ;; NumLock, CapsLock and ScrollLock.
 ;; Uncomment the lines below if you want to use them.
-;; To dissable them, call the functions with #f
+;; To disable them, call the functions with #f
 
 
 ;;;;EXTRA FUNCTIONS: Enable numlock, scrolllock or capslock usage
@@ -72,16 +72,16 @@
 ;; specify a mouse button
 ;; (xbindkey '(control "b:2") "xterm")
 
-;;(xbindkey '(shift mod2 alt s) "xterm -geom 50x20+20+20")
+;; (xbindkey '(shift mod2 alt s) "xterm -geom 50x20+20+20")
 
 ;; set directly keycode (control+alt+mod2 + f with my keyboard)
 (xbindkey '(alt "m:4" mod2 "c:0x29") "xterm")
 
 ;; Control+Shift+a  release event starts rxvt
-;;(xbindkey '(release control shift a) "rxvt")
+;; (xbindkey '(release control shift a) "rxvt")
 
 ;; Control + mouse button 2 release event starts rxvt
-;;(xbindkey '(releace control "b:2") "rxvt")
+;; (xbindkey '(release control "b:2") "rxvt")
 
 
 ;; Extra features
@@ -122,7 +122,7 @@
 ;;      	       (set! time (current-time)))))
 
 
-;; Chording keys test: Start differents program if only one key is
+;; Chording keys test: Start different program if only one key is
 ;; pressed or another if two keys are pressed.
 ;; If key1 is pressed start cmd-k1
 ;; If key2 is pressed start cmd-k2
@@ -156,7 +156,7 @@
 ;; (define-chord-keys '(shift "b:1") '(shift "b:3")
 ;;   "xterm" "rxvt" "gv" "xpdf")
 
-;; Here the release order have no importance
+;; Here the release order has no importance
 ;; (the same program is started in both case)
 ;; (define-chord-keys '(alt "b:1") '(alt "b:3")
 ;;   "gv" "xpdf" "xterm" "xterm")
