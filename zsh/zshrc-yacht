@@ -1,0 +1,60 @@
+##
+# HISTORY
+###
+#
+declare -x HISTFILE=/home/danny/Private/histfile
+declare -x SAVEHIST=2048
+declare -x HISTSIZE=2048
+setopt INC_APPEND_HISTORY
+
+GPG_TTY=$(tty)
+export GPG_TTY
+
+###
+# FASD
+###
+
+#eval "$(fasd --init auto)"
+#bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
+#bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
+#bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
+#alias c='fasd_cd -d'
+#alias cc='fasd_cd -d -i'
+#alias v='f -e nvim' 
+
+###
+# LOCAL FUNCTIONS
+###
+
+aptinstall() {
+	local commit
+	vared -c -p "Why are you installing $1? " commit
+	if sudo apt-get install $1; then
+        cat >>~/ChangeLog<<EOF
+$(date -Imin)  $DEBFULLNAME  <$DEBEMAIL>
+
+	* $commit
+
+	% sudo apt-get install $1
+EOF
+	else
+		echo "Not logged!"
+	fi
+}
+
+###
+# ANTIGEN
+###
+
+source /usr/share/zsh-antigen/antigen.zsh
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle zsh-users/zsh-history-substring-search
+antigen apply
+
+
+# zsh-history-substring-search
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+zmodload zsh/terminfo
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
