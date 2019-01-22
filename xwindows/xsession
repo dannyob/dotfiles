@@ -1,0 +1,11 @@
+xrdb -merge .Xresources
+setxkbmap -option caps:hyper
+xmodmap -e 'clear Mod4'
+xmodmap -e 'clear Mod3'
+xmodmap -e 'keycode 66 = Escape'
+xmodmap -e 'add mod3 = Escape Hyper_L'
+xmodmap -e 'add Mod4 = Super_L Super_R'
+
+xsetroot -bg black
+xsetroot -cursor_name left_ptr
+dbus-launch --exit-with-session /home/danny/.local/bin/dwm
