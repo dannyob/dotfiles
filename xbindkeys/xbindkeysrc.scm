@@ -65,7 +65,9 @@
 ;; My settings
 
 (xbindkey '(mod3 a) "wmctrl -x -a Firefox || pgrep firefox || firefox")
-(xbindkey '(mod3 s) "wmctrl -x -a Terminal || pgrep terminal || x-terminal-emulator")
+(xbindkey '(mod3 d) "wmctrl -x -a Terminal || pgrep terminal || x-terminal-emulator")
+;; (xbindkey '(mod3 s) "# spare")
+;; (xbindkey '(mod3 f) "# chat")
 
 ;; Examples of commands:
 
