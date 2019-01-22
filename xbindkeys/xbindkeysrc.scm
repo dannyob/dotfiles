@@ -62,9 +62,14 @@
 ;; (debug)
 
 
+;; My settings
+
+(xbindkey '(mod3 a) "wmctrl -x -a Firefox || pgrep firefox || firefox")
+(xbindkey '(mod3 s) "wmctrl -x -a Terminal || pgrep terminal || x-terminal-emulator")
+
 ;; Examples of commands:
 
-(xbindkey '(control shift q) "xbindkeys_show")
+;; (xbindkey '(control shift q) "xbindkeys_show")
 
 ;; set directly keycode (here control + f with my keyboard)
 ;; (xbindkey '("m:0x4" "c:41") "xterm")
@@ -75,7 +80,7 @@
 ;; (xbindkey '(shift mod2 alt s) "xterm -geom 50x20+20+20")
 
 ;; set directly keycode (control+alt+mod2 + f with my keyboard)
-(xbindkey '(alt "m:4" mod2 "c:0x29") "xterm")
+;; (xbindkey '(alt "m:4" mod2 "c:0x29") "xterm")
 
 ;; Control+Shift+a  release event starts rxvt
 ;; (xbindkey '(release control shift a) "rxvt")
