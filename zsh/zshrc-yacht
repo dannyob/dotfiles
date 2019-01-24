@@ -44,6 +44,7 @@ guixinstall() {
 	vared -c -p "Why are you installing $1? " commit
 	if guix package -i $1; then
         cat >>~/ChangeLog<<EOF
+
 $(date -Imin)  $DEBFULLNAME  <$DEBEMAIL>
 
 	* $commit
