@@ -12,3 +12,4 @@
 .xsession	Public/dotfiles/xwindows
 .zshrc		Public/dotfiles/zsh
 .zshrc-yacht	Public/dotfiles/zsh
+.config/xsettingsd/xsettingsd.conf	Public/dotfiles/xwindows

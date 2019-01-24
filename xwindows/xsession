@@ -13,6 +13,9 @@ xmodmap -e 'add Mod4 = Super_L Super_R'
 xsetroot -bg black
 xsetroot -cursor_name left_ptr
 
+# Applets and agents
+xsettingsd &
+nm-applet &
 xbindkeys_autostart
 
 dbus-launch --exit-with-session /home/danny/.local/bin/dwm
