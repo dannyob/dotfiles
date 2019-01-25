@@ -143,3 +143,7 @@ highlight Normal ctermbg=black guibg=#000
 highlight SignColumn ctermbg=black guibg=#000
 
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+
+call plug#begin()
+Plug 'tpope/vim-surround'
+call plug#end()
