@@ -13,3 +13,4 @@
 .zshrc		Public/dotfiles/zsh
 .zshrc-yacht	Public/dotfiles/zsh
 .config/xsettingsd/xsettingsd.conf	Public/dotfiles/xwindows
+.config/nvim/init.vim	Public/dotfiles/neovim/init.vim
