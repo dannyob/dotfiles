@@ -1,4 +1,4 @@
-" shhh! no bell or visualbell
+"shhh! no bell or visualbell
 set noerrorbells novisualbell t_vb=
 filetype plugin indent on
 let mapleader = " "
@@ -20,7 +20,7 @@ set background=dark
 set listchars=tab:»┄,eol:↲,trail:·,precedes:«,extends:»
 
 " Minimize time waiting for leader and esc keys
-set timeoutlen=100 ttimeoutlen=0
+set timeoutlen=1000 ttimeoutlen=0
 
 " Super backspace!
 set backspace=indent,eol,start
@@ -132,7 +132,10 @@ let g:GPGDefaultRecipients=["danny@spesh.com"]
 if has('nvim')
     autocmd BufWinEnter,WinEnter term://* startinsert
     autocmd BufLeave term://* stopinsert
+    tnoremap <Esc><Esc> <c-\><c-n>
+    tnoremap <c-w> <c-\><c-n>
 endif
+
 
 set completeopt=menu,menuone,preview,longest
 set number
@@ -145,5 +148,25 @@ highlight SignColumn ctermbg=black guibg=#000
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 call plug#begin()
+Plug 'eraserhd/parinfer-rust'
+Plug 'jpalardy/vim-slime'
+Plug 'tomtom/quickfixsigns_vim'
+" gc == comment/uncomment
+Plug 'tpope/vim-commentary' 
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-repeat'
+" <c-a> and <c-x>, d<c-x>, d<c-a> on dates
+Plug 'tpope/vim-speeddating'
+" cs, ys
 Plug 'tpope/vim-surround'
+" ]b. [b and friends
+Plug 'tpope/vim-unimpaired'
+Plug 'vimoutliner/vimoutliner'
+Plug 'vim-scripts/utl.vim'
 call plug#end()
+
+" Plugin Setup
+" jpalardy/vim-slime
+" see slime-kitty
+let g:slime_target = "neovim"
