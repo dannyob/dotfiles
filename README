@@ -1,6 +1,24 @@
 # My Dotfiles!
 
-Many, many thanks to every other dotfile repository I've ever gawped at
+First, many, many thanks to every other dotfile repository I've ever gawped at
 amazement at.
 
+These dotfiles are managed using [GNU
+Stow](https://www.gnu.org/software/stow/), using a system similar to that
+described by [Brandon
+Invergo](http://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html).
+One minor gotcha to note is that, by default, `stow` targets the parent
+directory of the stowed files. That default works if you have a "dotfiles"
+directory in your home directory. I store my dotfiles a little deeper into my
+directory structure, so I use a function like this instead of using the stow
+command directly:
 
+```zsh
+stowdotfiles() {
+    if [ "dotfiles" = $(basename $(pwd)) ]; then
+        stow -vv -t ~/ $*
+    else
+        echo "You're not in a dotfiles directory."
+    fi
+}
+```
