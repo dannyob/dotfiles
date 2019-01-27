@@ -66,14 +66,6 @@ EOF
 	fi
 }
 
-stowdotfiles() {
-    if [ "dotfiles" = $(basename $(pwd)) ]; then
-        stow -vv -t ~/ $*
-    else
-        echo "You're not in a dotfiles directory."
-    fi
-}
-
 ###
 # ANTIGEN
 ###
