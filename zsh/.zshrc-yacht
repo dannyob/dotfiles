@@ -14,10 +14,20 @@ export GPG_TTY
 # GUIX
 ###
 
+if [[ -d "$GUIX_PROFILE" ]]; then
+    . $GUIX_PROFILE/etc/profile
+fi
+
 export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
+
+export SSL_CERT_DIR="$HOME/.guix-profile/etc/ssl/certs"
+export SSL_CERT_FILE="$HOME/.guix-profile/etc/ssl/certs/ca-certificates.crt"
+export GIT_SSL_CAINFO="$SSL_CERT_FILE"
+
+export INFOPATH="/home/danny/.guix-profile/share/info${INFOPATH:+:}$INFOPATH"
+
 pathadd /home/danny/.config/guix/current/bin
 pathadd /home/danny/.guix-profile/bin
-
 
 ###
 # LOCAL FUNCTIONS

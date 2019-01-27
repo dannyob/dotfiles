@@ -4,8 +4,8 @@ filetype plugin indent on
 let mapleader = " "
 let localleader = "_"
 
-" read/write a shared file, don't store items that are bigger than 100K, save in Private area
-set viminfo='20,s100,n~/Private/dotfiles/cache/viminfo	
+" read/write a shared file, don't store items that are bigger than 100K.
+set shada='20,s100
 
 " Show status lines on all windows
 set laststatus=2
@@ -164,6 +164,8 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
+Plug 'hiphish/info.vim'
+" For all this Guix Info goodness
 call plug#end()
 
 " Plugin Setup
