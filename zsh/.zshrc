@@ -83,7 +83,7 @@ declare -x MAILFOLDER=$HOME/Private/Mail
 
 declare -x DEBFULLNAME="Danny O'Brien"
 declare -x EMAIL=danny@spesh.com
-declare -x DEBEMAIL="$DEBFULLNAME <EMAIL>"
+declare -x DEBEMAIL=$EMAIL
 declare -x SHORTHOST=`hostname -s`
 
 pathadd $HOME/.local/bin
