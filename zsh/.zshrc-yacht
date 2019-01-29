@@ -26,6 +26,9 @@ export GIT_SSL_CAINFO="$SSL_CERT_FILE"
 
 export INFOPATH="/home/danny/.guix-profile/share/info${INFOPATH:+:}$INFOPATH"
 
+export GUILE_LOAD_PATH="/home/danny/.guix-profile/share/guile/site/2.2${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
+export GUILE_LOAD_COMPILED_PATH="/home/danny/.guix-profile/lib/guile/2.2/site-ccache${GUILE_LOAD_COMPILED_PATH:+:}$GUILE_LOAD_COMPILED_PATH"
+
 pathadd /home/danny/.config/guix/current/bin
 pathadd /home/danny/.guix-profile/bin
 
