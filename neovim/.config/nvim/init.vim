@@ -99,6 +99,9 @@ map <Leader>S <Esc>:setlocal spell spelllang=en_us<CR>
 "
 map <Leader>F ggj/From:<CR>wwy$0ggjwwD<Esc>jA<Esc>p<Esc>k"0p<Esc>}
 
+" Mice!
+"
+set mouse=a
 " Block/Line selection with mouse
 noremap <C-LeftMouse> <4-LeftMouse>
 inoremap <C-LeftMouse> <4-LeftMouse>
