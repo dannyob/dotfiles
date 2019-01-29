@@ -168,6 +168,7 @@ Plug 'tpope/vim-unimpaired'
 Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
 Plug 'hiphish/info.vim'
+Plug 'dannyob/vim-scripts'
 " For all this Guix Info goodness
 call plug#end()
 
@@ -175,3 +176,14 @@ call plug#end()
 " jpalardy/vim-slime
 " see slime-kitty
 let g:slime_target = "neovim"
+
+" dannyobrien/vim-scripts
+" (Really a fork of TobBrandt/vim-scripts )
+
+let g:guile_highlight_naming_conventions=1
+let g:guile_highlight_base_library=1
+let g:guile_highlight_std_libs=1
+let g:guile_highlight_reader_extensions=1
+let g:guile_highlight_goops=1
+let g:guile_highlight_api=1
+let g:guile_highlight_modules=1
