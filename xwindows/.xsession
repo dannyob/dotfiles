@@ -1,3 +1,6 @@
+. /etc/profile
+. $HOME/.profile
+
 export GUIX_PROFILE=$HOME/.guix-profile
 export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 . $GUIX_PROFILE/etc/profile
@@ -12,6 +15,7 @@ xsetroot -cursor_name left_ptr
 # Applets and agents
 xsettingsd &
 nm-applet &
+gbar &
 xbindkeys_autostart
 
 dbus-launch --exit-with-session /home/danny/.local/bin/dwm
