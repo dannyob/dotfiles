@@ -1,6 +1,5 @@
 "shhh! no bell or visualbell
 set noerrorbells novisualbell t_vb=
-filetype plugin indent on
 let mapleader = " "
 let localleader = "_"
 
@@ -62,7 +61,7 @@ let html_use_css = 1  " use stylesheets when generating html
 set directory=~/tmp,.,/var/tmp,/tmp
 set undodir=~/tmp,.
 
-syntax on
+set undofile
 
 " Typos etc
 abbrev ogr org
@@ -148,7 +147,8 @@ highlight LineNr ctermbg=black guibg=#000
 highlight Normal ctermbg=black guibg=#000
 highlight SignColumn ctermbg=black guibg=#000
 
-let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+set termguicolors
+set guicursor=n-c:block,i-ci-ve:ver40,r-cr-v:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
 
 call plug#begin()
 " Plug 'eraserhd/parinfer-rust' " Testing without
@@ -168,7 +168,8 @@ Plug 'tpope/vim-unimpaired'
 Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
 Plug 'dannyob/vim-scripts'
- " For all this Guix Info goodness
+Plug 'gioele/vim-autoswap'
+
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
 Plug 'hiphish/info.vim'
