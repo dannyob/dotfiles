@@ -18,4 +18,4 @@ nm-applet &
 gbar &
 xbindkeys_autostart
 
-dbus-launch --exit-with-session /home/danny/.local/bin/dwm
+/home/danny/.local/bin/dwm

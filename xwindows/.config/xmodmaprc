@@ -1,5 +1,5 @@
 clear Mod4
 clear Mod3
 keycode 66 = Escape
-add mod3 = Escape Hyper_L
+add Mod3 = Escape Hyper_L
 add Mod4 = Super_L Super_R
