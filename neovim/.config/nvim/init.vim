@@ -151,7 +151,7 @@ highlight SignColumn ctermbg=black guibg=#000
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 
 call plug#begin()
-Plug 'eraserhd/parinfer-rust'
+" Plug 'eraserhd/parinfer-rust' " Testing without
 Plug 'jpalardy/vim-slime'
 Plug 'tomtom/quickfixsigns_vim'
 " gc == comment/uncomment
@@ -167,15 +167,25 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
-Plug 'hiphish/info.vim'
 Plug 'dannyob/vim-scripts'
+ " For all this Guix Info goodness
+" Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
+Plug 'hiphish/info.vim'
+Plug 'guns/vim-sexp'
+Plug 'junegunn/rainbow_parentheses.vim'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
 call plug#end()
 
 " Plugin Setup
 " jpalardy/vim-slime
 " see slime-kitty
 let g:slime_target = "neovim"
+
+augroup rainbow_lisp
+  autocmd!
+  autocmd FileType lisp,clojure,scheme RainbowParentheses
+augroup END
 
 " dannyobrien/vim-scripts
 " (Really a fork of TobBrandt/vim-scripts )
