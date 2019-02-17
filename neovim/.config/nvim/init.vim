@@ -12,7 +12,7 @@ set laststatus=2
 " automatically put cuts into the clipboard
 set clipboard+=unnamedplus
  
-" Try to pick colors that look good on dark backgroun
+" Try to pick colors that look good on dark background
 set background=dark
 
 " Fancy listchars
@@ -151,7 +151,7 @@ set termguicolors
 set guicursor=n-c:block,i-ci-ve:ver40,r-cr-v:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
 
 call plug#begin()
-" Plug 'eraserhd/parinfer-rust' " Testing without
+Plug 'eraserhd/parinfer-rust'
 Plug 'jpalardy/vim-slime'
 Plug 'tomtom/quickfixsigns_vim'
 " gc == comment/uncomment
@@ -167,13 +167,15 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
-Plug 'dannyob/vim-scripts'
 Plug 'gioele/vim-autoswap'
+Plug 'unblevable/quick-scope'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
 Plug 'hiphish/info.vim'
 Plug 'guns/vim-sexp'
+"(Really a fork of TobBrandt/vim-scripts )
+Plug 'dannyob/vim-scripts' 
 Plug 'junegunn/rainbow_parentheses.vim'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
 call plug#end()
