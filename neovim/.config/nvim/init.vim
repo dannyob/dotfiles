@@ -59,7 +59,7 @@ let html_use_css = 1  " use stylesheets when generating html
 
 " Don't want tmp and undo files cluttering up directories
 set directory=~/tmp,.,/var/tmp,/tmp
-set undodir=~/tmp,.
+set undodir=~/.cache/undos,.
 
 set undofile
 
