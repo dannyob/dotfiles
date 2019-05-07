@@ -1,7 +1,7 @@
 "shhh! no bell or visualbell
 set noerrorbells novisualbell t_vb=
 let mapleader = " "
-let localleader = "_"
+let maplocalleader = "_"
 
 " read/write a shared file, don't store items that are bigger than 100K.
 set shada='20,s100
@@ -169,6 +169,11 @@ Plug 'vimoutliner/vimoutliner'
 Plug 'vim-scripts/utl.vim'
 Plug 'gioele/vim-autoswap'
 Plug 'unblevable/quick-scope'
+Plug 'mbbill/undotree'
+
+" Dirty Emacs Experimentation
+"
+Plug 'jceb/vim-orgmode'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness

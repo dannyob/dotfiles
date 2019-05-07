@@ -66,6 +66,7 @@
 
 (xbindkey '(mod3 a) "wmctrl -x -a Firefox || pgrep firefox || firefox")
 (xbindkey '(mod3 d) "wmctrl -x -a kitty || pgrep kitty || x-terminal-emulator")
+(xbindkey '(mod3 s) "wmctrl -x -a emacs || pgrep emacs || emacs") 
 ;; (xbindkey '(mod3 s) "# spare")
 ;; (xbindkey '(mod3 f) "# chat")
 
