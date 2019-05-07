@@ -8,15 +8,15 @@ export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
 # Applets and agents
 xsettingsd &
 nm-applet &
-gbar &
 xbindkeys_autostart
 synology-drive &
 
-# fiddle with keyboard after xkb has done its worst
-(sleep 4; 
+# Fiddle with keyboard after xkb has done its worst
+(sleep 3; 
  setxkbmap -option caps:hyper
  setxkbmap -option compose:prsc
- xmodmap -verbose $HOME/.config/xmodmaprc 
+ xmodmap -verbose $HOME/.config/xmodmaprc
+ guile `which gbar` &
  ) &
 xrdb -merge .Xresources
 
