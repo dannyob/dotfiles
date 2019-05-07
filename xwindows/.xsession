@@ -17,6 +17,7 @@ synology-drive &
  setxkbmap -option compose:prsc
  xmodmap -verbose $HOME/.config/xmodmaprc
  guile `which gbar` &
+ x-terminal-emulator &
  ) &
 xrdb -merge .Xresources
 
