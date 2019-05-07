@@ -10,6 +10,7 @@ xsettingsd &
 nm-applet &
 gbar &
 xbindkeys_autostart
+synology-drive &
 
 # fiddle with keyboard after xkb has done its worst
 (sleep 4; 
