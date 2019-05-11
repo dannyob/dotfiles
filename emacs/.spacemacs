@@ -494,7 +494,7 @@ This function is called at the very end of Spacemacs initialization.")
  '(notmuch-archive-tags (quote ("-inbox" "+archive")))
  '(org-agenda-files
    (quote
-    ("~/Private/org/todo.org" "~/Private/org/checklist.org")))
+    ("~/Private/org/" "~/todo.org")))
  '(org-agenda-include-diary t)
  '(org-ellipsis " ▼")
  '(org-modules
