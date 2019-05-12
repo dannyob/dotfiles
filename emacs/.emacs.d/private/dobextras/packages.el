@@ -42,13 +42,13 @@
  (use-package dob-org))
 
 (defun dobextras/init-dob-notmuch ()
-  (use-package dob-notmuch
-    :bind (("C-c n" . dob-notmuch-today)
-           :map notmuch-search-mode-map
-           ("C-c g" . notmuch-poll-refresh-this-buffer)
-           ("S"     . dob-notmuch-spamify)
-           :map notmuch-show-mode-map
-           ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread))))
+  (use-package dob-notmuch))
+    ;; :bind (("C-c n" . dob-notmuch-today)
+    ;;        :map notmuch-search-mode-map
+    ;;        ("C-c g" . notmuch-poll-refresh-this-buffer)
+    ;;        ("S"     . dob-notmuch-spamify)
+    ;;        :map notmuch-show-mode-map
+    ;;        ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread))))
 
 (defun dobextras/post-init-notmuch ())
 

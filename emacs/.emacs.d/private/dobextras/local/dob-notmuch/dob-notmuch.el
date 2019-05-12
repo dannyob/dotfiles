@@ -1,4 +1,3 @@
-;; (require 'notmuch)
 (defvar dob-notmuch-spam-tags '("-inbox" "+spam" "+missedspam"))
 
 (defun dob-notmuch-today ()
@@ -44,5 +43,13 @@ thread from search."
   (dob-notmuch-show-spamify-message)
   (unless (notmuch-show-next-open-message)
     (notmuch-show-next-thread t)))
+
+(use-package notmuch
+  :bind (("C-c n" . dob-notmuch-today)
+         :map notmuch-search-mode-map
+         ("C-c g" . notmuch-poll-refresh-this-buffer)
+         ("S"     . dob-notmuch-spamify)
+         :map notmuch-show-mode-map
+         ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread)))
 
 (provide 'dob-notmuch)
