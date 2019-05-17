@@ -5,6 +5,12 @@
   (interactive)
   (notmuch-search "tag:inbox AND ( date:today OR date:yesterday )"))
 
+(defun dob-notmuch-now ()
+  "Show inbox now"
+  (interactive)
+  (notmuch-search "tag:inbox"))
+
+
 (defun dob-notmuch-spamify
     (&optional unspam beg end)
   "Mark as spam the currently selected thread or region.
@@ -45,11 +51,14 @@ thread from search."
     (notmuch-show-next-thread t)))
 
 (use-package notmuch
-  :bind (("C-c n" . dob-notmuch-today)
+  :bind (("C-c t" . dob-notmuch-today)
+         ("C-c n" . dob-notmuch-now)
          :map notmuch-search-mode-map
          ("C-c g" . notmuch-poll-refresh-this-buffer)
          ("S"     . dob-notmuch-spamify)
          :map notmuch-show-mode-map
          ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread)))
+
+(evil-define-key 'normal notmuch-message-mode-map (kbd "ZZ") 'notmuch-draft-save)
 
 (provide 'dob-notmuch)
