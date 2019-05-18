@@ -22,7 +22,7 @@
      `dob-notmuch-spam-tags' will be reversed).
 
      This function advances the next thread when finished."
-  (interactive (cons current-prefix-arg (notmuch-search-interactive-region)))
+  (interactive (cons current-prefix-arg (notmuch-interactive-region)))
   (when dob-notmuch-spam-tags
     (notmuch-search-tag
      (notmuch-tag-change-list dob-notmuch-spam-tags unspam) beg end))
