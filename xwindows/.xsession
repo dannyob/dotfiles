@@ -1,9 +1,9 @@
 . /etc/profile
-. $HOME/.profile
 
 export GUIX_PROFILE=$HOME/.guix-profile
 export GUIX_LOCPATH=$GUIX_PROFILE/lib/locale
-. $GUIX_PROFILE/etc/profile
+
+. $HOME/.profile
 
 # Applets and agents
 xsettingsd &
