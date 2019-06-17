@@ -50,12 +50,21 @@ thread from search."
   (unless (notmuch-show-next-open-message)
     (notmuch-show-next-thread t)))
 
+(defmacro dob-with-inbox (s) `(with-current-buffer "*notmuch-saved-search-inbox*" ,s))
+(defun dob-limit-to-author ()
+  "Limit the inbox to mail written by the authors in
+the current thread. Useful for finding other conversations, and as a substitute
+for sorting by author."
+  (interactive)
+  (notmuch-search-filter (format "from:\"%s\"" (notmuch-search-find-authors))))
+
 (use-package notmuch
   :bind (("C-c t" . dob-notmuch-today)
          ("C-c n" . dob-notmuch-now)
          :map notmuch-search-mode-map
          ("C-c g" . notmuch-poll-refresh-this-buffer)
          ("S"     . dob-notmuch-spamify)
+         ("F"     . dob-limit-to-author)
          :map notmuch-show-mode-map
          ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread)))
 
