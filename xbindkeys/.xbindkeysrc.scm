@@ -70,6 +70,12 @@
 ;; (xbindkey '(mod3 s) "# spare")
 ;; (xbindkey '(mod3 f) "# chat")
 
+(xbindkey 'XF86AudioLowerVolume "pactl set-sink-volume '@DEFAULT_SINK@' '-10%'")
+(xbindkey 'XF86AudioRaiseVolume "pactl set-sink-volume '@DEFAULT_SINK@' '+10%'")
+(xbindkey 'XF86AudioMute "pactl set-sink-mute '@DEFAULT_SINK@' toggle")
+(xbindkey 'XF86AudioMicMute "pactl set-source-mute '@DEFAULT_SOURCE@' toggle")
+(xbindkey 'XF86MonBrightnessUp "xbacklight -inc 5")
+(xbindkey 'XF86MonBrightnessDown "xbacklight -dec 5")
 ;; Examples of commands:
 
 ;; (xbindkey '(control shift q) "xbindkeys_show")
