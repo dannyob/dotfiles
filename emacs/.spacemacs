@@ -474,6 +474,7 @@ dump.")
  Put your configuration code here, except for variables that should be set
  before packages are loaded."
   (persistent-scratch-setup-default)
+  (global-fasd-mode 1)
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
 
