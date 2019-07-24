@@ -7,7 +7,9 @@
 ### Variables
 #
 # Logo key. Use Mod1 for Alt.
+# I use Hyper!
 set $mod Mod4
+
 # Home row direction keys, like vim
 set $left h
 set $down j
@@ -61,6 +63,11 @@ output $laptop scale 1
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
+
+# Caps = Hyper
+input type:keyboard {
+    xkb_options 'compose:prsc,caps:hyper'
+}
 
 ### Key bindings
 #
@@ -221,3 +228,4 @@ bar {
 include /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/etc/sway/config.d/*
 xwayland enable
 
+exec evscript -d /dev/input/event0 -f ~/.local/share/evscript/evscript-caps2esc.dyon
