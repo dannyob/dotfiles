@@ -23,8 +23,8 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 
 ### Output configuration
 #
-# Default wallpaper (more resolutions are available in /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/share/backgrounds/sway/)
-output * bg /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+#output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 # Example configuration:
 #
@@ -225,7 +225,7 @@ bar {
     }
 }
 
-include /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/etc/sway/config.d/*
+#include /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/etc/sway/config.d/*
 # App selection
 bindsym $mod+d [app_id="kitty"] focus
 bindsym $mod+a [instance="Navigator"] focus
@@ -241,6 +241,14 @@ bindsym XF86AudioMicMute exec pactl set-source-mute '@DEFAULT_SOURCE@' toggle
 bindsym XF86MonBrightnessUp exec xbacklight -inc 5
 bindsym XF86MonBrightnessDown exec xbacklight -dec 5
 
+# clipboard hack
+for_window [title="wl-clipboard"] floating enable
+
 xwayland enable
 
+exec_always xrdb -merge ~/.Xresources
+
 exec evscript -d /dev/input/event0 -f ~/.local/share/evscript/evscript-caps2esc.dyon
+exec nm-applet --indicator
+
+
