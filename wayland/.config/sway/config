@@ -64,6 +64,10 @@ output $laptop scale 1
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
+input 2:10:TPPS/2_IBM_TrackPoint {
+      pointer_accel -0.5
+}
+
 # Caps = Hyper
 input type:keyboard {
     xkb_options 'compose:prsc,caps:hyper'
