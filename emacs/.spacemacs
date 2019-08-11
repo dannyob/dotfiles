@@ -69,8 +69,8 @@ This function should only modify configuration layer settings."
      syntax-checking
      version-control
      dobextras
-     dobprivate
-     )
+     dobprivate)
+   
 
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -478,8 +478,24 @@ dump.")
  Put your configuration code here, except for variables that should be set
  before packages are loaded."
   (persistent-scratch-setup-default)
+  (setq helm-ff-auto-update-initial-value 't)
   (global-fasd-mode 1)
   (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
+  (setq deft-extensions '("txt" "tex" "org"))
+  (setq deft-directory "~/Private/wiki/")
+  (setq deft-recursive t)
+  (global-set-key (kbd "C-c d") 'deft)
+
+  (defun dob-make-person (start end)
+    "Create a file for a mentioned person"
+    (interactive "r")
+    (let* ((person-name (buffer-substring start end))
+           (filename (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name)))))
+      (org-store-link start)
+      (find-file-other-window (concat "~/Private/wiki/people/" filename ".org"))
+      (org-insert-last-stored-link 1)))
+
+
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
 
