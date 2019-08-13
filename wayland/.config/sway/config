@@ -253,6 +253,7 @@ xwayland enable
 exec_always xrdb -merge ~/.Xresources
 
 exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-caps2esc.dyon
+exec epicroot
 exec nm-applet --indicator
 
 
