@@ -485,6 +485,12 @@ dump.")
   (setq deft-directory "~/Private/wiki/")
   (setq deft-recursive t)
   (global-set-key (kbd "C-c d") 'deft)
+  (global-set-key (kbd "<redo>") 'undo-tree-redo)
+  (global-set-key (kbd "<XF86Cut>") 'clipboard-kill-region)
+  (global-set-key (kbd "<XF86Copy>") 'clipboard-kill-ring-save)
+  (global-set-key (kbd "<XF86Paste>") 'clipboard-yank)
+  (global-set-key (kbd "<mouse-8>") 'previous-buffer)
+  (global-set-key (kbd "<mouse-9>") 'next-buffer)
 
   (defun dob-make-person (start end)
     "Create a file for a mentioned person"
