@@ -19,26 +19,28 @@ fi
 # GUIX
 ###
 
-if [[ -d "$GUIX_PROFILE" ]]; then
-    . $GUIX_PROFILE/etc/profile
-fi
+# export GUIX_PROFILE=$HOME/.guix-profile
 
-export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
+#if [[ -d "$GUIX_PROFILE" ]]; then
+#    . $GUIX_PROFILE/etc/profile
+#fi
 
-export SSL_CERT_DIR="$HOME/.guix-profile/etc/ssl/certs"
-export SSL_CERT_FILE="$HOME/.guix-profile/etc/ssl/certs/ca-certificates.crt"
-export GIT_SSL_CAINFO="$SSL_CERT_FILE"
+#export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
 
-export INFOPATH="/home/danny/.guix-profile/share/info${INFOPATH:+:}$INFOPATH"
+#export SSL_CERT_DIR="$HOME/.guix-profile/etc/ssl/certs"
+#export SSL_CERT_FILE="$HOME/.guix-profile/etc/ssl/certs/ca-certificates.crt"
+#export GIT_SSL_CAINFO="$SSL_CERT_FILE"
 
-export GUILE_LOAD_PATH="/home/danny/.guix-profile/share/guile/site/2.2${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
-export GUILE_LOAD_COMPILED_PATH="/home/danny/.guix-profile/lib/guile/2.2/site-ccache${GUILE_LOAD_COMPILED_PATH:+:}$GUILE_LOAD_COMPILED_PATH"
+#export INFOPATH="/home/danny/.guix-profile/share/info${INFOPATH:+:}$INFOPATH"
 
-export ACLOCAL_PATH="/home/danny/.guix-profile/share/aclocal${ACLOCAL_PATH:+:}$ACLOCAL_PATH"
-export PKG_CONFIG_PATH="/home/danny/.guix-profile/lib/pkgconfig${PKG_CONFIG_PATH:+:}$PKG_CONFIG_PATH"
+#GUILE_LOAD_PATH="/home/danny/.guix-profile/share/guile/2.2${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
+#export GUILE_LOAD_COMPILED_PATH="/home/danny/.guix-profile/lib/guile/2.2/site-ccache${GUILE_LOAD_COMPILED_PATH:+:}$GUILE_LOAD_COMPILED_PATH"
 
-pathadd /home/danny/.config/guix/current/bin
-pathadd /home/danny/.guix-profile/bin
+#export ACLOCAL_PATH="/home/danny/.guix-profile/share/aclocal${ACLOCAL_PATH:+:}$ACLOCAL_PATH"
+#export PKG_CONFIG_PATH="/home/danny/.guix-profile/lib/pkgconfig${PKG_CONFIG_PATH:+:}$PKG_CONFIG_PATH"
+
+# pathadd /home/danny/.config/guix/current/bin
+# pathadd /home/danny/.guix-profile/bin
 
 fpath=(~/.config/guix/current/share/zsh/site-functions/ $fpath)
 

@@ -33,7 +33,6 @@ setopt hist_reduce_blanks
 ##
 
 # colored ls
-eval `/usr/bin/dircolors`
 alias   ls='ls -F --color=auto' 
 
 alias	ps='ps -ef'
@@ -49,46 +48,14 @@ alias   clipout='xclip -out -selection clipboard'
 # FUNCTIONS
 ###
 
-# add to path without repeating yourself
-pathadd() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
-	PATH="$1${PATH:+":$PATH"}"
-    fi
-}
-
 # Quickly edit executable scripts
 vimbin() {
 $EDITOR `which $1`
 }
 
-###
-# ENVIRONMENT VARIABLES
-###
-#
-if [ -x "`which vim`" ]; then
-        declare -x EDITOR=vim
-else
-        declare -x EDITOR=vi
-fi
+alias vi=$EDITOR
 
-if [ -x "`which nvim`" ]; then
-    declare -x EDITOR=nvim;
-fi
-
-declare -x VISUAL=$EDITOR
-declare -x LESS="-RiMb256cX"
-declare -x PAGER=less
-
-declare -x MAILFOLDER=$HOME/Private/Mail
-
-declare -x DEBFULLNAME="Danny O'Brien"
-declare -x EMAIL=danny@spesh.com
-declare -x DEBEMAIL=$EMAIL
-declare -x SHORTHOST=`hostname -s`
-
-pathadd $HOME/.local/bin
-
- # 10ms for key sequences
+# 10ms for key sequences
 KEYTIMEOUT=1
 
 ###
