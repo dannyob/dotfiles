@@ -231,8 +231,9 @@ bar {
 
 #include /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/etc/sway/config.d/*
 # App selection
-bindsym $mod+d [app_id="kitty"] focus
-bindsym $mod+a [instance="Navigator"] focus
+bindsym $mod+d [class="kitty"] focus
+bindsym $mod+a [app_id="firefox"] focus
+
 bindsym $mod+s [instance="emacs"] focus
 bindsym $mod+f [instance="hexchat"] focus
 
@@ -256,4 +257,8 @@ exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-cap
 exec epicroot
 exec nm-applet --indicator
 
+assign [class="Mattermost"] 4
+assign [class="Hexchat"] 4
+assign [class="Emacs"] 2
+assign [app_id="Netscape"] 3
 
