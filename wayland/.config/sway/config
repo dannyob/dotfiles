@@ -125,6 +125,8 @@ input type:keyboard {
 #
 # Workspaces:
 #
+workspace_auto_back_and_forth yes
+
     # switch to workspace
     bindsym $mod+1 workspace 1
     bindsym $mod+2 workspace 2
@@ -231,11 +233,15 @@ bar {
 
 #include /gnu/store/4sd8slhza0yv9hys2ws56zyc6yqgp0nj-sway-1.1.1/etc/sway/config.d/*
 # App selection
-bindsym $mod+d [class="kitty"] focus
-bindsym $mod+a [app_id="firefox"] focus
+#bindsym $mod+d [class="kitty"] focus
+#bindsym $mod+a [app_id="firefox"] focus
+#bindsym $mod+d [app_id="kitty"] focus
+#bindsym $mod+f [instance="hexchat"] focus
+#bindsym $mod+a [class="Firefox"] focus
+#bindsym $mod+s [instance="emacs"] focus
 
-bindsym $mod+s [instance="emacs"] focus
-bindsym $mod+f [instance="hexchat"] focus
+#bindsym $mod+f [con_mark="chat" workspace=__focused__] focus
+#bindsym $mod+d [con_mark="shell"] focus
 
 # Thinkpad function key alternatives
 bindsym XF86AudioLowerVolume exec pactl set-sink-volume '@DEFAULT_SINK@' '-10%'
@@ -251,14 +257,40 @@ for_window [title="wl-clipboard"] floating enable
 
 xwayland enable
 
+# various UI tweaks
 exec_always xrdb -merge ~/.Xresources
+default_border pixel 1
+hide_edge_borders --i3 smart_no_gaps
 
 exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-caps2esc.dyon
 exec epicroot
 exec nm-applet --indicator
+     
+for_window [app_id="Netscape"] mark browser1
+for_window [class="Firefox"] mark browser 2
+for_window [instance="Navigator"] mark browser3
+for_window [class="Emacs"] mark emacs1
+for_window [instance="hexchat"] mark talk1
+for_window [class="Mattermost"] mark talk2
+for_window [class="kitty"] mark shell1
+for_window [app_id="kitty"] mark shell2
 
 assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
 assign [class="Emacs"] 2
 assign [app_id="Netscape"] 3
+
+# App selection
+#bindsym $mod+d [class="kitty"] focus
+#bindsym $mod+a [app_id="firefox"] focus
+#bindsym $mod+d [app_id="kitty"] focus
+#bindsym $mod+f [instance="hexchat"] focus
+#bindsym $mod+a [class="Firefox"] focus
+#bindsym $mod+s [instance="emacs"] focus
+
+bindsym $mod+a [con_mark="browser"] focus
+bindsym $mod+s [con_mark="emacs"] focus
+#bindsym $mod+f [con_mark="chat" workspace=__focused__] focus
+bindsym $mod+f [con_mark="talk"] focus
+bindsym $mod+d [con_mark="shell"] focus
 
