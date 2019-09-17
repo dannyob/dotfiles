@@ -21,4 +21,5 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-. ~/.guix-profile/etc/profile
+#. ~/.guix-profile/etc/profile
+. "$HOME/.zshenv"

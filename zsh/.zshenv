@@ -16,14 +16,14 @@ else
     declare -x EDITOR=vi
 fi
 
-VISUAL=$EDITOR
-LESS="-RiMb256cX"
-PAGER=less
-MAILFOLDER=$HOME/Private/Mail
-DEBFULLNAME="Danny O'Brien"
-EMAIL=danny@spesh.com
-DEBEMAIL=$EMAIL
-SHORTHOST=`hostname -s`
+declare -x VISUAL=$EDITOR
+declare -x LESS="-RiMb256cX"
+declare -x PAGER=less
+declare -x MAILFOLDER=$HOME/Private/Mail
+declare -x DEBFULLNAME="Danny O'Brien"
+declare -x EMAIL=danny@spesh.com
+declare -x DEBEMAIL=$EMAIL
+declare -x SHORTHOST=`hostname -s`
 
 if [ "$SHORTHOST" = "localhost" ]; then
     SHORTHOST=`hostname -a |  sed 's/ .*$//'`
