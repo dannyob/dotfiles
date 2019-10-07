@@ -527,6 +527,9 @@ dump.")
      (scheme . t)
      ))
 
+  (setq geiser-active-implementations '(guile))
+  (setq geiser-repl-save-debugging-history-p t)
+
   (global-set-key (kbd "C-u") 'universal-argument)
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
