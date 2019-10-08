@@ -527,6 +527,16 @@ dump.")
      (scheme . t)
      ))
 
+  (defun dob-double-click (p)
+    "My general purpose double click"  
+    (interactive "d")
+    (message (get-text-property p 'org-category))
+    (cond ((string= "todo" (get-text-property p 'org-category))
+           (org-todo "DONE"))))
+  (global-set-key [double-mouse-1] 'dob-double-click)
+
+
+
   (global-set-key (kbd "C-u") 'universal-argument)
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
