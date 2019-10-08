@@ -1,4 +1,7 @@
-eval `guix package -p /run/current-system/profile -p ~/.guix-profile --search-paths`
+if [ -d "$HOME/.guix-profile" ] ; then
+    eval `guix package -p /run/current-system/profile -p ~/.guix-profile --search-paths`
+fi
+
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
