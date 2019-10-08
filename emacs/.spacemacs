@@ -500,6 +500,7 @@ dump.")
 
   (global-set-key (kbd "C-c i") 'org-clock-in)
   (global-set-key (kbd "C-c o") 'org-clock-out)
+  (global-set-key (kbd "C-c g") 'org-clock-goto)
 
   (global-set-key (kbd "M-c") 'kill-ring-save)
   (global-set-key (kbd "M-v") 'yank)
