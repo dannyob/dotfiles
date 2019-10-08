@@ -213,6 +213,10 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
+# for resizing stuff at the bottom of the screen
+# during my streaming so it doesn't show.
+bindsym $mod+m resize set height 303px
+bindsym $mod+n border toggle
 #
 # Status Bar:
 #
@@ -267,8 +271,9 @@ exec epicroot
 exec nm-applet --indicator
      
 for_window [app_id="Netscape"] mark browser1
-for_window [class="Firefox"] mark browser 2
+for_window [class="Firefox"] mark browser2
 for_window [instance="Navigator"] mark browser3
+for_window [window_role="browser"] mark browser4
 for_window [class="Emacs"] mark emacs1
 for_window [instance="hexchat"] mark talk1
 for_window [class="Mattermost"] mark talk2
@@ -278,7 +283,13 @@ for_window [app_id="kitty"] mark shell2
 assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
 assign [class="Emacs"] 2
-assign [app_id="Netscape"] 3
+assign [class="Firefox"] 3
+assign [instance="Navigator"] 3
+
+assign [app_id="pavucontrol"] 8
+assign [class="Clementine"] 8
+
+assign [class="obs"] 9
 
 # App selection
 #bindsym $mod+d [class="kitty"] focus
@@ -290,7 +301,6 @@ assign [app_id="Netscape"] 3
 
 bindsym $mod+a [con_mark="browser"] focus
 bindsym $mod+s [con_mark="emacs"] focus
-#bindsym $mod+f [con_mark="chat" workspace=__focused__] focus
 bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+d [con_mark="shell"] focus
-
+bindsym $mod+g [con_mark="teleprompt" workspace=__focused__] focus
