@@ -500,6 +500,7 @@ dump.")
 
   (global-set-key (kbd "C-c i") 'org-clock-in)
   (global-set-key (kbd "C-c o") 'org-clock-out)
+  (global-set-key (kbd "C-c g") 'org-clock-goto)
 
   (global-set-key (kbd "M-c") 'kill-ring-save)
   (global-set-key (kbd "M-v") 'yank)
@@ -526,6 +527,14 @@ dump.")
      (python . t)
      (scheme . t)
      ))
+
+  (defun dob-double-click (p)
+    "My general purpose double click"  
+    (interactive "d")
+    (message (get-text-property p 'org-category))
+    (cond ((string= "todo" (get-text-property p 'org-category))
+           (org-todo "DONE"))))
+  (global-set-key [double-mouse-1] 'dob-double-click)
 
   (setq geiser-active-implementations '(guile))
   (setq geiser-repl-save-debugging-history-p t)
