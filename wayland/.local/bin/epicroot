@@ -1,0 +1,13 @@
+#!/bin/sh
+###
+# epicroot - set window manager background to earth
+###
+# Downloads the latest picture from EPIC on DSCOVR
+# and uses feh or swaymsg to make it the background.
+ 
+wget -O ~/tmp/epic.jpg $(curl -s 'https://epic.gsfc.nasa.gov/api/natural' | jq -r 'sort_by(.date) | "https://epic.gsfc.nasa.gov/archive/natural/\(.[-1].date[0:4])/\(.[-1].date[5:7])/\(.[-1].date[8:10])/jpg/\(.[-1].image).jpg"') &> /dev/null
+if command -v swaymsg >/dev/null 2>&1; then 
+    swaymsg output "*" bg ~/tmp/epic.jpg center "#000000"
+elif command -v feh >/dev/null 2>&1; then 
+    feh --bg-center ~/tmp/epic.jpg
+fi
