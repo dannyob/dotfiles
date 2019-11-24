@@ -21,5 +21,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-#. ~/.guix-profile/etc/profile
+export GUIX_LOCPATH $HOME/.guix-profile/lib/locale
+
+. "$HOME/.guix-profile/etc/profile"
 . "$HOME/.zshenv"

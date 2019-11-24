@@ -801,7 +801,7 @@ dump.")
 
   (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
 
-  (setq deft-extensions '("txt" "tex" "org"))
+  (setq deft-extensions '("org" "md" "markdown" "txt" "wiki"))
   (setq deft-directory "~/Private/wiki/")
   (setq deft-recursive t)
   (global-set-key (kbd "C-c d") 'deft)
@@ -824,9 +824,16 @@ dump.")
     "Create a file for a mentioned person"
     (interactive "r")
     (let* ((person-name (buffer-substring start end))
-           (filename (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name)))))
+           (name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
+           (filename (concat "~/Private/wiki/people" name-file ".org")))
       (org-store-link start)
-      (find-file-other-window (concat "~/Private/wiki/people/" filename ".org"))
+      (let ((link (caar org-stored-links)))
+        (if (string-prefix-p "notmuch:id:" link)
+            (with-temp-buffer
+              (call-process-shell-command (format "notmuch search --output=files id:%s | xargs cat | email2vcard" (substring link 11)) nil t nil)
+              (beginning-of-buffer)
+              (setq filename (string-trim (thing-at-point 'line))))))
+      (find-file-other-window filename)
       (org-insert-last-stored-link 1)))
 
   (require 'org-attach)
