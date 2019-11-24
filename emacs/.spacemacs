@@ -33,7 +33,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(javascript
+   '(python
+     javascript
      yaml
      haskell
      ;; ----------------------------------------------------------------
@@ -68,6 +69,7 @@ This function should only modify configuration layer settings."
      spell-checking
      syntax-checking
      version-control
+     theming
      dobextras
      dobprivate)
 
@@ -80,6 +82,7 @@ This function should only modify configuration layer settings."
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '(
+                                      (org-pretty-table :location (recipe :fetcher github :repo "Fuco1/org-pretty-table"))
                                       guix
                                       beeminder
                                       persistent-scratch)
@@ -207,8 +210,8 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(spacemacs-dark
-                         spacemacs-light)
+   dotspacemacs-themes '(spacemacs-light
+                         spacemacs-dark)
 
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -462,7 +465,293 @@ See the header of this file for more information."
 This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
-If you are unsure, try setting them in `dotspacemacs/user-config' first.")
+If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  ;; Pretty settings from http://blog.lujun9972.win/emacs-document/blog/2018/10/22/ricing-up-org-mode/index.html
+
+  (defmacro set-pair-faces (themes consts faces-alist)
+    "Macro for pair setting of custom faces.
+THEMES name the pair (theme-one theme-two). CONSTS sets the variables like
+  ((sans-font \"Some Sans Font\") ...). FACES-ALIST has the actual faces
+like:
+  ((face1 theme-one-attr theme-two-atrr)
+   (face2 theme-one-attr nil           )
+   (face3 nil            theme-two-attr)
+   ...)"
+    (defmacro get-proper-faces ()
+      `(let* (,@consts)
+         (backquote ,faces-alist)))
+
+    `(setq theming-modifications
+           ',(mapcar (lambda (theme)
+                       `(,theme ,@(cl-remove-if
+                                   (lambda (x) (equal x "NA"))
+                                   (mapcar (lambda (face)
+                                             (let ((face-name (car face))
+                                                   (face-attrs (nth (cl-position theme themes) (cdr face))))
+                                               (if face-attrs
+                                                   `(,face-name ,@face-attrs)
+                                                 "NA"))) (get-proper-faces)))))
+                     themes)))
+
+  (set-pair-faces
+   ;; Themes to cycle in
+   (doom-molokai spacemacs-light)
+
+   ;; Variables
+   ((bg-white           "#fbf8ef")
+    (bg-light           "#222425")
+    (bg-dark            "#1c1e1f")
+    (bg-darker          "#1c1c1c")
+    (fg-white           "#ffffff")
+    (shade-white        "#efeae9")
+    (fg-light           "#655370")
+    (dark-cyan          "#008b8b")
+    (region-dark        "#2d2e2e")
+    (region             "#39393d")
+    (slate              "#8FA1B3")
+    (keyword            "#f92672")
+    (comment            "#525254")
+    (builtin            "#fd971f")
+    (purple             "#9c91e4")
+    (doc                "#727280")
+    (type               "#66d9ef")
+    (string             "#b6e63e")
+    (gray-dark          "#999")
+    (gray               "#bbb")
+    (sans-font          "Iosevka")
+    (serif-font         "Merriweather")
+    (et-font            "EtBembo")
+    (sans-mono-font     "Iosevka")
+    (serif-mono-font    "Iosevka"))
+
+   ;; Settings
+   ((variable-pitch
+     (:family ,sans-font)
+     (:family ,et-font
+              :background nil
+              :foreground ,bg-dark
+              :height 1.0))
+    (header-line
+     (:background nil :inherit nil)
+     (:background nil :inherit nil))
+    (eval-sexp-fu-flash
+     (:background ,dark-cyan
+                  :foreground ,fg-white)
+     nil)
+
+    (org-document-title
+     (:inherit variable-pitch
+               :height 1.3
+               :weight normal
+               :foreground ,gray)
+     (:inherit nil
+               :family ,et-font
+               :height 1.8
+               :foreground ,bg-dark
+               :underline nil))
+    (org-document-info
+     (:foreground ,gray
+                  :slant italic)
+     (:height 1.2
+              :slant italic))
+    (org-level-1
+     (:inherit variable-pitch
+               :height 1.3
+               :weight bold
+               :foreground ,keyword
+               :background ,bg-dark)
+     (:inherit nil
+               :family ,et-font
+               :height 1.6
+               :weight normal
+               :slant normal
+               :foreground ,bg-dark))
+    (org-level-2
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.2
+               :foreground ,gray
+               :background ,bg-dark)
+     (:inherit nil
+               :family ,et-font
+               :weight normal
+               :height 1.3
+               :slant italic
+               :foreground ,bg-dark))
+    (org-level-3
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     (:inherit nil
+               :family ,et-font
+               :weight normal
+               :slant italic
+               :height 1.2
+               :foreground ,bg-dark))
+    (org-level-4
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     (:inherit nil
+               :family ,et-font
+               :weight normal
+               :slant italic
+               :height 1.1
+               :foreground ,bg-dark))
+    (org-level-5
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     nil)
+    (org-level-6
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     nil)
+    (org-level-7
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     nil)
+    (org-level-8
+     (:inherit variable-pitch
+               :weight bold
+               :height 1.1
+               :foreground ,slate
+               :background ,bg-dark)
+     nil)
+    (org-headline-done
+     (:strike-through t)
+     (:family ,et-font
+              :strike-through t))
+    (org-quote
+     (:background ,bg-dark)
+     nil)
+    (org-block
+     (:background ,bg-dark)
+     (:background nil
+                  :family ,sans-mono-font
+                  :foreground ,bg-dark))
+    (org-block-begin-line
+     (:background ,bg-dark)
+     (:background nil
+                  :height 0.8
+                  :family ,sans-mono-font
+                  :foreground ,slate))
+    (org-block-end-line
+     (:background ,bg-dark)
+     (:background nil
+                  :height 0.8
+                  :family ,sans-mono-font
+                  :foreground ,slate))
+    (org-document-info-keyword
+     (:foreground ,comment)
+     (:height 0.8
+              :foreground ,gray))
+    (org-link
+     (:underline nil
+                 :weight normal
+                 :foreground ,slate)
+     (:foreground ,bg-dark))
+    (org-special-keyword
+     (:height 0.9
+              :foreground ,comment)
+     (:family ,sans-mono-font
+              :height 0.8))
+    (org-todo
+     (:foreground ,builtin
+                  :background ,bg-dark)
+     nil)
+    (org-done
+     (:inherit variable-pitch
+               :foreground ,dark-cyan
+               :background ,bg-dark)
+     nil)
+    (org-agenda-current-time
+     (:foreground ,slate)
+     nil)
+    (org-hide
+     nil
+     (:foreground ,bg-white))
+    (org-indent
+     (:inherit org-hide)
+     (:inherit (org-hide fixed-pitch)))
+    (org-time-grid
+     (:foreground ,comment)
+     nil)
+    (org-warning
+     (:foreground ,builtin)
+     nil)
+    (org-date
+     nil
+     (:family ,sans-mono-font
+              :height 0.8))
+    (org-agenda-structure
+     (:height 1.3
+              :foreground ,doc
+              :weight normal
+              :inherit variable-pitch)
+     nil)
+    (org-agenda-date
+     (:foreground ,doc
+                  :inherit variable-pitch)
+     (:inherit variable-pitch
+               :height 1.1))
+    (org-agenda-date-today
+     (:height 1.5
+              :foreground ,keyword
+              :inherit variable-pitch)
+     nil)
+    (org-agenda-date-weekend
+     (:inherit org-agenda-date)
+     nil)
+    (org-scheduled
+     (:foreground ,gray)
+     nil)
+    (org-upcoming-deadline
+     (:foreground ,keyword)
+     nil)
+    (org-scheduled-today
+     (:foreground ,fg-white)
+     nil)
+    (org-scheduled-previously
+     (:foreground ,slate)
+     nil)
+    (org-agenda-done
+     (:inherit nil
+               :strike-through t
+               :foreground ,doc)
+     (:strike-through t
+                      :foreground ,doc))
+    (org-ellipsis
+     (:underline nil
+                 :foreground ,comment)
+     (:underline nil
+                 :foreground ,comment))
+    (org-tag
+     (:foreground ,doc)
+     (:foreground ,doc))
+    (org-table
+     (:background nil)
+     (:family ,serif-mono-font
+              :height 0.9
+              :background ,bg-white))
+    (org-code
+     (:inherit font-lock-builtin-face)
+     (:inherit nil
+               :family ,serif-mono-font
+               :foreground ,comment
+               :height 0.9)))))
 
 
 (defun dotspacemacs/user-load ()
@@ -483,6 +772,32 @@ dump.")
   (setq helm-ff-auto-update-initial-value 't)
 
   (global-fasd-mode 1)
+
+  (setq vc-follow-symlinks 't)
+
+  ;; Some beautification tips from http://blog.lujun9972.win/emacs-document/blog/2018/10/22/ricing-up-org-mode/
+
+  (add-hook 'org-mode-hook (lambda () (progn
+                                        (variable-pitch-mode)
+                                        (visual-line-mode)
+
+                                        (setq line-spacing 1)
+                                        (setq header-line-format " ")
+                                        (setq left-margin-width 2)
+                                        (setq right-margin-width 2)
+                                        (hl-line-mode -1)
+                                        (set-window-buffer nil (current-buffer)))))
+  (setq org-startup-indented t
+        org-bullets-bullet-list '(" ") 
+        org-ellipsis "  " 
+        org-pretty-entities t
+        org-hide-emphasis-markers t
+
+        org-agenda-block-separator ""
+        org-fontify-whole-heading-line t
+        org-fontify-done-headline t
+        org-fontify-quote-and-verse-blocks t)
+  ;;  (add-hook 'text-mode-hook 'variable-pitch-mode)
 
   (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
 
@@ -542,71 +857,41 @@ dump.")
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
 
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(evil-want-Y-yank-to-eol nil)
- '(initial-major-mode (quote lisp-interaction-mode))
- '(mm-text-html-renderer (quote gnus-w3m))
- '(mml-secure-openpgp-encrypt-to-self t)
- '(notmuch-archive-tags (quote ("-inbox" "+archive")))
- '(org-agenda-include-diary t)
- '(org-ellipsis " ▼")
- '(org-modules
-   (quote
-    (org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch)))
- '(package-selected-packages
-   (quote
-    (pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
- '(undo-tree-auto-save-history t)
- '(undo-tree-history-directory-alist (quote ((".*" . "~/.emacs.d/.cache/undo/")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:inherit bold :foreground "#bc6ec5" :underline t :height 1.0))))
- '(org-level-1 ((t (:inherit bold :foreground "#4f97d7" :weight normal :height 1.0))))
- '(org-level-2 ((t (:inherit bold :foreground "#2d9574" :weight normal :height 1.0))))
- '(org-level-3 ((t (:foreground "#67b11d" :weight normal :height 1.0)))))
-
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(evil-want-Y-yank-to-eol nil)
- '(initial-major-mode (quote lisp-interaction-mode))
- '(mm-text-html-renderer (quote gnus-w3m))
- '(mml-secure-openpgp-encrypt-to-self t)
- '(notmuch-archive-tags (quote ("-inbox" "+archive")))
- '(org-agenda-include-diary t)
- '(org-ellipsis " ▼")
- '(org-modules
-   (quote
-    (org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch)))
- '(package-selected-packages
-   (quote
-    (helm-hoogle helm helm-core pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
- '(split-width-threshold 140)
- '(undo-tree-auto-save-history t)
- '(undo-tree-history-directory-alist (quote ((".*" . "~/.emacs.d/.cache/undo/")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(org-document-title ((t (:inherit bold :foreground "#bc6ec5" :underline t :height 1.0))))
- '(org-level-1 ((t (:inherit bold :foreground "#4f97d7" :weight normal :height 1.0))))
- '(org-level-2 ((t (:inherit bold :foreground "#2d9574" :weight normal :height 1.0))))
- '(org-level-3 ((t (:foreground "#67b11d" :weight normal :height 1.0)))))
-)
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(custom-safe-themes
+     (quote
+      ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+   '(evil-want-Y-yank-to-eol nil)
+   '(initial-major-mode (quote lisp-interaction-mode))
+   '(mm-text-html-renderer (quote gnus-w3m))
+   '(mml-secure-openpgp-encrypt-to-self t)
+   '(notmuch-archive-tags (quote ("-inbox" "+archive")))
+   '(org-agenda-include-diary t)
+   '(org-modules
+     (quote
+      (org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch org-pretty-table)))
+   '(package-selected-packages
+     (quote
+      (yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms python live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags cython-mode counsel-gtags counsel swiper ivy company-anaconda blacken anaconda-mode pythonic pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
+   '(split-width-threshold 140)
+   '(undo-tree-auto-save-history t)
+   '(undo-tree-history-directory-alist (quote ((".*" . "~/.emacs.d/.cache/undo/")))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(org-document-title ((t (:inherit bold :foreground "#bc6ec5" :underline t :height 1.0))))
+   '(org-level-1 ((t (:inherit bold :foreground "#4f97d7" :weight normal :height 1.0))))
+   '(org-level-2 ((t (:inherit bold :foreground "#2d9574" :weight normal :height 1.0))))
+   '(org-level-3 ((t (:foreground "#67b11d" :weight normal :height 1.0)))))
+  )
