@@ -518,15 +518,14 @@ dump.")
   (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)))
 
   (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org")))
-  (if (string-equal "yacht" (getenv "SHORTHOST" ))
+  (if (string-equal "yacht" (getenv "SHORTHOST"))
       (setq org-agenda-files '("~/Private/org/yacht.org" "~/Private/org/codetherapy-guix.org")))
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((gnuplot . t)
      (python . t)
-     (scheme . t)
-     ))
+     (scheme . t)))
 
   (defun dob-double-click (p)
     "My general purpose double click"  
