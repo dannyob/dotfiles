@@ -1,7 +1,6 @@
 ##
 # HISTORY
 ###
-#
 declare -x HISTFILE=/home/danny/Private/histfile
 declare -x SAVEHIST=2048
 declare -x HISTSIZE=2048
@@ -10,30 +9,6 @@ setopt INC_APPEND_HISTORY
 ###
 # GUIX
 ###
-
-# export GUIX_PROFILE=$HOME/.guix-profile
-
-#if [[ -d "$GUIX_PROFILE" ]]; then
-#    . $GUIX_PROFILE/etc/profile
-#fi
-
-#export GUIX_LOCPATH="$HOME/.guix-profile/lib/locale"
-
-#export SSL_CERT_DIR="$HOME/.guix-profile/etc/ssl/certs"
-#export SSL_CERT_FILE="$HOME/.guix-profile/etc/ssl/certs/ca-certificates.crt"
-#export GIT_SSL_CAINFO="$SSL_CERT_FILE"
-
-#export INFOPATH="/home/danny/.guix-profile/share/info${INFOPATH:+:}$INFOPATH"
-
-#GUILE_LOAD_PATH="/home/danny/.guix-profile/share/guile/2.2${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
-#export GUILE_LOAD_COMPILED_PATH="/home/danny/.guix-profile/lib/guile/2.2/site-ccache${GUILE_LOAD_COMPILED_PATH:+:}$GUILE_LOAD_COMPILED_PATH"
-
-#export ACLOCAL_PATH="/home/danny/.guix-profile/share/aclocal${ACLOCAL_PATH:+:}$ACLOCAL_PATH"
-#export PKG_CONFIG_PATH="/home/danny/.guix-profile/lib/pkgconfig${PKG_CONFIG_PATH:+:}$PKG_CONFIG_PATH"
-
-# pathadd /home/danny/.config/guix/current/bin
-# pathadd /home/danny/.guix-profile/bin
-
 fpath=(~/.config/guix/current/share/zsh/site-functions/ $fpath)
 
 ###
@@ -51,7 +26,6 @@ fi
 ###
 # LOCAL FUNCTIONS
 ###
-
 aptinstall() {
 	local commit
 	vared -c -p "Why are you installing $1? " commit
@@ -88,7 +62,6 @@ EOF
 ###
 ## zgen
 ###
-
 source "${HOME}/.zgen/zgen.zsh"
 
 if ! zgen saved; then
@@ -102,7 +75,6 @@ fi
 ###
 # FASD
 ###
-
 eval "$(fasd --init auto)"
 bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
 bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
@@ -117,6 +89,3 @@ bindkey -M vicmd 'j' history-substring-search-down
 zmodload zsh/terminfo
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
-
-
-
