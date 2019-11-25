@@ -36,6 +36,9 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec --
 set $laptop eDP-1 
 output $laptop scale 1
 
+bindswitch lid:on output $laptop disable
+bindswitch lid:off output $laptop enable
+
 ### Idle configuration
 #
 # Example configuration:
