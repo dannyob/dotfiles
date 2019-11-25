@@ -7,12 +7,7 @@ fi
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
-
-if [ -d "/run/setuid-programs/" ] ; then
-    PATH="/run/setuid-programs:$PATH"
-fi
-
-
+#
 if [ -x "`which vim`" ]; then
     declare -x EDITOR=vim
 elif [ -x "`which nvim`" ]; then
