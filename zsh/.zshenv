@@ -1,7 +1,7 @@
 if [ -d "$HOME/.guix-profile" ] ; then
     OLDPATH=$PATH
-    eval `guix package -p /run/current-system/profile -p ~/.guix-profile --search-paths`
-    PATH=$PATH:$OLDPATH
+    eval `$HOME/.config/guix/current/bin/guix package -p /run/current-system/profile -p ~/.guix-profile --search-paths`
+    PATH=$HOME/.config/guix/current/bin:$PATH:$OLDPATH
 fi
 
 if [ -d "$HOME/.local/bin" ] ; then
