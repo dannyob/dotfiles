@@ -780,7 +780,6 @@ dump.")
   (add-hook 'org-mode-hook (lambda () (progn
                                         (variable-pitch-mode)
                                         (visual-line-mode)
-
                                         (setq line-spacing 1)
                                         (setq header-line-format " ")
                                         (setq left-margin-width 2)
@@ -839,7 +838,7 @@ dump.")
      (scheme . t)))
 
   (defun dob-double-click (p)
-    "My general purpose double click"  
+    "My general purpose double click"
     (interactive "d")
     (message (get-text-property p 'org-category))
     (cond ((string= "todo" (get-text-property p 'org-category))
@@ -886,8 +885,4 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-   '(org-document-title ((t (:inherit bold :foreground "#bc6ec5" :underline t :height 1.0))))
-   '(org-level-1 ((t (:inherit bold :foreground "#4f97d7" :weight normal :height 1.0))))
-   '(org-level-2 ((t (:inherit bold :foreground "#2d9574" :weight normal :height 1.0))))
-   '(org-level-3 ((t (:foreground "#67b11d" :weight normal :height 1.0)))))
-  )
+  ))
