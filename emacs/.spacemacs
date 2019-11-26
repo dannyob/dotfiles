@@ -828,7 +828,7 @@ dump.")
   (require 'org-attach)
   (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)))
 
-  (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org")))
+  (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org" "~/Private/wiki/journal/")))
   (if (string-equal "yacht" (getenv "SHORTHOST"))
       (setq org-agenda-files '("~/Private/org/yacht.org" "~/Private/org/codetherapy-guix.org")))
 
