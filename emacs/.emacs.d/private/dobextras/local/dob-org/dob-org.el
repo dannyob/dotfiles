@@ -16,4 +16,14 @@
 (setq org-todo-keywords
       '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED")))
 
+(setq org-startup-indented t
+      org-bullets-bullet-list '(" ")
+      org-ellipsis "  "
+      org-pretty-entities t
+      org-hide-emphasis-markers t
+      org-agenda-block-separator ""
+      org-fontify-whole-heading-line t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+
 (provide 'dob-org)

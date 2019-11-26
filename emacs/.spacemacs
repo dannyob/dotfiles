@@ -787,17 +787,6 @@ dump.")
                                         (setq right-margin-width 2)
                                         (hl-line-mode -1)
                                         (set-window-buffer nil (current-buffer)))))
-  (setq org-startup-indented t
-        org-bullets-bullet-list '(" ") 
-        org-ellipsis "  " 
-        org-pretty-entities t
-        org-hide-emphasis-markers t
-
-        org-agenda-block-separator ""
-        org-fontify-whole-heading-line t
-        org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
-  ;;  (add-hook 'text-mode-hook 'variable-pitch-mode)
 
   (add-hook 'purescript-mode-hook 'turn-on-purescript-indentation)
 
