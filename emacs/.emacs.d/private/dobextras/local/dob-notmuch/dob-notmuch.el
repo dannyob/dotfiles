@@ -27,8 +27,9 @@
     (notmuch-search-tag
      (notmuch-tag-change-list dob-notmuch-spam-tags unspam) beg end))
   (when (eq beg end)
-    (notmuch-search-next-thread))
-  (defun dob-notmuch-show-spamify-message (&optional unspam)
+    (notmuch-search-next-thread)))
+
+(defun dob-notmuch-show-spamify-message (&optional unspam)
     "Mark the current message as spam.
 
 Spamify the current message by applying the tag changes in
@@ -38,7 +39,7 @@ message will be \"unarchived\", i.e. the tag changes in
     (interactive "P")
     (when dob-notmuch-spam-tags
       (apply 'notmuch-show-tag-message
-             (notmuch-tag-change-list dob-notmuch-spam-tags unspam)))))
+             (notmuch-tag-change-list dob-notmuch-spam-tags unspam))))
 
 (defun dob-notmuch-show-spamify-message-then-next-or-next-thread ()
   "Mark as spam the current message, then show the next open message in the current thread.
@@ -51,6 +52,7 @@ thread from search."
     (notmuch-show-next-thread t)))
 
 (defmacro dob-with-inbox (s) `(with-current-buffer "*notmuch-saved-search-inbox*" ,s))
+
 (defun dob-limit-to-author ()
   "Limit the inbox to mail written by the authors in
 the current thread. Useful for finding other conversations, and as a substitute
@@ -75,17 +77,6 @@ for sorting by author."
     (concat "+relevance=" (number-to-string relevance)))
    (if (= 0 (or importance urgency relevance))
       (dob-notmuch-spamify))))
-
-;; (defun dob--debug (x)
-;;   (print (plist-get x :body)))
-
-;; (defun dob-notmuch-extract-people ()
-;;   "Use polyglot to extract the names of people from an email, and feed that as choices to dob-make-person"
-;;   (interactive)
-;;   (notmuch-show-with-message-as-text 'dob--debug))
-    
-;;          (call-shell-region (buffer-end 0) (buffer-end 1) "polyglot ner" nil "foo")))))
-
 
 (use-package notmuch
   :bind (("C-c t" . dob-notmuch-today)
