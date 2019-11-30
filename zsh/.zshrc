@@ -91,3 +91,6 @@ zstyle ':completion:*' group-name ''
 zstyle :compinstall filename '$HOME/.zshrc'
 autoload -U compinit
 compinit
+
+# Fix for TRAMP
+[ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
