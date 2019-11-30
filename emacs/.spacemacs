@@ -769,6 +769,9 @@ dump.")
  before packages are loaded."
   (persistent-scratch-setup-default)
 
+  (setq auto-save-interval 20) 
+  (setq auto-save-timeout 10) 
+
   (setq helm-ff-auto-update-initial-value 't)
 
   (global-fasd-mode 1)
