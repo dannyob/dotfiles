@@ -54,4 +54,11 @@
       org-fontify-done-headline t
       org-fontify-quote-and-verse-blocks t)
 
+(defun dob-org-insert-time-now (arg)
+   "Insert a timestamp with today's time and date."
+   (interactive "P")
+   (org-time-stamp '(16)))
+
+(spacemacs/set-leader-keys-for-major-mode 'org-mode "dn" 'dob-org-insert-time-now)
+
 (provide 'dob-org)
