@@ -16,10 +16,6 @@ else
     declare -x EDITOR=vi
 fi
 
-if [ "$SHORTHOST" = "localhost" ]; then
-    SHORTHOST=`hostname -a |  sed 's/ .*$//'`
-fi
-
 declare -x VISUAL=$EDITOR
 declare -x LESS="-RiMb256cX"
 declare -x PAGER=less
@@ -31,6 +27,10 @@ if [ "$SHORTHOST" = "lifeboat" ]; then
     declare -x EMAIL=danny@eff.org
 fi
 declare -x DEBEMAIL=$EMAIL
+
+if [ "$SHORTHOST" = "localhost" ]; then
+    SHORTHOST=`hostname -a |  sed 's/ .*$//'`
+fi
 
 
 declare -x GUIX_LOCPATH=$HOME/.guix-profile/lib/locale
