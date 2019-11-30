@@ -54,8 +54,6 @@ This function should only modify configuration layer settings."
      scheme
      multiple-cursors
      parinfer
-     (org :variables
-          org-enable-org-journal-support t)
      fasd
      notmuch
      pandoc
@@ -63,6 +61,8 @@ This function should only modify configuration layer settings."
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
      org
+     (org :variables
+          org-enable-org-journal-support t)
      purescript
      racket
      spacemacs-org
@@ -811,12 +811,18 @@ dump.")
   (global-set-key (kbd "M-c") 'kill-ring-save)
   (global-set-key (kbd "M-v") 'yank)
 
-  (defun dob-make-person (start end)
+  (setq spaceline-org-clock-p t)
+
+  (defun dob-person-filename (person-name)
+    (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
+           (filename (concat "~/Private/wiki/people/" name-file ".org")))
+      filename))
+
+  (defun dob-person-make (start end)
     "Create a file for a mentioned person"
     (interactive "r")
     (let* ((person-name (buffer-substring start end))
-           (name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
-           (filename (concat "~/Private/wiki/people" name-file ".org")))
+           (filename (dob-person-filename person-name)))
       (org-store-link start)
       (let ((link (caar org-stored-links)))
         (if (string-prefix-p "notmuch:id:" link)
@@ -827,8 +833,18 @@ dump.")
       (find-file-other-window filename)
       (org-insert-last-stored-link 1)))
 
+  (defun dob-wiki-url (name)
+    "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
+    (let* ((prefix (if (equal (getenv "SHORTHOST") "lifeboat") "file:///home/danny/Private/wiki/" "/ssh:danny@l4:/home/danny/Private/wiki/"))
+           (suffix ".org"))
+      (concat prefix (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim name))) suffix)))
+
   (require 'org-attach)
-  (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)))
+  (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
+                                ("people" . "file:///%(dob-person-filename)")
+                                ("wiki" . "%(dob-wiki-url)")))
+
+
 
   (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org" "~/Private/wiki/journal/")))
   (if (string-equal "yacht" (getenv "SHORTHOST"))
@@ -840,6 +856,7 @@ dump.")
      (python . t)
      (scheme . t)))
 
+  (require 'org-git-link)
   (defun dob-double-click (p)
     "My general purpose double click"
     (interactive "d")
@@ -876,7 +893,7 @@ This function is called at the very end of Spacemacs initialization."
    '(org-agenda-include-diary t)
    '(org-modules
      (quote
-      (org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch org-pretty-table)))
+      (org-bbdb org-bibtex org-contrib-plus org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch org-pretty-table)))
    '(package-selected-packages
      (quote
       (yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms python live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags cython-mode counsel-gtags counsel swiper ivy company-anaconda blacken anaconda-mode pythonic pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
@@ -888,4 +905,4 @@ This function is called at the very end of Spacemacs initialization."
    ;; If you edit it by hand, you could mess it up, so be careful.
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
-  ))
+   ))

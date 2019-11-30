@@ -40,7 +40,7 @@
              "* TODO %?\n  %i\n  %a")
             ("n" "Note" entry (file "~/Private/wiki/notes.org")
              "* %? %^g\nEntered on %U\n  %i\n  %a"))))
-  
+
 (setq org-todo-keywords
       '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED")))
 
