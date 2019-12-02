@@ -820,7 +820,7 @@ dump.")
            (filename (concat "~/Private/wiki/people/" name-file ".org")))
       filename))
 
-  (defun dob-person-make (start end)
+  (defun dob-person-make-region (start end)
     "Create a file for a mentioned person"
     (interactive "r")
     (let* ((person-name (buffer-substring start end))
@@ -834,6 +834,10 @@ dump.")
               (setq filename (string-trim (thing-at-point 'line))))))
       (find-file-other-window filename)
       (org-insert-last-stored-link 1)))
+
+  (defun dob-person-make (person-name)
+    (interactive "MPerson:")
+    (find-file-other-window (dob-person-filename person-name)))
 
   (defun dob-wiki-url (name)
     "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
