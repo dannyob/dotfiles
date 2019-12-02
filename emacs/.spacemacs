@@ -638,7 +638,7 @@ like:
               :strike-through t))
     (org-quote
      (:background ,bg-dark)
-     nil)
+     (:family ,et-font))
     (org-block
      (:background ,bg-dark)
      (:background nil
