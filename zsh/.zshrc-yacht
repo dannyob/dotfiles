@@ -22,7 +22,6 @@ if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
     export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 fi
 
-
 ###
 # LOCAL FUNCTIONS
 ###
@@ -57,6 +56,15 @@ EOF
 	else
 		echo "Not logged!"
 	fi
+}
+
+guixupgrade() {
+    ( 
+    cd ~/Public/src/guix/
+    git pull
+    guix pull
+    guix package -u
+)
 }
 
 ###
