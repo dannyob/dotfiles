@@ -41,8 +41,8 @@ alias 	rm='rm -i'
 alias	mv='mv -i'
 alias 	cp='cp -i'
 alias   more=less
-alias   clipin='xclip -in -selection clipboard'
-alias   clipout='xclip -out -selection clipboard'
+alias   clipin='wl-copy'
+alias   clipout='wl-paste'
 
 ###
 # FUNCTIONS
