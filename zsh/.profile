@@ -21,7 +21,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-export GUIX_LOCPATH $HOME/.guix-profile/lib/locale
+export GUIX_LOCPATH=$HOME/.guix-profile/lib/locale
 PATH=$HOME/.guix-profile/current/bin/:$PATH
 
 . "$HOME/.guix-profile/etc/profile"
