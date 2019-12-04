@@ -273,6 +273,7 @@ exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-cap
 exec epicroot
 exec mako
 exec nm-applet --indicator
+exec owncloud
      
 for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
