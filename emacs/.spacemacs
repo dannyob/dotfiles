@@ -889,6 +889,14 @@ dump.")
   (setq geiser-active-implementations '(guile))
   (setq geiser-repl-save-debugging-history-p t)
 
+  ;; Guix helpers
+  ;; From [[info:guix#The%20Perfect%20Setup][info:guix#The Perfect Setup]] 
+  (with-eval-after-load 'geiser-guile
+    (add-to-list 'geiser-guile-load-path "~/Public/src/guix"))
+  (with-eval-after-load 'yasnippet
+    (add-to-list 'yas-snippet-dirs "~/Public/src/guix/etc/snippets"))
+
+
   (global-set-key (kbd "C-u") 'universal-argument)
   (define-key evil-normal-state-map "g\C-g" 'count-words)
   (define-key evil-motion-state-map "C-u" 'universal-argument))
