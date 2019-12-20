@@ -30,13 +30,9 @@
 ;;; Code:
 
 (defconst dobextras-packages
-  '((org-habit-plus :location local)
-    (dob-org :location local)
+  '((dob-org :location local)
     (dob-notmuch :location local)
     (notmuch)))
-
-(defun dobextras/init-org-habit-plus ()
- (use-package org-habit-plus))
 
 (defun dobextras/init-dob-org ()
  (use-package dob-org))
