@@ -59,12 +59,9 @@ This function should only modify configuration layer settings."
      fasd
      notmuch
      pandoc
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     (shell :variables
+            shell-default-position 'right)
      org
-     (org :variables
-          org-enable-org-journal-support t)
      purescript
      racket
      spacemacs-org
@@ -523,6 +520,7 @@ like:
     (sans-font          "Iosevka")
     (serif-font         "Merriweather")
     (et-font            "EtBembo")
+    (twee-font          "Trattatello")
     (sans-mono-font     "Iosevka")
     (serif-mono-font    "Iosevka"))
 
@@ -547,7 +545,7 @@ like:
                :weight normal
                :foreground ,gray)
      (:inherit nil
-               :family ,et-font
+               :family ,twee-font
                :height 1.8
                :foreground ,bg-dark
                :underline nil))
@@ -563,7 +561,7 @@ like:
                :foreground ,keyword
                :background ,bg-dark)
      (:inherit nil
-               :family ,et-font
+               :family ,twee-font
                :height 1.6
                :weight normal
                :slant normal
@@ -877,7 +875,7 @@ dump.")
      (python . t)
      (scheme . t)))
 
-  (require 'org-git-link)
+  (require 'ol-git-link)
   (defun dob-double-click (p)
     "My general purpose double click"
     (interactive "d")
@@ -906,32 +904,83 @@ dump.")
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-  (custom-set-variables
-   ;; custom-set-variables was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   '(custom-safe-themes
-     (quote
-      ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
-   '(evil-want-Y-yank-to-eol nil)
-   '(initial-major-mode (quote lisp-interaction-mode))
-   '(mm-text-html-renderer (quote gnus-w3m))
-   '(mml-secure-openpgp-encrypt-to-self t)
-   '(notmuch-archive-tags (quote ("-inbox" "+archive")))
-   '(org-agenda-include-diary t)
-   '(org-modules
-     (quote
-      (org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-notmuch org-pretty-table)))
-   '(package-selected-packages
-     (quote
-      (yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms python live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags cython-mode counsel-gtags counsel swiper ivy company-anaconda blacken anaconda-mode pythonic pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
-   '(split-width-threshold 140)
-   '(undo-tree-auto-save-history t)
-   '(undo-tree-history-directory-alist (quote ((".*" . "~/.emacs.d/.cache/undo/")))))
-  (custom-set-faces
-   ;; custom-set-faces was added by Custom.
-   ;; If you edit it by hand, you could mess it up, so be careful.
-   ;; Your init file should contain only one such instance.
-   ;; If there is more than one, they won't work right.
-   ))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("fa2b58bb98b62c3b8cf3b6f02f058ef7827a8e497125de0254f56e373abee088" default)))
+ '(evil-want-Y-yank-to-eol nil)
+ '(initial-major-mode (quote lisp-interaction-mode))
+ '(mm-text-html-renderer (quote gnus-w3m))
+ '(mml-secure-openpgp-encrypt-to-self t)
+ '(notmuch-archive-tags (quote ("-inbox" "+archive")))
+ '(org-agenda-include-diary t)
+ '(org-capture-templates
+   (quote
+    (("c" "Commonplace" entry
+      (file+headline "~/Private/org/daylog.org" "Commonplace")
+      "* %T - %?" :unnarrowed t)
+     ("d" "Distraction" entry
+      (file+headline "~/Private/org/daylog.org" "Distractions")
+      "* %T %?" :unnarrowed t)
+     ("l" "Day[l]og" entry
+      (file+headline "~/Private/org/daylog.org" "This Week")
+      "* %T %?" :unnarrowed t)
+     ("t" "Todo" entry
+      (file+headline "~/Private/org/todo.org" "Inbox")
+      "* TODO %?
+  %i
+  %a" :unnarrowed t)
+     ("n" "Note" entry
+      (file "~/Private/wiki/notes.org")
+      "* %? %^g
+Entered on %U
+  %i
+  %a")
+     ("j" "Journal entry" entry
+      (function org-journal-find-location)
+      "* %(format-time-string org-journal-time-format)%^{Title}
+%i%?"))))
+ '(org-modules
+   (quote
+    (ol-bibtex org-habit ol-info org-mouse org-protocol org-panel org-checklist org-eval ol-git-link ol-man org-notify ol-notmuch org-bbdb org-bibtex org-docview org-eww org-gnus org-info org-irc org-mhe org-rmail org-w3m org-checklist org-protocol org-pretty-table)))
+ '(package-selected-packages
+   (quote
+    (xterm-color vterm shell-pop multi-term eshell-z eshell-prompt-extras esh-help yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms python live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags cython-mode counsel-gtags counsel swiper ivy company-anaconda blacken anaconda-mode pythonic pandoc-mode ox-pandoc yasnippet-snippets ws-butler writeroom-mode winum which-key web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package unfill treemacs-projectile treemacs-evil toc-org tagedit symon string-inflection spaceline-all-the-icons smeargle slim-mode scss-mode sass-mode restart-emacs rainbow-delimiters pug-mode prettier-js popwin persp-mode persistent-scratch pcre2el password-generator paradox overseer orgit org-projectile org-present org-checklist org-pomodoro org-mime org-journal org-download org-bullets org-brain open-junk-file nameless mwim move-text mmm-mode markdown-toc magit-svn magit-gitflow macrostep lorem-ipsum link-hint indent-guide impatient-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation helm-xref helm-themes helm-swoop helm-purpose helm-projectile helm-org-rifle helm-notmuch helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md fuzzy font-lock+ flyspell-correct-helm flycheck-pos-tip flycheck-package flx-ido fill-column-indicator fasd fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu emmet-mode elisp-slime-nav editorconfig dumb-jump dotenv-mode doom-modeline diminish diff-hl define-word counsel-projectile company-web company-statistics column-enforce-mode clean-aindent-mode centered-cursor-mode browse-at-remote beeminder guix auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile aggressive-indent ace-link ace-jump-helm-line ac-ispell)))
+ '(split-width-threshold 140)
+ '(undo-tree-auto-save-history t)
+ '(undo-tree-history-directory-alist (quote ((".*" . "~/.emacs.d/.cache/undo/")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(header-line ((t (:background nil :inherit nil))))
+ '(org-agenda-date ((t (:inherit variable-pitch :height 1.1))))
+ '(org-agenda-done ((t (:strike-through t :foreground "#727280"))))
+ '(org-block ((t (:background nil :family "Iosevka" :foreground "#1c1e1f"))))
+ '(org-block-begin-line ((t (:background nil :height 0.8 :family "Iosevka" :foreground "#8FA1B3"))))
+ '(org-block-end-line ((t (:background nil :height 0.8 :family "Iosevka" :foreground "#8FA1B3"))))
+ '(org-code ((t (:inherit nil :family "Iosevka" :foreground "#525254" :height 0.9))))
+ '(org-date ((t (:family "Iosevka" :height 0.8))))
+ '(org-document-info ((t (:height 1.2 :slant italic))))
+ '(org-document-info-keyword ((t (:height 0.8 :foreground "#bbb"))))
+ '(org-document-title ((t (:inherit nil :family "Trattatello" :height 1.8 :foreground "#1c1e1f" :underline nil))))
+ '(org-ellipsis ((t (:underline nil :foreground "#525254"))))
+ '(org-headline-done ((t (:family "EtBembo" :strike-through t))))
+ '(org-hide ((t (:foreground "#fbf8ef"))))
+ '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+ '(org-level-1 ((t (:inherit nil :family "Trattatello" :height 1.6 :weight normal :slant normal :foreground "#1c1e1f"))))
+ '(org-level-2 ((t (:inherit nil :family "EtBembo" :weight normal :height 1.3 :slant italic :foreground "#1c1e1f"))))
+ '(org-level-3 ((t (:inherit nil :family "EtBembo" :weight normal :slant italic :height 1.2 :foreground "#1c1e1f"))))
+ '(org-level-4 ((t (:inherit nil :family "EtBembo" :weight normal :slant italic :height 1.1 :foreground "#1c1e1f"))))
+ '(org-link ((t (:foreground "#1c1e1f"))))
+ '(org-quote ((t (:family "EtBembo"))))
+ '(org-special-keyword ((t (:family "Iosevka" :height 0.8))))
+ '(org-table ((t (:family "Iosevka" :height 0.9 :background "#fbf8ef"))))
+ '(org-tag ((t (:foreground "#727280"))))
+ '(variable-pitch ((t (:family "EtBembo" :background nil :foreground "#1c1e1f" :height 1.0)))))
+)
