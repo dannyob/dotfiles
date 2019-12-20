@@ -309,3 +309,4 @@ bindsym $mod+s [con_mark="emacs"] focus
 bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+d [con_mark="shell"] focus
 bindsym $mod+g [con_mark="teleprompt" workspace=__focused__] focus
+bindsym $mod+slash exec makoctl dismiss -a
