@@ -866,7 +866,7 @@ dump.")
                                 ("people" . "file:///%(dob-person-filename)")
                                 ("wiki" . "%(dob-wiki-url)")))
 
-  (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org" "~/Private/wiki/journal/")))
+  (setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org")))
   (if (string-equal "yacht" (getenv "SHORTHOST"))
       (setq org-agenda-files '("~/Private/org/yacht.org" "~/Private/org/codetherapy-guix.org")))
 
