@@ -270,15 +270,19 @@ default_border pixel 1
 hide_edge_borders --i3 smart_no_gaps
 
 exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-caps2esc.dyon
+exec gnome-keyring
+exec sudo ~/.local/bin/powertop-twiddle
 exec epicroot
 exec mako
 exec nm-applet --indicator
 exec owncloud
+exec kitty ecryptfs-mount-private
      
 for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
 for_window [instance="Navigator"] mark browser3
 for_window [window_role="browser"] mark browser4
+for_window [instance="Brave"] mark browser5
 for_window [class="Emacs"] mark emacs1
 for_window [instance="hexchat"] mark talk1
 for_window [class="Mattermost"] mark talk2
@@ -289,6 +293,7 @@ assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
 assign [class="Emacs"] 2
 assign [class="Firefox"] 3
+assign [class="Brave"] 3
 assign [instance="Navigator"] 3
 
 assign [app_id="pavucontrol"] 8
