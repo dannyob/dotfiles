@@ -21,8 +21,6 @@ setopt hist_verify
 setopt share_history
 # Compact listings of shell history
 setopt list_packed
-# Correct all arguments
-setopt correct_all
 # Ignore repeated commands
 setopt hist_ignore_dups
 # Remove superfluous blank lines
@@ -43,6 +41,7 @@ alias 	cp='cp -i'
 alias   more=less
 alias   clipin='wl-copy'
 alias   clipout='wl-paste'
+alias   mailq='msmtp-queue'
 
 ###
 # FUNCTIONS
