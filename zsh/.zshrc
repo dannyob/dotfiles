@@ -52,7 +52,7 @@ vimbin() {
 $EDITOR `which $1`
 }
 
-alias vi=$EDITOR
+alias vi=${EDITOR:-nvim}
 
 # 10ms for key sequences
 KEYTIMEOUT=1
@@ -93,3 +93,4 @@ compinit
 
 # Fix for TRAMP
 [ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
+
