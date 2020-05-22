@@ -303,6 +303,9 @@ for sorting by author."
 
 ;; Org-mode
 ;;
+(require 'ol-info)
+(require 'ol-eww)
+
 (setq org-journal-dir "~/Private/wiki/journal/")
 (setq org-journal-file-type 'weekly)
 (setq org-journal-file-format "%Y-%m-%d.org")
