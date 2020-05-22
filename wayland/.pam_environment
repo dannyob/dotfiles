@@ -1,0 +1,2 @@
+PATH DEFAULT=${PATH}:/home/@{PAM_USER}/.local/bin
+
