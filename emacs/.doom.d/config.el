@@ -52,12 +52,26 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(setq emacsql-sqlite-executable  "~/.guix-profile/bin/emacsql-sqlite")
-(after! persistent-scratch
-  (persistent-scratch-setup-default))
+(let ((tempdir (concat (getenv "HOME") "/tmp/")))
+  (if (file-directory-p tempdir)
+      (setq temporary-file-directory tempdir)))
+
+(setq backup-directory-alist
+          `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+          `((".*" ,temporary-file-directory t)))
 
 (setq auto-save-interval 20)
 (setq auto-save-timeout 10)
+
+(if (file-executable-p "~/.guix-profile/bin/emacsql-sqlite")
+    (setq emacsql-sqlite-executable  "~/.guix-profile/bin/emacsql-sqlite")
+    (message "Emacsql-Sqlite not where I was expecting it."))
+
+(after! persistent-scratch
+  (persistent-scratch-setup-default))
+
+
 
 ;; (defvar --backup-directory (concat users-emacs-directory "backups"))
 ;;(if (not (file-exists-p --backup-directory))
@@ -223,12 +237,12 @@
 
 (defun dob-notmuch-spamify
     (&optional unspam beg end)
-  "Mark as spam the currently selected thread or region.
+  "Mark as spam the currently selected thread or region.)
 
      Archive each message in the currently selected thread by applying
-     the tag changes in `dob-notmuch-spam-tags' to each (remove the
+     the tag changes in `dob-notmuch-spam-tags' to each (remove the)
          \"inbox\" tag by default). If a prefix argument is given, the
-     messages will be \"unspammed\" (i.e. the tag changes in
+     messages will be \"unspammed\" (i.e. the tag changes in)
      `dob-notmuch-spam-tags' will be reversed).
 
      This function advances the next thread when finished."
@@ -306,6 +320,7 @@ for sorting by author."
 (require 'ol-info)
 (require 'ol-eww)
 
+(setq org-log-done 'time)
 (setq org-journal-dir "~/Private/wiki/journal/")
 (setq org-journal-file-type 'weekly)
 (setq org-journal-file-format "%Y-%m-%d.org")
