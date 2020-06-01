@@ -1,1 +1,1 @@
-PATH DEFAULT=${PATH}:/bin:/home/@{PAM_USER}/.local/bin
+PATH DEFAULT=${PATH}:/run/current-system/profile/bin:/home/@{PAM_USER}/.local/bin
