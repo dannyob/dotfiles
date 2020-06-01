@@ -1,10 +1,10 @@
-##
-# HISTORY
 ###
-declare -x HISTFILE=/home/danny/Private/histfile
-declare -x SAVEHIST=2048
-declare -x HISTSIZE=2048
-setopt INC_APPEND_HISTORY
+# Me!
+###
+
+declare -x DEBEMAIL=danny@spesh.com
+declare -x DEBFULLNAME="Danny O'Brien"
+declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
 
 ###
 # GUIX
