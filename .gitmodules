@@ -1,3 +1,6 @@
 [submodule "emacs/.emacs.d"]
 	path = emacs/.emacs.d
 	url = https://github.com/hlissner/doom-emacs
+[submodule "zsh/.zgen"]
+	path = zsh/.zgen
+	url = https://github.com/tarjoilija/zgen.git
