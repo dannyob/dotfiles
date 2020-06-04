@@ -28,6 +28,8 @@
       "jq"
       "lsof"
       "magic-wormhole"
+      "mailutils"
+      "msmtp"
       "nmap"
       "neovim"
       "nss"
