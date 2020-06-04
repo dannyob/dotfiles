@@ -52,7 +52,9 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(setq emacsql-sqlite-executable  "~/.guix-profile/bin/emacsql-sqlite")
+(if (file-exists-p "~/.guix-profile/bin/emacsql-sqlite")
+  (setq emacsql-sqlite-executable  "~/.guix-profile/bin/emacsql-sqlite"))
+
 (after! persistent-scratch
   (persistent-scratch-setup-default))
 
