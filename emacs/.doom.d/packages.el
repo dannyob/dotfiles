@@ -6,6 +6,7 @@
 ;; Alternatively, use M-x doom/reload.
 
 (package! kaolin-themes)
+(package! notmuch)
 ;; (package! guix)
 (package! beeminder)
 (package! org-roam)

@@ -209,109 +209,112 @@
   message-sendmail-envelope-from 'header
   message-sendmail-extra-arguments '("--read-envelope-from")
   message-sendmail-f-is-evil t
-  mm-text-html-renderer (quote gnus-w3m)
   mml-secure-openpgp-encrypt-to-self t
   send-mail-function (quote sendmail-send-it)
   message-send-mail-function 'message-send-mail-with-sendmail
   sendmail-program "msmtpq"
-  user-mail-address "danny@spesh.com")
+  user-mail-address "danny@codetherapy.space")
 
 (setenv "EMAIL_QUEUE_QUIET" "t")
 
 
 ;; Notmuch setup
 ;;
-(defvar dob-notmuch-spam-tags '("-inbox" "+spam" "+missedspam"))
-
+;;
 (defun dob-notmuch-today ()
-  "Show just today's inbox"
-  (interactive)
-  (notmuch-search "tag:inbox AND ( date:today OR date:yesterday )"))
+    "Show just today's inbox"
+    (interactive)
+    (notmuch-search "tag:inbox AND ( date:today OR date:yesterday )"))
 
 (defun dob-notmuch-now ()
   "Show inbox now"
   (interactive)
-  (notmuch-search "tag:inbox"))
+  (notmuch-tree "tag:inbox"))
 
-(defun dob-notmuch-spamify
-    (&optional unspam beg end)
-  "Mark as spam the currently selected thread or region.)
+(map!
+ (:prefix "C-c"
+  :desc "Show today's email" "t" 'dob-notmuch-today
+  :desc "Show email now" "n" 'dob-notmuch-now))
 
-     Archive each message in the currently selected thread by applying
-     the tag changes in `dob-notmuch-spam-tags' to each (remove the)
-         \"inbox\" tag by default). If a prefix argument is given, the
-     messages will be \"unspammed\" (i.e. the tag changes in)
-     `dob-notmuch-spam-tags' will be reversed).
+(after! notmuch
+  (defvar dob-notmuch-spam-tags '("-inbox" "+spam" "+missedspam"))
+  (setq notmuch-archive-tags '("-inbox" "+archived"))
 
-     This function advances the next thread when finished."
-  (interactive (cons current-prefix-arg (notmuch-interactive-region)))
-  (when dob-notmuch-spam-tags
-    (notmuch-search-tag
-     (notmuch-tag-change-list dob-notmuch-spam-tags unspam) beg end))
-  (when (eq beg end)
-    (notmuch-search-next-thread)))
+  (defun dob-notmuch-spamify
+      (&optional unspam beg end)
+    "Mark as spam the currently selected thread or region.
+      Archive each message in the currently selected thread by applying
+      the tag changes in `dob-notmuch-spam-tags' to each (remove the)
+          \"inbox\" tag by default). If a prefix argument is given, the
+      messages will be \"unspammed\" (i.e. the tag changes in)
+      `dob-notmuch-spam-tags' will be reversed).
 
-(defun dob-notmuch-show-spamify-message (&optional unspam)
-    "Mark the current message as spam.
-
-Spamify the current message by applying the tag changes in
-`dob-spam-tags' to it. If a prefix argument is given, the
-message will be \"unarchived\", i.e. the tag changes in
-`dob-spam-tags' will be reversed."
-    (interactive "P")
+      This function advances the next thread when finished."
+    (interactive (cons current-prefix-arg (notmuch-interactive-region)))
     (when dob-notmuch-spam-tags
-      (apply 'notmuch-show-tag-message
-             (notmuch-tag-change-list dob-notmuch-spam-tags unspam))))
+      (notmuch-search-tag)
+      (notmuch-tag-change-list dob-notmuch-spam-tags unspam) beg end)
+    (when (eq beg end)
+      (notmuch-search-next-thread)))
 
-(defun dob-notmuch-show-spamify-message-then-next-or-next-thread ()
-  "Mark as spam the current message, then show the next open message in the current thread.
+  (defun dob-notmuch-show-spamify-message (&optional unspam)
+      "Mark the current message as spam.
 
-If at the last open message in the current thread, then show next
-thread from search."
-  (interactive)
-  (dob-notmuch-show-spamify-message)
-  (unless (notmuch-show-next-open-message)
-    (notmuch-show-next-thread t)))
+  Spamify the current message by applying the tag changes in
+  `dob-spam-tags' to it. If a prefix argument is given, the
+  message will be \"unarchived\", i.e. the tag changes in
+  `dob-spam-tags' will be reversed."
+      (interactive "P")
+      (when dob-notmuch-spam-tags
+        (apply 'notmuch-show-tag-message
+              (notmuch-tag-change-list dob-notmuch-spam-tags unspam))))
 
-(defmacro dob-with-inbox (s) `(with-current-buffer "*notmuch-saved-search-inbox*" ,s))
+  (defun dob-notmuch-show-spamify-message-then-next-or-next-thread ()
+    "Mark as spam the current message, then show the next open message in the current thread.
 
-(defun dob-limit-to-author ()
-  "Limit the inbox to mail written by the authors in
-the current thread. Useful for finding other conversations, and as a substitute
-for sorting by author."
-  (interactive)
-  (notmuch-search-filter (format "from:\"%s\"" (notmuch-search-find-authors))))
+  If at the last open message in the current thread, then show next
+  thread from search."
+    (interactive)
+    (dob-notmuch-show-spamify-message)
+    (unless (notmuch-show-next-open-message)
+      (notmuch-show-next-thread t)))
 
-(defun dob-notmuch-ml-tag (iur)
-  "Tag for future machine-learning. Takes three numerical attributes between 0-5:
-   * Importance -- how bad would it be if I didn't see this
-   * Urgency    -- how quickly should I be shown this?
-   * Relevance  -- how connected is this to my actual work?
-"
-  (interactive "sImportance/Urgency/Relevance:")
-  (if (string-equal iur "spam") (setq iur "000"))
-  (let ((importance (string-to-number (substring iur 0 1)))
-        (urgency (string-to-number (substring iur 1 2)))
-        (relevance (string-to-number (substring iur 2 3))))
-   (notmuch-show-tag-message
-    (concat "+importance=" (number-to-string importance))
-    (concat "+urgency=" (number-to-string urgency))
-    (concat "+relevance=" (number-to-string relevance)))
-   (if (= 0 (or importance urgency relevance))
-      (dob-notmuch-spamify))))
+  (defmacro dob-with-inbox (s) `(with-current-buffer "*notmuch-tree-tag:inbox*" ,s))
 
-(use-package notmuch
-  :bind (("C-c t" . dob-notmuch-today)
-         ("C-c n" . dob-notmuch-now)
-         :map notmuch-search-mode-map
-         ("C-c g" . notmuch-poll-refresh-this-buffer)
-         ("S"     . dob-notmuch-spamify)
-         ("F"     . dob-limit-to-author)
-         :map notmuch-show-mode-map
-         ("T"     . dob-notmuch-ml-tag)
-         ("S"     . dob-notmuch-show-spamify-message-then-next-or-next-thread)))
+  (defun dob-limit-to-author ()
+    "Limit the inbox to mail written by the authors in
+  the current thread. Useful for finding other conversations, and as a substitute
+  for sorting by author."
+    (interactive)
+    (notmuch-search-filter (format "from:\"%s\"" (notmuch-search-find-authors))))
 
-(evil-define-key 'normal notmuch-message-mode-map (kbd "ZZ") 'notmuch-draft-save)
+  (defun dob-notmuch-ml-tag (iur)
+    "Tag for future machine-learning. Takes three numerical attributes between 0-5:
+    * Importance -- how bad would it be if I didn't see this
+    * Urgency    -- how quickly should I be shown this?
+    * Relevance  -- how connected is this to my actual work?
+  "
+    (interactive "sImportance/Urgency/Relevance:")
+    (if (string-equal iur "spam") (setq iur "000"))
+    (let ((importance (string-to-number (substring iur 0 1)))
+          (urgency (string-to-number (substring iur 1 2)))
+          (relevance (string-to-number (substring iur 2 3)))))
+    (notmuch-show-tag-message
+      (concat "+importance=" (number-to-string importance))
+      (concat "+urgency=" (number-to-string urgency))
+      (concat "+relevance=" (number-to-string relevance)))
+    (if (= 0 (or importance urgency relevance))
+        (dob-notmuch-spamify)))
+
+  (map!
+    (:map (notmuch-search-mode-map notmuch-tree-mode-map)
+      :desc "Limit to same author" "C-c f" #'dob-limit-to-author
+      :desc "Poll and refresh this buffer" "C-c g" #'notmuch-poll-and-refresh-this-buffer
+      :desc "Mark as spam" "C-c s" #'dob-notmuch-spamify)
+    (:map notmuch-show-mode-map
+      :desc "Spamify, then show next" "C-c s" #'dob-notmuch-show-spamify-message-then-next-or-next-thread)
+    (:map notmuch-message-mode-map
+      :desc "Save draft" "ZZ" #'notmuch-draft-save)))
 
 ;; Org-mode
 ;;
