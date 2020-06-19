@@ -318,13 +318,15 @@
 
 ;; Org-mode
 ;;
-(require 'ol-info)
-(require 'ol-eww)
 
 (after! org
 ;;  (setq org-journal-dir "~/Private/wiki/journal/")
 ;;  (setq org-journal-file-type 'weekly)
 ;;  (setq org-journal-file-format "%Y-%m-%d.org")
+  (require 'ol-info)
+  (require 'ol-eww)
+  (require 'org-ql)
+
   (defun org-journal-date-format-func (time)
     "Custom function to insert journal date header.
 
@@ -378,8 +380,22 @@
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
+  (defun dob-add-journal-todo ()
+      "Add a new todo at the end of the journal subtree"
+      (interactive)
+      (let ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer)))))
+        (switch-to-buffer (cdar journal-loc))
+        (goto-char (caar journal-loc))
+        (org-insert-todo-subheading nil)
+        (dob-org-insert-time-now nil)
+        (org-todo "")
+        (insert " ")))
+
   (setq org-log-done 'time)
   (defun dob-org-insert-time-now (arg)
     "Insert a timestamp with today's time and date."
     (interactive "P")
-    (org-time-stamp '(16))))
+    (org-time-stamp '(16)))
+  (map!
+    (:prefix "C-c"
+      :desc "Add a new journal entry" "x" 'dob-add-journal-todo)))
