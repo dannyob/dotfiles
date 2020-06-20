@@ -206,9 +206,11 @@
   (add-to-list 'yas-snippet-dirs "~/Public/src/guix/etc/snippets"))
 
 
-(global-set-key (kbd "C-u") 'universal-argument)
+;; (global-set-key (kbd "C-u") 'universal-argument)
 (define-key evil-normal-state-map "g\C-g" 'count-words)
-(define-key evil-motion-state-map "C-u" 'universal-argument)
+;; (define-key evil-normal-state-map "C-u" 'universal-argument)
+(define-key evil-normal-state-map "H" 'previous-buffer)
+(define-key evil-normal-state-map "L" 'next-buffer)
 
 ;; Mail Stuff
 (setq
