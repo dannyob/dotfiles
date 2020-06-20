@@ -16,6 +16,10 @@
             comp-deferred-compilation-black-list
             '("autoloads.el")))
 
+;; I like tabs
+(when (fboundp 'tab-bar-mode)
+  (tab-bar-mode))
+
 
 ;; are the three important ones:
 ;;
