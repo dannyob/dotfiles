@@ -1,8 +1,16 @@
+# last chance
+declare -x SHORTHOST=${SHORTHOST:=$(hostname)}
+
 # I like vim-syle bindings
 bindkey -A viins main
 
 # My prompt, which if pasted, is null action under zsh so you can copy and paste
 declare -x PS1=': %m %1(j.[%j].) %~%#; '
+
+if [[ -n $GUIX_ENVIRONMENT ]]
+then
+declare -x PS1=': [] %m %1(j.[%j].) %~%#; '
+fi
 
 # More generous umask -- people in my user group can also write my files
 umask 002
