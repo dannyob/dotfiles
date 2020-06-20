@@ -6,13 +6,10 @@
 ;; Alternatively, use M-x doom/reload.
 
 (package! kaolin-themes)
-(package! notmuch)
-;; (package! guix)
 (package! beeminder)
-(package! org-roam)
-(package! persistent-scratch)
 (package! org-plus-contrib)
-(package! ag)
+(package! org-ql)
+(package! mu4e)
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...
