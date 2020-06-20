@@ -401,15 +401,41 @@
         org-fontify-quote-and-verse-blocks t)
 
   (defun dob-add-journal-todo ()
-      "Add a new todo at the end of the journal subtree"
-      (interactive)
-      (let ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer)))))
-        (switch-to-buffer (cdar journal-loc))
-        (goto-char (caar journal-loc))
-        (org-insert-todo-subheading nil)
-        (dob-org-insert-time-now nil)
-        (org-todo "")
-        (insert " ")))
+    "Add a new todo at the end of the journal subtree"
+    (interactive)
+    (let ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer)))))
+      (switch-to-buffer (cdar journal-loc))
+      (goto-char (caar journal-loc))
+      (org-insert-todo-subheading nil)
+      (dob-org-insert-time-now nil)
+      (org-todo "")
+      (insert " ")))
+
+  (defun dob-daylog () (interactive)
+    (setq org-attach-id-dir "~/Private/wiki/data/")
+    (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
+                                  ("people" . "file:///%(dob-person-filename)")
+                                  ("wiki" . "%(dob-wiki-url)")))
+    (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
+
+  (defun dob-yacht () (interactive)
+    (setq org-agenda-files '("~/Private/org/codetherapy")))
+
+  (if (string-equal "yacht" (getenv "SHORTHOST"))
+      (dob-yacht)
+    (dob-daylog))
+
+  ;; OMG Org Publishing AGAIN??
+  (setq org-export-with-broken-links 'mark)
+  (setq org-publish-project-alist
+        '(("codetherapy-dev-blog"
+           :base-directory "/home/danny/Private/org/codetherapy/"
+           :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
+           :publishing-function org-html-publish-to-html)))
+
+  (setq orgit-export-alist
+        (append orgit-export-alist
+                '(("git.savannah.gnu.org/git[:/]\\(.+\\)$" "https://git.savannah.gnu.org/cgit/%n" "https://git.savannah.gnu.org/cgit/%n/log/?h=%r" "https://git.savannah.gnu.org/cgit/%n/commit/?id=%r"))))
 
   (setq org-log-done 'time)
   (defun dob-org-insert-time-now (arg)
