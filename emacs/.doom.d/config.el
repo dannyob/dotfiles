@@ -114,9 +114,18 @@
 (global-set-key (kbd "C-c i") 'org-clock-in)
 (global-set-key (kbd "C-c o") 'org-clock-out)
 (global-set-key (kbd "C-c g") 'org-clock-goto)
-
+(global-set-key (kbd "C-x C-b") 'ivy-switch-buffer) ;; I hate typing C-x C-b when I meant C-x b
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
+
+
+(defun dob-switch-to-messages () (interactive) (switch-to-buffer (messages-buffer)))
+
+(map!
+ (:leader
+  :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
+  :desc "Open Messages Buffer" "b m" 'dob-switch-to-messages))
+
 
 ;; (setq spaceline-org-clock-p t)          ;
 
