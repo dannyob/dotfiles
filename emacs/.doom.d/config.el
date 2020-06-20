@@ -4,12 +4,18 @@
 ;; sync' after modifying this file!
 
 
+;; If we have native compilation, let's get compiling!
+(when (fboundp 'native-compile-async)
+      (setq comp-async-jobs-number 2 ;; not using all cores
+            comp-deferred-compilation t
+            comp-deferred-compilation-black-list
+            '("autoloads.el")))
+
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh..com")
 
-;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
 ;;
 ;; + `doom-font'
