@@ -81,36 +81,6 @@
 (setq auto-save-interval 20)
 (setq auto-save-timeout 10)
 
-
-;; (defvar --backup-directory (concat users-emacs-directory "backups"))
-;;(if (not (file-exists-p --backup-directory))
-;;      (make-directory --backup-directory t))
-;;(setq backup-directory-alist `(("." . ,--backup-directory)))
-;; (setq make-backup-files t               ; backup of a file the first time it is saved.
-;;       backup-by-copying t               ; don't clobber symlinks
-;;       version-control t                 ; version numbers for backup files
-;;       delete-old-versions t             ; delete excess backup files silently
-;;       delete-by-moving-to-trash t
-;;       kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
-;;       kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
-;;       auto-save-default t               ; auto-save every buffer that visits a file
-;;       auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
-;;       auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
-;;       vc-make-backup-files t            ; Make backups of version controlled files
-
-;; (use-package org-roam
-;;   :hook
-;;   (after-init . org-roam-mode)
-;;   :custom
-;;   (org-roam-directory "/home/danny/Private/wiki/")
-;;   :bind (:map org-roam-mode-map
-;;          (("C-c d l" . org-roam)
-;;           ("C-c d f" . org-roam-find-file)
-;;           ("C-c d b" . org-roam-switch-to-buffer)
-;;           ("C-c d g" . org-roam-graph-show))
-;;          :map org-mode-map
-;;          (("C-c d i" . org-roam-insert))))
-
 ;; Guix hack -- Guix's emacs startup stuffs XDG_DATA_DIR with values pointing to various stuff, but
 ;; does not include XDG_DATA_DIR's defaults, which are /usr/local/share/:/usr/share/
 
@@ -342,9 +312,6 @@
 ;;
 
 (after! org
-;;  (setq org-journal-dir "~/Private/wiki/journal/")
-;;  (setq org-journal-file-type 'weekly)
-;;  (setq org-journal-file-format "%Y-%m-%d.org")
   (require 'ol-info)
   (require 'ol-eww)
   (require 'org-ql)
