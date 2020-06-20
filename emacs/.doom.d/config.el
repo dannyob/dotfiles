@@ -99,16 +99,14 @@
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
 
-
-(defun dob-switch-to-messages () (interactive) (switch-to-buffer (messages-buffer)))
+(define-key evil-normal-state-map "g\C-g" 'count-words)
+(define-key evil-normal-state-map "H" 'previous-buffer)
+(define-key evil-normal-state-map "L" 'next-buffer)
 
 (map!
  (:leader
   :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
-  :desc "Open Messages Buffer" "b m" 'dob-switch-to-messages))
-
-
-;; (setq spaceline-org-clock-p t)          ;
+  :desc "Open Messages Buffer" "b m" (lambda () (interactive) (switch-to-buffer (messages-buffer)))))
 
 (defun dob-begin ()
    "Start up my day"
@@ -119,79 +117,51 @@
    (split-window-horizontally)
    (dob-notmuch-now))
 
-;; (defun dob-person-filename (person-name)
-;;   (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
-;;          (filename (concat "~/Private/wiki/people/" name-file ".org")))
-;;     filename))
+(defun dob-person-filename (person-name)
+  (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
+         (filename (concat "~/Private/wiki/people/" name-file ".org")))
+    filename))
 
-;; (defun dob-person-make-region (start end)
-;;   "Create a file for a mentioned person"
-;;   (interactive "r")
-;;   (let* ((person-name (buffer-substring start end))
-;;          (filename (dob-person-filename person-name)))
-;;     (org-store-link start)
-;;     (let ((link (caar org-stored-links)))
-;;       (if (string-prefix-p "notmuch:id:" link)
-;;           (with-temp-buffer
-;;             (call-process-shell-command (format "notmuch search --output=files id:%s | xargs cat | email2vcard" (substring link 11)) nil t nil)
-;;             (beginning-of-buffer)
-;;             (setq filename (string-trim (thing-at-point 'line))))))
-;;     (find-file-other-window filename)
-;;     (org-insert-last-stored-link 1)))
+(defun dob-person-make-region (start end)
+  "Create a file for a mentioned person"
+  (interactive "r")
+  (let* ((person-name (buffer-substring start end))
+         (filename (dob-person-filename person-name)))
+    (org-store-link start)
+    (let ((link (caar org-stored-links)))
+      (if (string-prefix-p "notmuch:id:" link)
+          (with-temp-buffer
+            (call-process-shell-command (format "notmuch search --output=files id:%s | xargs cat | email2vcard" (substring link 11)) nil t nil)
+            (beginning-of-buffer)
+            (setq filename (string-trim (thing-at-point 'line))))))
+    (find-file-other-window filename)
+    (org-insert-last-stored-link 1)))
 
-;; (defun dob-person-make (person-name)
-;;   (interactive "MPerson:")
-;;   (find-file-other-window (dob-person-filename person-name)))
+(defun dob-person-make (person-name)
+  (interactive "MPerson:")
+  (find-file-other-window (dob-person-filename person-name)))
 
-;; (defun dob-wiki-url (name)
-;;   "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
-;;   (let* ((prefix (if (equal (getenv "SHORTHOST") "lifeboat") "file:///home/danny/Private/wiki/" "/ssh:danny@l4:/home/danny/Private/wiki/"))
-;;          (suffix ".org"))
-;;     (concat prefix (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim name))) suffix)))
+(defun dob-wiki-url (name)
+  "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
+  (let* ((prefix (if (equal (getenv "SHORTHOST") "lifeboat")
+                     "file:///home/danny/Private/wiki/"
+                   "/ssh:danny@l4:/home/danny/Private/wiki/"))
+         (suffix ".org"))
+    (concat prefix (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim name))) suffix)))
 
-;; (require 'org-attach)
-
-(setq org-attach-id-dir "~/Private/wiki/data/")
-(setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
-                              ("people" . "file:///%(dob-person-filename)")
-                              ("wiki" . "%(dob-wiki-url)")))
-
-(setq org-agenda-files (remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org")))
-(if (string-equal "yacht" (getenv "SHORTHOST"))
-    (setq org-agenda-files '("~/Private/org/yacht.org" "~/Private/org/codetherapy-guix.org")))
-
-;; (org-babel-do-load-languages
-;;  'org-babel-load-languages
-;;  '((gnuplot . t)
-;;    (python . t)
-;;    (scheme . t)))
-
-;; (require 'ol-git-link)
-
-;; (defun dob-double-click (p)
-;;   "My general purpose double click"
-;;   (interactive "d")
-;;   (message (get-text-property p 'org-category))
-;;   (cond ((string= "todo" (get-text-property p 'org-category))
-;;          (org-todo "DONE"))))
-;; (global-set-key [double-mouse-1] 'dob-double-click)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)
+   (python . t)
+   (scheme . t)))
 
 (setq geiser-active-implementations '(guile))
-;; (setq geiser-repl-save-debugging-history-p t)
 
 ;; Guix helpers
 ;; From [[info:guix#The%20Perfect%20Setup][info:guix#The Perfect Setup]]
-;(with-eval-after-load 'geiser-guile
-;  (add-to-list 'geiser-guile-load-path "~/Public/src/guix"))
 (with-eval-after-load 'yasnippet
   (add-to-list 'yas-snippet-dirs "~/Public/src/guix/etc/snippets"))
 
-
-;; (global-set-key (kbd "C-u") 'universal-argument)
-(define-key evil-normal-state-map "g\C-g" 'count-words)
-;; (define-key evil-normal-state-map "C-u" 'universal-argument)
-(define-key evil-normal-state-map "H" 'previous-buffer)
-(define-key evil-normal-state-map "L" 'next-buffer)
 
 ;; Mail Stuff
 (setq
@@ -238,51 +208,10 @@
   (require 'ol-info)
   (require 'ol-eww)
   (require 'org-ql)
-
-  (defun org-journal-date-format-func (time)
-    "Custom function to insert journal date header.
-
-    When buffer is empty prepend a header in front the entry header."
-    (concat (when (= (buffer-size) 0)
-              (concat)
-              (pcase org-journal-file-type
-                (`daily "#+TITLE: Daily Journal\n")
-                (`weekly "#+TITLE: Weekly Journal\n")
-                (`monthly "#+TITLE: Monthly Journal\n")
-                (`yearly "#+TITLE: Yearly Journal\n")))
-            org-journal-date-prefix
-            (format-time-string "%A, %F" time)))
-  (setq org-journal-date-format 'org-journal-date-format-func)
-  (add-to-list 'org-agenda-files org-journal-dir)
-
-  (defun org-journal-find-location ()
-    ;; Open today's journal, but specify a non-nil prefix argument in order to
-    ;; inhibit inserting the heading; org-capture will insert the heading.
-    (org-journal-new-entry t)
-    ;; Position point on the journal's top-level heading so that org-capture
-    ;; will add the new entry as a child entry.
-    (goto-char (point-min)))
-
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/Private/org/todo.org" "Inbox"))
-          "* TODO %?\n  %i\n  %a"
-          ("n" "Note" entry (file "~/Private/wiki/notes.org"))
-          "* %? %^g\nEntered on %U\n  %i\n  %a"
-          ("j" "Journal entry" entry (function
-                                      org-journal-find-location))
-          "* %(format-time-string org-journal-time-format)%^{Title}\n%i%?"))
-
-  (if (string-equal "yacht" (getenv "SHORTHOST"))
-      (setq org-capture-templates
-            '(("t" "Todo" entry (file+headline "~/Private/org/yacht.org" "Inbox"))
-              "* TODO %?\n  %i\n  %a"
-              ("n" "Note" entry (file "~/Private/wiki/notes.org"))
-              "* %? %^g\nEntered on %U\n  %i\n  %a")))
-
-  (setq org-todo-keywords
-        '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED")))
+  (require 'org-attach)
 
   (setq org-startup-indented t
+        org-todo-keywords '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED"))
         org-bullets-bullet-list '(" ")
         org-ellipsis "  "
         org-pretty-entities t
