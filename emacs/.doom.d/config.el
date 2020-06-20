@@ -26,7 +26,9 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "Iosevka Term" :size 32))
+(setq doom-font (font-spec :family "Iosevka" :size 32))
+(setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
+(setq doom-big-font (font-spec :family "Iosevka Aile" :size 48))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -415,5 +417,14 @@
     (interactive "P")
     (org-time-stamp '(16)))
   (map!
-    (:prefix "C-c"
-      :desc "Add a new journal entry" "x" 'dob-add-journal-todo)))
+   (:prefix "C-c"
+    :desc "Add a new journal entry" "x" 'dob-add-journal-todo)))
+
+;; Finally, I like a teeny modeline
+(setq doom-modeline-height 1)
+(custom-set-faces
+ '(mode-line ((t (:height 80))))
+ '(mode-line-inactive ((t (:height 80)))))
+
+;; NOW IT IS TIME FOR THE CUSTOMARY CUSTOMIZATION
+;;
