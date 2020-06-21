@@ -9,6 +9,7 @@
 (package! beeminder)
 (package! org-plus-contrib)
 (package! org-ql)
+(package! org-mime)
 (package! mu4e)
 
 ;; Doom's packages are pinned to a specific commit and updated from release to

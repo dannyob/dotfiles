@@ -164,24 +164,25 @@
 
 
 ;; Mail Stuff
-(setq
-  mail-envelope-from 'header
-  mail-specify-envelope-from t
-  message-kill-buffer-on-exit t
-  message-sendmail-envelope-from 'header
-  message-sendmail-extra-arguments '("--read-envelope-from")
-  message-sendmail-f-is-evil t
-  mml-secure-openpgp-encrypt-to-self t
-  send-mail-function (quote sendmail-send-it)
-  message-send-mail-function 'message-send-mail-with-sendmail
-  sendmail-program "msmtpq"
-  user-mail-address "danny@codetherapy.space")
 
 (setenv "EMAIL_QUEUE_QUIET" "t")
 
 ;; Mu4e!
 ;;
 (after! mu4e
+  (setq
+    mail-envelope-from 'header
+    mail-specify-envelope-from t
+    message-kill-buffer-on-exit t
+    message-sendmail-envelope-from 'header
+    message-sendmail-extra-arguments '("--read-envelope-from")
+    message-sendmail-f-is-evil t
+    mml-secure-openpgp-encrypt-to-self t
+    send-mail-function (quote sendmail-send-it)
+    message-send-mail-function 'message-send-mail-with-sendmail
+    sendmail-program "msmtpq"
+    user-mail-address "danny@codetherapy.space")
+
   (setq mail-user-agent 'mu4e-user-agent)
   (setq
    mu4e-sent-folder   "/sent"       ;; folder for sent messages
@@ -193,6 +194,33 @@
   (setq mu4e-change-filenames-when-moving t)
   (setq mu4e-get-mail-command "mbsync -a")
   (setq mu4e-split-view nil) ;; I like a mutt-like division of labour
+
+  ;; Get ORG-mode composing working
+  ;;
+  ;;;; https://matt.hackinghistory.ca/2016/11/18/sending-html-mail-with-mu4e/
+  (defun htmlize-and-send ()
+    "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+    (interactive)
+    (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+      (org-mime-htmlize)
+      (org-mu4e-compose-org-mode)
+      (mu4e-compose-mode)
+      (message-send-and-exit)))
+
+  ;; This overloads the amazing C-c C-c commands in org-mode with one more function
+  ;; namely the htmlize-and-send, above.
+  (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
+
+  ;; Originally, I set the `mu4e-compose-mode-hook' here, but
+  ;; this new hook works much, much better for me.
+  (add-hook 'mu4e-compose-post-hook
+            (defun do-compose-stuff ()
+              "My settings for message composition."
+              (org-mu4e-compose-org-mode)))
+
+  (setq org-mime-export-options '(:section-numbers nil
+                                  :with-author nil
+                                  :with-toc nil))
   (map!
    :map (mu4e-headers-mode-map mu4e-view-mode-map)
    :n "x" 'mu4e-headers-mark-for-something
