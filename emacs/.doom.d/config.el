@@ -221,10 +221,50 @@
   (setq org-mime-export-options '(:section-numbers nil
                                   :with-author nil
                                   :with-toc nil))
+
+  (map!
+   (:prefix "C-c"
+    :desc "Jump to Inbox" "j"  (defun dob-jump-to-inbox () (interactive) (mu4e~headers-jump-to-maildir "/INBOX"))))
+
+  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus"))
+  (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
+  (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
+
+
+  ;; Colorize headers based on tags
+  ;;
+  (defvar dob-mu4e-tag-colors
+    '("boring-guess" "boring-corpus" "spam-corpus" "spam-guess"))
+
+  (setq dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro") ("spam-guess". "gainsboro")))
+
+  (defun dob-mu4e~headers-line-apply-tag-face (msg line)
+    "Adjust LINE's face property based on the MSG's mailing-list value."
+    (let* ((ml (mu4e-message-field msg :tags))
+           (tagl (mapcar 'car dob-mu4e-tag-colors))
+           (tag (cl-intersection ml tagl :test 'equal))
+           (face (if tag
+                     `(:foreground ,(assoc-default (cl-first tag) dob-mu4e-tag-colors))
+                   'mu4e-header-face)))
+      (when (fboundp 'add-face-text-property)
+        (add-face-text-property 0 (length line) face t line))
+      line))
+
+  (add-to-list 'mu4e~headers-line-handler-functions
+               'dob-mu4e~headers-line-apply-tag-face)
+
+  (setq mu4e-bookmarks
+        '((:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key 117)
+          (:name "Today's messages" :query "date:today..now" :key 116)
+          (:name "Last 7 days" :query "date:7d..now" :hide-unread t :key 119)
+          (:name "Inbox (Clean)" :query "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 118)
+          (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
+          (:name "Suspected Boring" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus)" :key 121)))
+
   (map!
    :map (mu4e-headers-mode-map mu4e-view-mode-map)
    :n "x" 'mu4e-headers-mark-for-something
-   :n "e" (lambda () (interactive) (mu4e-mark-execute-all t))
+   :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
    :n "i" 'mu4e-select-other-view))
 
