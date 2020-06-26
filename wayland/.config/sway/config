@@ -39,6 +39,12 @@ output $laptop scale 1
 bindswitch lid:on output $laptop disable
 bindswitch lid:off output $laptop enable
 
+# My desktop setup
+output "Unknown VIOTEK GN24CB             " {
+scale 0.8
+mode 1920x1080@143.981003Hz
+}
+
 ### Idle configuration
 #
 # Example configuration:
