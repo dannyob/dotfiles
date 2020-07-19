@@ -237,7 +237,7 @@
   (defvar dob-mu4e-tag-colors
     '("boring-guess" "boring-corpus" "spam-corpus" "spam-guess"))
 
-  (setq dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro") ("spam-guess". "gainsboro")))
+  (setq dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro")  ("spam-guess". "gainsboro") ("notification-corpus" . "dark grey") ("notification-guess" . "dark gray")))
 
   (defun dob-mu4e~headers-line-apply-tag-face (msg line)
     "Adjust LINE's face property based on the MSG's mailing-list value."
@@ -260,7 +260,7 @@
           (:name "Last 7 days" :query "date:7d..now" :hide-unread t :key 119)
           (:name "Inbox (Clean)" :query "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 118)
           (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
-          (:name "Suspected Boring" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus)" :key 121)))
+          (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
 
   (map!
    :map (mu4e-headers-mode-map mu4e-view-mode-map)
