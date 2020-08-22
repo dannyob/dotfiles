@@ -81,6 +81,8 @@
 
 (setq auto-save-interval 20)
 (setq auto-save-timeout 10)
+(setq delete-auto-save-files nil)
+(setq auto-save-default t)
 
 ;; Guix hack -- Guix's emacs startup stuffs XDG_DATA_DIR with values pointing to various stuff, but
 ;; does not include XDG_DATA_DIR's defaults, which are /usr/local/share/:/usr/share/
