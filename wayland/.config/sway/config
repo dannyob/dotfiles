@@ -276,7 +276,6 @@ default_border pixel 1
 hide_edge_borders --i3 smart_no_gaps
 
 exec evscript -d /dev/input/by-path/*kbd -f ~/.local/share/evscript/evscript-caps2esc.dyon
-exec gnome-keyring
 exec sudo ~/.local/bin/powertop-twiddle
 exec epicroot
 exec mako
