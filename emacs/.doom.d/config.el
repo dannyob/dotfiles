@@ -175,28 +175,30 @@
 ;;
 (after! mu4e
   (setq
-    mail-envelope-from 'header
-    mail-specify-envelope-from t
-    message-kill-buffer-on-exit t
-    message-sendmail-envelope-from 'header
-    message-sendmail-extra-arguments '("--read-envelope-from")
-    message-sendmail-f-is-evil t
-    mml-secure-openpgp-encrypt-to-self t
-    send-mail-function (quote sendmail-send-it)
-    message-send-mail-function 'message-send-mail-with-sendmail
-    sendmail-program "msmtpq"
-    user-mail-address "danny@codetherapy.space")
+   mail-envelope-from 'header
+   mail-specify-envelope-from t
+   message-kill-buffer-on-exit t
+   message-sendmail-envelope-from 'header
+   message-sendmail-extra-arguments '("--read-envelope-from")
+   message-sendmail-f-is-evil t
+   mml-secure-openpgp-encrypt-to-self t
+   send-mail-function (quote sendmail-send-it)
+   message-send-mail-function 'message-send-mail-with-sendmail
+   sendmail-program "msmtpq"
+   user-mail-address (cond ((cl-search "eff" (getenv "MAILDIR")) "danny@eff.org")
+                           ((cl-search "codetherapy" (getenv "MAILDIR")) "danny@codetherapy.space")
+                           "danny@spesh.com"))
+
 
   (setq mail-user-agent 'mu4e-user-agent)
   (setq
    mu4e-sent-folder   "/sent"       ;; folder for sent messages
    mu4e-drafts-folder "/drafts"     ;; unfinished messages
-   mu4e-trash-folder  "/trash"      ;; trashed messages
-   mu4e-refile-folder "/archive2020")   ;; saved messages
+   mu4e-trash-folder  "/trash")      ;; trashed messages
   (setq mu4e-use-fancy-chars t)
   (setq mu4e-attachment-dir "~/tmp")
   (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-get-mail-command "mbsync -a")
+  (setq mu4e-get-mail-command "syncandspam")
   (setq mu4e-split-view nil) ;; I like a mutt-like division of labour
 
   ;; Get ORG-mode composing working
