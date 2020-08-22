@@ -236,6 +236,8 @@
   (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
   (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
 
+  ;; gnus-inherited email viewer
+  (setq mu4e-view-use-gnus 't)
 
   ;; Colorize headers based on tags
   ;;
@@ -267,12 +269,24 @@
           (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
           (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
 
+  (setq mu4e-refile-folder
+      (defun dob-refile-to-archive (msg)
+        (cond
+         ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
+         ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
+         (t  (concat "/archive" (format-time-string "%Y"))))))
+
   (map!
-   :map (mu4e-headers-mode-map mu4e-view-mode-map)
+   :map (mu4e-headers-mode-map)
    :n "x" 'mu4e-headers-mark-for-something
    :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
+   :n "i" 'mu4e-select-other-view
+   :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
+   :map (gnus-article-mode-map)
+   :n "M-SPC" 'mu4e-view-scroll-up-or-next
    :n "i" 'mu4e-select-other-view))
+
 
 
 ;; Org-mode
