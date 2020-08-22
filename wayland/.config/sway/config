@@ -287,19 +287,22 @@ for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
 for_window [instance="Navigator"] mark browser3
 for_window [window_role="browser"] mark browser4
-for_window [instance="Brave"] mark browser5
+for_window [instance="brave-browser"] mark browser5
 for_window [class="Emacs"] mark emacs1
 for_window [instance="hexchat"] mark talk1
 for_window [class="Mattermost"] mark talk2
 for_window [class="kitty"] mark shell1
 for_window [app_id="kitty"] mark shell2
+for_window [class="zoom"] mark zoom1
 
 assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
 assign [class="Emacs"] 2
-assign [class="Firefox"] 3
-assign [class="Brave"] 3
-assign [instance="Navigator"] 3
+assign [class="Firefox"] 1
+assign [class="Brave-browser"] 1
+assign [instance="Navigator"] 1
+
+assign [class="zoom"] 5
 
 assign [app_id="pavucontrol"] 8
 assign [class="Clementine"] 8
@@ -319,4 +322,6 @@ bindsym $mod+s [con_mark="emacs"] focus
 bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+d [con_mark="shell"] focus
 bindsym $mod+g [con_mark="teleprompt" workspace=__focused__] focus
+bindsym $mod+z [con_mark="zoom"] focus
+
 bindsym $mod+slash exec makoctl dismiss -a
