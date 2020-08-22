@@ -95,6 +95,7 @@
 (global-set-key (kbd "<mouse-8>") 'previous-buffer)
 (global-set-key (kbd "<mouse-9>") 'next-buffer)
 
+(global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c i") 'org-clock-in)
 (global-set-key (kbd "C-c o") 'org-clock-out)
 (global-set-key (kbd "C-c g") 'org-clock-goto)
@@ -287,7 +288,10 @@
         org-ellipsis "  "
         org-pretty-entities t
         org-hide-emphasis-markers t
+        org-agenda-span 3
+        org-agenda-start-day "-1d"
         org-agenda-block-separator ""
+        org-agenda-include-diary t
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
@@ -304,14 +308,14 @@
       (insert " ")))
 
   (defun dob-daylog () (interactive)
-    (setq org-attach-id-dir "~/Private/wiki/data/")
-    (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
-                                  ("people" . "file:///%(dob-person-filename)")
-                                  ("wiki" . "%(dob-wiki-url)")))
-    (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
+         (setq org-attach-id-dir "~/Private/wiki/data/")
+         (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
+                                       ("people" . "file:///%(dob-person-filename)")
+                                       ("wiki" . "%(dob-wiki-url)")))
+         (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
-    (setq org-agenda-files '("~/Private/org/codetherapy")))
+         (setq org-agenda-files '("~/Private/org/codetherapy")))
 
   (if (string-equal "yacht" (getenv "SHORTHOST"))
       (dob-yacht)
@@ -334,10 +338,12 @@
     "Insert a timestamp with today's time and date."
     (interactive "P")
     (org-time-stamp '(16)))
+
   (map!
    (:prefix "C-c"
-    :desc "Add a new journal entry" "x" 'dob-add-journal-todo)))
-
+    :desc "Add a new journal entry" "x" 'dob-add-journal-todo
+    :desc "Org store link" "M-c" 'org-store-link
+    :desc "Org insert link" "M-v" 'org-insert-link-global)))
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
 (custom-set-faces
