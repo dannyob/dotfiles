@@ -241,10 +241,8 @@
 
   ;; Colorize headers based on tags
   ;;
-  (defvar dob-mu4e-tag-colors
-    '("boring-guess" "boring-corpus" "spam-corpus" "spam-guess"))
 
-  (setq dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro")  ("spam-guess". "gainsboro") ("notification-corpus" . "dark grey") ("notification-guess" . "dark gray")))
+  (defvar dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro")  ("spam-guess". "gainsboro") ("notification-corpus" . "dark grey") ("notification-guess" . "dark gray")))
 
   (defun dob-mu4e~headers-line-apply-tag-face (msg line)
     "Adjust LINE's face property based on the MSG's mailing-list value."
