@@ -312,15 +312,15 @@ assign [class="obs"] 9
 # App selection
 #bindsym $mod+d [class="kitty"] focus
 #bindsym $mod+a [app_id="firefox"] focus
+#bindsym $mod+s [instance="emacs"] focus
 #bindsym $mod+d [app_id="kitty"] focus
 #bindsym $mod+f [instance="hexchat"] focus
 #bindsym $mod+a [class="Firefox"] focus
-#bindsym $mod+s [instance="emacs"] focus
 
 bindsym $mod+a [con_mark="browser"] focus
 bindsym $mod+s [con_mark="emacs"] focus
-bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+d [con_mark="shell"] focus
+bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+g [con_mark="teleprompt" workspace=__focused__] focus
 bindsym $mod+z [con_mark="zoom"] focus
 
