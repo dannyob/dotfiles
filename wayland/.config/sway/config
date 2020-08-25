@@ -324,4 +324,13 @@ bindsym $mod+f [con_mark="talk"] focus
 bindsym $mod+g [con_mark="teleprompt" workspace=__focused__] focus
 bindsym $mod+z [con_mark="zoom"] focus
 
+bindsym $mod+u unmark
+bindsym $mod+shift+a mark browserX
+bindsym $mod+shift+s mark emacsX
+bindsym $mod+shift+d mark shellX
+#bindsym $mod+shift+f mark talkX
+bindsym $mod+shift+z mark zoomX
+
 bindsym $mod+slash exec makoctl dismiss -a
+
+workspace 3
