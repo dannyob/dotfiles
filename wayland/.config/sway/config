@@ -286,7 +286,7 @@ exec kitty ecryptfs-mount-private
 for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
 for_window [instance="Navigator"] mark browser3
-for_window [window_role="browser"] mark browser4
+#for_window [window_role="browser"] mark browser4
 for_window [instance="brave-browser"] mark browser5
 for_window [class="Emacs"] mark emacs1
 for_window [instance="hexchat"] mark talk1
