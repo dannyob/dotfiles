@@ -277,12 +277,16 @@
          ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
          (t  (concat "/archive" (format-time-string "%Y"))))))
 
+  ;; I prefer to be able to switch between org-msg-mode and not
+  (remove-hook 'mu4e-compose-pre-hook 'org-msg-mode)
+
   (map!
    :map (mu4e-headers-mode-map)
    :n "x" 'mu4e-headers-mark-for-something
    :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
    :n "i" 'mu4e-select-other-view
+   :n "o" 'org-msg-mode
    :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
    :map (gnus-article-mode-map)
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
