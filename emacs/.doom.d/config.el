@@ -9,6 +9,8 @@
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
 
+(setq org-list-allow-alphabetical nil)
+
 ;; If we have native compilation, let's get compiling!
 (when (fboundp 'native-compile-async)
       (setq comp-async-jobs-number 2 ;; not using all cores
