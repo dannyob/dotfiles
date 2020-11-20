@@ -187,9 +187,9 @@
    send-mail-function (quote sendmail-send-it)
    message-send-mail-function 'message-send-mail-with-sendmail
    sendmail-program "msmtpq"
-   user-mail-address (cond ((cl-search "eff" (getenv "MAILDIR")) "danny@eff.org")
-                           ((cl-search "codetherapy" (getenv "MAILDIR")) "danny@codetherapy.space")
-                           "danny@spesh.com"))
+   user-mail-address (cond ((cl-search "eff" (file-truename (getenv "MAILDIR"))) "danny@eff.org")
+                           ((cl-search "codetherapy" (file-truename (getenv "MAILDIR"))) "danny@codetherapy.space")
+                            (t "danny@spesh.com")))
 
 
   (setq mail-user-agent 'mu4e-user-agent)
