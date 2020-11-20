@@ -235,7 +235,7 @@
     :desc "Jump to Inbox" "j" (defun dob-jump-to-inbox () (interactive) (mu4e~headers-search-execute "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus AND NOT tag:notification-guess AND NOT tag:notification-corpus"  't))
     :desc "Jump to Current Headers" "h" (lambda () (interactive (let ((i (get-buffer "*mu4e-headers*"))) (if i (switch-to-buffer "*mu4e-headers*") (dob-jump-to-inbox)))))))
 
-  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus"))
+  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus" "notification-corpus"))
   (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
   (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
 
