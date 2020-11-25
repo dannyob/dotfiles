@@ -9,6 +9,8 @@
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
 
+(setq dob-org-file "~/Private/org/daylog.org")
+
 (setq org-list-allow-alphabetical nil)
 
 ;; If we have native compilation, let's get compiling!
@@ -335,12 +337,14 @@
 
   (defun dob-daylog () (interactive)
          (setq org-attach-id-dir "~/Private/wiki/data/")
+         (setq dob-org-file "~/Private/org/daylog.org")
          (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
                                        ("people" . "file:///%(dob-person-filename)")
                                        ("wiki" . "%(dob-wiki-url)")))
          (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
+         (setq dob-org-file "~/Private/org/codetherapy.org")
          (setq org-agenda-files '("~/Private/org/codetherapy")))
 
   (if (string-equal "yacht" (getenv "SHORTHOST"))
