@@ -24,6 +24,11 @@
 (when (fboundp 'tab-bar-mode)
   (tab-bar-mode))
 
+(map!
+ (:prefix "C-c"
+  :desc "Start mu4e" "j" '=mu4e
+  :desc "Start mu4e" "h" '=mu4e))
+
 
 ;; are the three important ones:
 ;;
