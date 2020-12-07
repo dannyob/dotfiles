@@ -151,7 +151,7 @@ set termguicolors
 set guicursor=n-c:block,i-ci-ve:ver40,r-cr-v:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
 
 call plug#begin()
-Plug 'eraserhd/parinfer-rust'
+" Plug 'eraserhd/parinfer-rust'
 Plug 'jpalardy/vim-slime'
 Plug 'tomtom/quickfixsigns_vim'
 " gc == comment/uncomment
@@ -170,6 +170,9 @@ Plug 'vim-scripts/utl.vim'
 Plug 'gioele/vim-autoswap'
 Plug 'unblevable/quick-scope'
 Plug 'mbbill/undotree'
+
+" PGP you know me
+Plug 'jamessan/vim-gnupg'
 
 " Dirty Emacs Experimentation
 "
