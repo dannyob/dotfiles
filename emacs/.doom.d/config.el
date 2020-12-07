@@ -154,6 +154,7 @@
   (interactive "MPerson:")
   (find-file-other-window (dob-person-filename person-name)))
 
+
 (defun dob-wiki-url (name)
   "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
   (let* ((prefix (if (equal (getenv "SHORTHOST") "lifeboat")
@@ -180,6 +181,7 @@
 
 (setenv "EMAIL_QUEUE_QUIET" "t")
 
+
 ;; Mu4e!
 ;;
 (after! mu4e
@@ -196,7 +198,7 @@
    sendmail-program "msmtpq"
    user-mail-address (cond ((cl-search "eff" (file-truename (getenv "MAILDIR"))) "danny@eff.org")
                            ((cl-search "codetherapy" (file-truename (getenv "MAILDIR"))) "danny@codetherapy.space")
-                            (t "danny@spesh.com")))
+                           (t "danny@spesh.com")))
 
 
   (setq mail-user-agent 'mu4e-user-agent)
@@ -213,29 +215,30 @@
   ;; Get ORG-mode composing working
   ;;
   ;;;; https://matt.hackinghistory.ca/2016/11/18/sending-html-mail-with-mu4e/
-  (defun htmlize-and-send ()
-    "When in an org-mu4e-compose-org-mode message, htmlize and send it."
-    (interactive)
-    (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
-      (org-mime-htmlize)
-      (org-mu4e-compose-org-mode)
-      (mu4e-compose-mode)
-      (message-send-and-exit)))
+  ;; (defun htmlize-and-send ()
+  ;;   "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+  ;;   (interactive)
+  ;;   (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+  ;;     (org-mime-htmlize)
+  ;;     (org-mu4e-compose-org-mode)
+  ;;     (mu4e-compose-mode)
+  ;;     (message-send-and-exit)))
 
-  ;; This overloads the amazing C-c C-c commands in org-mode with one more function
-  ;; namely the htmlize-and-send, above.
-  (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
+  ;; ;; This overloads the amazing C-c C-c commands in org-mode with one more function
+  ;; ;; namely the htmlize-and-send, above.
+  ;; (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
 
-  ;; Originally, I set the `mu4e-compose-mode-hook' here, but
-  ;; this new hook works much, much better for me.
-  (add-hook 'mu4e-compose-post-hook
-            (defun do-compose-stuff ()
-              "My settings for message composition."
-              (org-mu4e-compose-org-mode)))
+  ;; ;; Originally, I set the `mu4e-compose-mode-hook' here, but
+  ;; ;; this new hook works much, much better for me.
+  ;; (add-hook 'mu4e-compose-post-hook
+  ;;           (defun do-compose-stuff ()
+  ;;             "My settings for message composition."
+  ;;             (org-mu4e-compose-org-mode)))
 
   (setq org-mime-export-options '(:section-numbers nil
                                   :with-author nil
                                   :with-toc nil))
+
 
   (map!
    (:prefix "C-c"
