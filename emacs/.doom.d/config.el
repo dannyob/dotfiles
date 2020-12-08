@@ -131,6 +131,28 @@
   (split-window-horizontally)
   (mu4e~start 'mu4e~main-view))
 
+(defun dob-from ()
+  (interactive)
+  (save-excursion
+    (let ((to-content
+           (save-restriction (message-narrow-to-headers)
+                             (message-fetch-field "to")))
+          (cc-content
+           (save-restriction (message-narrow-to-headers)
+                             (message-fetch-field "cc"))))
+      (message-goto-body)
+      (if (re-search-forward "From:[[:space:]]+\\(.*\\)$" nil t)
+          (let* ((matchdata (match-data))
+                 (start (nth 2 matchdata))
+                 (end (nth 3 matchdata))
+                 (from-names (buffer-substring start end)))
+            (message-goto-to)
+            (message-delete-line)
+            (insert (concat "To: " from-names "\n"))
+            (message-goto-cc)
+            (end-of-line)
+            (unless (s-blank-str-p cc-content) (insert ", "))
+            (insert to-content))))))
 
 (defun dob-person-filename (person-name)
   (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
