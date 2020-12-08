@@ -122,13 +122,15 @@
   :desc "Open Messages Buffer" "b m" (lambda () (interactive) (switch-to-buffer (messages-buffer)))))
 
 (defun dob-begin ()
-   "Start up my day"
-   (interactive)
-   (switch-to-buffer "daylog.org")
-   (set-window-dedicated-p nil t)
-   (org-id-goto "ac128a00-0af4-43e5-942e-38a2f36afd28")
-   (split-window-horizontally)
-   (dob-notmuch-now))
+  "Start up my day"
+  (interactive)
+  (require 'mu4e)
+  (require 'org)
+  (find-file dob-org-file)
+  (set-window-dedicated-p nil t)
+  (split-window-horizontally)
+  (mu4e~start 'mu4e~main-view))
+
 
 (defun dob-person-filename (person-name)
   (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
