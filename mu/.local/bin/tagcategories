@@ -1,0 +1,30 @@
+#!/bin/bash
+ALLTAGS=$(ls -1 ~/.cache/dbacl/*-mail)
+echo $ALLTAG
+find ${MAILDIR}/INBOX -type f | egrep '(cur|new)' > ~/tmp/mailist
+MSGCNT=$(wc -l ~/tmp/mailist)
+MSGINX=0
+echo "Tagging INBOX"
+while read f; do
+    ((MSGINX++))
+    echo -ne "\r" $MSGINX "/" $MSGCNT
+    NEWTAG=$(dbacl -T email -c ~/.cache/dbacl/notification-mail -c ~/.cache/dbacl/spam-mail -c ~/.cache/dbacl/ham-mail -c ~/.cache/dbacl/boring-mail -v <$f | sed 's/-mail//g')
+    if [[ ! $NEWTAG =~ "ham" ]]
+    then
+        SUBJECT=`formail -X Subject <$f`
+        TAGS=`formail -x X-Keywords <$f`
+        if [[ ! $TAGS =~ $NEWTAG ]]
+        then
+            OLDTAGS=$(echo $TAGS | sed -E 's/,?[^,]*guess,?//g')
+            if [[ -n $OLDTAGS ]]
+            then
+                OLDTAGS=${OLDTAGS},
+            fi
+            echo $SUBJECT
+            echo $OLDTAGS ${NEWTAG}-guess
+            formail -i "X-Keywords: ${TAGS} ${NEWTAG}-guess" <$f | sponge $f
+            mflag -S $f
+        fi
+    fi
+done < ~/tmp/mailist;
+#mu index

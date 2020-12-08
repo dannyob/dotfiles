@@ -1,0 +1,11 @@
+#/bin/sh
+categories="ham spam boring notification"
+rm -rf ~/.cache/dbacl
+mkdir -p ~/.cache/dbacl
+cd ~/.cache/dbacl
+for category in $categories; do
+    echo -n "Learning: $category     \t"
+    mu find --format=links --clearlinks --linksdir=~/tmp/mudump tag:${category}-corpus
+    echo "($(messages -s ~/tmp/mudump) samples)"
+    find -L ~/tmp/mudump -type f | grep -v noindex | while read f; do formail <$f; done | dbacl -h 16 -T email -l ${category}-mail
+done
