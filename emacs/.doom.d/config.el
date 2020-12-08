@@ -392,6 +392,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           (:name "Today's messages" :query "date:today..now" :key 116)
           (:name "Last 7 days" :query "date:7d..now" :hide-unread t :key 119)
           (:name "Inbox (Clean)" :query "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 118)
+          (:name "Inbox (No lists)" :query  "m:/INBOX AND NOT list:/.*/ AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 122)
           (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
           (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
 
