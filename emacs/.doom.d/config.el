@@ -396,11 +396,11 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
 
   (setq mu4e-refile-folder
-      (defun dob-refile-to-archive (msg)
-        (cond
-         ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
-         ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
-         (t  (concat "/archive" (format-time-string "%Y"))))))
+        (defun dob-refile-to-archive (msg)
+          (cond
+           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
+           ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
+           (t  (concat "/archive" (format-time-string "%Y"))))))
 
   ;; I prefer to be able to switch between org-msg-mode and not
   (remove-hook 'mu4e-compose-pre-hook 'org-msg-mode)
