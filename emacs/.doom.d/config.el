@@ -9,6 +9,10 @@
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
 
+(setq dob-org-file "~/Private/org/daylog.org")
+
+(setq org-list-allow-alphabetical nil)
+
 ;; If we have native compilation, let's get compiling!
 (when (fboundp 'native-compile-async)
       (setq comp-async-jobs-number 2 ;; not using all cores
@@ -20,6 +24,11 @@
 (when (fboundp 'tab-bar-mode)
   (tab-bar-mode))
 
+(map!
+ (:prefix "C-c"
+  :desc "Start mu4e" "j" '=mu4e
+  :desc "Start mu4e" "h" '=mu4e))
+
 
 ;; are the three important ones:
 ;;
@@ -30,7 +39,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
+(defvar dob-hidpi 1 "Scaling factor for HiDPI monitors")
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
 (setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
@@ -113,13 +122,37 @@
   :desc "Open Messages Buffer" "b m" (lambda () (interactive) (switch-to-buffer (messages-buffer)))))
 
 (defun dob-begin ()
-   "Start up my day"
-   (interactive)
-   (switch-to-buffer "daylog.org")
-   (set-window-dedicated-p nil t)
-   (org-id-goto "ac128a00-0af4-43e5-942e-38a2f36afd28")
-   (split-window-horizontally)
-   (dob-notmuch-now))
+  "Start up my day"
+  (interactive)
+  (require 'mu4e)
+  (require 'org)
+  (find-file dob-org-file)
+  (set-window-dedicated-p nil t)
+  (split-window-horizontally)
+  (mu4e~start 'mu4e~main-view))
+
+(defun dob-from ()
+  (interactive)
+  (save-excursion
+    (let ((to-content
+           (save-restriction (message-narrow-to-headers)
+                             (message-fetch-field "to")))
+          (cc-content
+           (save-restriction (message-narrow-to-headers)
+                             (message-fetch-field "cc"))))
+      (message-goto-body)
+      (if (re-search-forward "From:[[:space:]]+\\(.*\\)$" nil t)
+          (let* ((matchdata (match-data))
+                 (start (nth 2 matchdata))
+                 (end (nth 3 matchdata))
+                 (from-names (buffer-substring start end)))
+            (message-goto-to)
+            (message-delete-line)
+            (insert (concat "To: " from-names "\n"))
+            (message-goto-cc)
+            (end-of-line)
+            (unless (s-blank-str-p cc-content) (insert ", "))
+            (insert to-content))))))
 
 (defun dob-person-filename (person-name)
   (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
@@ -144,6 +177,7 @@
 (defun dob-person-make (person-name)
   (interactive "MPerson:")
   (find-file-other-window (dob-person-filename person-name)))
+
 
 (defun dob-wiki-url (name)
   "Convert a wiki page into a (emacs-accessible) URL. If it's local, return a filename. If it's remote (i.e. we're not on lifeboat), return a remote TRAMP url."
@@ -171,6 +205,7 @@
 
 (setenv "EMAIL_QUEUE_QUIET" "t")
 
+
 ;; Mu4e!
 ;;
 (after! mu4e
@@ -185,8 +220,8 @@
    send-mail-function (quote sendmail-send-it)
    message-send-mail-function 'message-send-mail-with-sendmail
    sendmail-program "msmtpq"
-   user-mail-address (cond ((cl-search "eff" (getenv "MAILDIR")) "danny@eff.org")
-                           ((cl-search "codetherapy" (getenv "MAILDIR")) "danny@codetherapy.space")
+   user-mail-address (cond ((cl-search "eff" (file-truename (getenv "MAILDIR"))) "danny@eff.org")
+                           ((cl-search "codetherapy" (file-truename (getenv "MAILDIR"))) "danny@codetherapy.space")
                            (t "danny@spesh.com")))
 
 
@@ -204,41 +239,133 @@
   ;; Get ORG-mode composing working
   ;;
   ;;;; https://matt.hackinghistory.ca/2016/11/18/sending-html-mail-with-mu4e/
-  (defun htmlize-and-send ()
-    "When in an org-mu4e-compose-org-mode message, htmlize and send it."
-    (interactive)
-    (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
-      (org-mime-htmlize)
-      (org-mu4e-compose-org-mode)
-      (mu4e-compose-mode)
-      (message-send-and-exit)))
+  ;; (defun htmlize-and-send ()
+  ;;   "When in an org-mu4e-compose-org-mode message, htmlize and send it."
+  ;;   (interactive)
+  ;;   (when (member 'org~mu4e-mime-switch-headers-or-body post-command-hook)
+  ;;     (org-mime-htmlize)
+  ;;     (org-mu4e-compose-org-mode)
+  ;;     (mu4e-compose-mode)
+  ;;     (message-send-and-exit)))
 
-  ;; This overloads the amazing C-c C-c commands in org-mode with one more function
-  ;; namely the htmlize-and-send, above.
-  (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
+  ;; ;; This overloads the amazing C-c C-c commands in org-mode with one more function
+  ;; ;; namely the htmlize-and-send, above.
+  ;; (add-hook 'org-ctrl-c-ctrl-c-hook 'htmlize-and-send t)
 
-  ;; Originally, I set the `mu4e-compose-mode-hook' here, but
-  ;; this new hook works much, much better for me.
-  (add-hook 'mu4e-compose-post-hook
-            (defun do-compose-stuff ()
-              "My settings for message composition."
-              (org-mu4e-compose-org-mode)))
+  ;; ;; Originally, I set the `mu4e-compose-mode-hook' here, but
+  ;; ;; this new hook works much, much better for me.
+  ;; (add-hook 'mu4e-compose-post-hook
+  ;;           (defun do-compose-stuff ()
+  ;;             "My settings for message composition."
+  ;;             (org-mu4e-compose-org-mode)))
 
   (setq org-mime-export-options '(:section-numbers nil
                                   :with-author nil
                                   :with-toc nil))
+
 
   (map!
    (:prefix "C-c"
     :desc "Jump to Inbox" "j" (defun dob-jump-to-inbox () (interactive) (mu4e~headers-search-execute "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus AND NOT tag:notification-guess AND NOT tag:notification-corpus"  't))
     :desc "Jump to Current Headers" "h" (lambda () (interactive (let ((i (get-buffer "*mu4e-headers*"))) (if i (switch-to-buffer "*mu4e-headers*") (dob-jump-to-inbox)))))))
 
-  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus"))
+  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus" "notification-corpus"))
   (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
   (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
 
   ;; gnus-inherited email viewer
   (setq mu4e-view-use-gnus 't)
+
+
+  ;; Funky Thread Folding!
+  ;; From: https://gist.github.com/felipeochoa/614308ac9d2c671a5830eb7847985202
+  ;;
+(defun mu4e~headers-msg-unread-p (msg)
+  "Check if MSG is unread."
+  (let ((flags (mu4e-message-field msg :flags)))
+    (and (member 'unread flags) (not (member 'trashed flags)))))
+
+(defvar mu4e-headers-folding-slug-function
+  (lambda (headers) (format " (%d)" (length headers)))
+  "Function to call to generate the slug that will be appended to folded threads.
+This function receives a single argument HEADERS, which is a list
+of headers about to be folded.")
+
+(defun mu4e~headers-folded-slug (headers)
+  "Generate a string to append to the message line indicating the fold status.
+HEADERS is a list with the messages being folded (including the root header)."
+  (funcall mu4e-headers-folding-slug-function headers))
+
+(defun mu4e~headers-fold-make-overlay (beg end headers)
+  "Hides text between BEG and END using an overlay.
+HEADERS is a list with the messages being folded (including the root header)."
+  (let ((o (make-overlay beg end)))
+    (overlay-put o 'mu4e-folded-thread t)
+    (overlay-put o 'face '(background-color . "#FF0000" ))
+    ;; (overlay-put o 'display (concat (mu4e~headers-folded-slug headers) "\n"))
+    (overlay-put o 'evaporate t)
+    (overlay-put o 'invisible t)))
+
+(defun mu4e~headers-fold-find-overlay (loc)
+  "Find and return the 'mu4e-folded-thread overlay at LOC, or return nil."
+  (cl-dolist (o (overlays-in (1- loc) (1+ loc)))
+    (when (overlay-get o 'mu4e-folded-thread)
+      (cl-return o))))
+
+(defun mu4e-headers-fold-all ()
+  "Fold all the threads in the current view."
+  (interactive)
+  (let ((thread-id "") msgs fold-start fold-end)
+    (mu4e-headers-for-each
+     (lambda (msg)
+       (end-of-line)
+       (push msg msgs)
+       (let ((this-thread-id (mu4e~headers-get-thread-info msg 'thread-id)))
+         (if (string= thread-id this-thread-id)
+             (setq fold-end (point))
+           (when (< 1 (length msgs))
+             (mu4e~headers-fold-make-overlay fold-start fold-end (nreverse msgs)))
+           (setq fold-start (point)
+                 fold-end (point)
+                 msgs nil
+                 thread-id this-thread-id)))))
+    (when (< 1 (length msgs))
+      (mu4e~headers-fold-make-overlay fold-start fold-end (nreverse msgs)))))
+
+(defun mu4e-headers-toggle-thread-folding (&optional subthread)
+  "Toggle the folding state for the thread at point.
+If SUBTHREAD is non-nil, only fold the current subthread."
+  ;; Folding is accomplished using an overlay that starts at the end
+  ;; of the parent line and ends at the end of the last descendant
+  ;; line. If there's no overlay, it means it isn't folded
+  (interactive "P")
+  (if-let ((o (mu4e~headers-fold-find-overlay (point-at-eol))))
+      (delete-overlay o)
+    (let* ((msg (mu4e-message-at-point))
+           (thread-id (mu4e~headers-get-thread-info msg 'thread-id))
+           (path-re (concat "^" (mu4e~headers-get-thread-info msg 'path)))
+           msgs first-marked-point last-marked-point)
+      (mu4e-headers-for-each
+       (lambda (submsg)
+         (when (and (string= thread-id (mu4e~headers-get-thread-info submsg 'thread-id))
+                    (or (not subthread)
+                        (string-match-p path-re (mu4e~headers-get-thread-info submsg 'path))))
+           (push msg msgs)
+           (setq last-marked-point (point-at-eol))
+           (unless first-marked-point
+             (setq first-marked-point last-marked-point)))))
+      (when (< 1 (length msgs))
+        (mu4e~headers-fold-make-overlay first-marked-point last-marked-point (nreverse msgs))))))
+
+(map!
+   :map (mu4e-headers-mode-map)
+   :n "za" 'mu4e-headers-toggle-thread-folding
+   :n "zM" 'mu4e-headers-fold-all)
+
+;; Below is more evilly correct but doesn't work with fold module in doom-emacs
+;; because fold module remaps evil-fold-action keys.
+;; (setq evil-fold-list (cl-remove-if (lambda (e) (eq (caar e) 'mu4e-headers-mode)) evil-fold-list))
+;; (add-to-list 'evil-fold-list `((mu4e-headers-mode) :open-all nil :close-all ,(lambda () (call-interactively 'mu4e-headers-fold-all)) :toggle ,(lambda () (call-interactively 'mu4e-headers-toggle-thread-folding)) :open nil :open-rec  nil :close nil))
 
   ;; Colorize headers based on tags
   ;;
@@ -265,15 +392,19 @@
           (:name "Today's messages" :query "date:today..now" :key 116)
           (:name "Last 7 days" :query "date:7d..now" :hide-unread t :key 119)
           (:name "Inbox (Clean)" :query "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 118)
+          (:name "Inbox (No lists)" :query  "m:/INBOX AND NOT list:/.*/ AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 122)
           (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
           (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
 
   (setq mu4e-refile-folder
-      (defun dob-refile-to-archive (msg)
-        (cond
-         ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
-         ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
-         (t  (concat "/archive" (format-time-string "%Y"))))))
+        (defun dob-refile-to-archive (msg)
+          (cond
+           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
+           ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
+           (t  (concat "/archive" (format-time-string "%Y"))))))
+
+  ;; I prefer to be able to switch between org-msg-mode and not
+  (remove-hook 'mu4e-compose-pre-hook 'org-msg-mode)
 
   (map!
    :map (mu4e-headers-mode-map)
@@ -281,6 +412,7 @@
    :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
    :n "i" 'mu4e-select-other-view
+   :n "o" 'org-msg-mode
    :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
    :map (gnus-article-mode-map)
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
@@ -296,7 +428,12 @@
   (require 'ol-eww)
   (require 'org-ql)
   (require 'org-attach)
-
+  (require 'org-crypt)
+  (org-crypt-use-before-save-magic)
+  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+;; GPG key to use for encryption
+;; Either the Key ID or set to nil to use symmetric encryption.
+  (setq org-crypt-key "E1E70D6E64BA8D1F74E78285E5001906A3FDE45E")
   (setq org-startup-indented t
         org-todo-keywords '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED"))
         org-bullets-bullet-list '(" ")
@@ -314,9 +451,13 @@
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
-    (let ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer)))))
-      (switch-to-buffer (cdar journal-loc))
-      (goto-char (caar journal-loc))
+    (let* ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer))))
+           (jbuf (cdar journal-loc))
+           (jloc (caar journal-loc)))
+      (if-let (jwin (get-buffer-window jbuf))
+          (select-window jwin)
+          (switch-to-buffer jbuf))
+      (goto-char jloc)
       (org-insert-todo-subheading nil)
       (dob-org-insert-time-now nil)
       (org-todo "")
@@ -324,12 +465,14 @@
 
   (defun dob-daylog () (interactive)
          (setq org-attach-id-dir "~/Private/wiki/data/")
+         (setq dob-org-file "~/Private/org/daylog.org")
          (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
                                        ("people" . "file:///%(dob-person-filename)")
                                        ("wiki" . "%(dob-wiki-url)")))
          (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
+         (setq dob-org-file "~/Private/org/codetherapy.org")
          (setq org-agenda-files '("~/Private/org/codetherapy")))
 
   (if (string-equal "yacht" (getenv "SHORTHOST"))

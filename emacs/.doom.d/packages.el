@@ -9,9 +9,9 @@
 (package! beeminder)
 (package! org-plus-contrib)
 (package! org-ql)
-(package! org-mime)
 (package! vterm)
 (package! flycheck-clj-kondo)
+(package! dedicated)
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...

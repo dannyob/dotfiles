@@ -1,0 +1,8 @@
+EMAIL=danny@eff.org 
+MAILTO=danny@eff.org
+
+0 */4 * * *     update_dns > /dev/null 2>&1
+*/4 * * * *   msmtp-queue -r > /dev/null 2>&1
+20 * * * *  vdirsyncer sync > /dev/null 2>&1
+30 * * * *  mkdiary > /dev/null 2>&1
+40 */4 * * *  epicroot
