@@ -187,7 +187,7 @@
    sendmail-program "msmtpq"
    user-mail-address (cond ((cl-search "eff" (getenv "MAILDIR")) "danny@eff.org")
                            ((cl-search "codetherapy" (getenv "MAILDIR")) "danny@codetherapy.space")
-                           "danny@spesh.com"))
+                           (t "danny@spesh.com")))
 
 
   (setq mail-user-agent 'mu4e-user-agent)
