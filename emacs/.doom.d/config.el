@@ -406,8 +406,26 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   ;; I prefer to be able to switch between org-msg-mode and not
   (remove-hook 'mu4e-compose-pre-hook 'org-msg-mode)
 
+(defun dob-mu4e-tag-as (msg tag)
+  (let* ((my-tags (dob-mu4e-my-tags msg))
+         (del-my-tags (mapcar (lambda ($x) (concat "-" $x)) my-tags))
+         (add-tag (list (concat "+" tag)))
+    (mu4e-action-retag-message msg (string-join (append add-tag del-my-tags) ","))))
+
+(defun dob-mu4e-quickspam ()
+  (interactive)
+  (dob-mu4e-mark-as (mu4e-message-at-point) "spam-corpus")
+  (mu4e-headers-mark-for-refile))
+
+(defun dob-mu4e-quickham ()
+  (interactive)
+  (dob-mu4e-mark-as (mu4e-message-at-point) "ham-corpus")
+  (mu4e-headers-mark-for-refile))
+
   (map!
    :map (mu4e-headers-mode-map)
+   :n "S" 'dob-mu4e-quickspam
+   :n "H" 'dob-mu4e-quickham
    :n "x" 'mu4e-headers-mark-for-something
    :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
