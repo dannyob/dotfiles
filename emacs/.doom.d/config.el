@@ -444,6 +444,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-agenda-start-day "-1d"
         org-agenda-block-separator ""
         org-agenda-include-diary t
+        org-archive-location "archives/%s_archive::"
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
