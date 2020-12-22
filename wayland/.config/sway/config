@@ -335,3 +335,5 @@ bindsym $mod+shift+z mark zoomX
 bindsym $mod+slash exec makoctl dismiss -a
 
 workspace 3
+
+include ~/.config/sway/config.$SHORTHOST
