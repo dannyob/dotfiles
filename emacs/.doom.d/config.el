@@ -473,6 +473,17 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
+  (setq org-super-agenda-groups
+       '(
+         (:name "Wekan"
+          :file-path "wekan"
+         )
+         (:name "EFF"
+          :tag "EFF")
+         (:name "Daylog"
+          :file-path "daylog")
+         ))
+
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
