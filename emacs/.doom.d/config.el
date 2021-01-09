@@ -428,19 +428,19 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (dob-mu4e-tag-as (mu4e-message-at-point) "ham-corpus")
   (mu4e-headers-mark-for-refile))
 
-  (map!
-   :map (mu4e-headers-mode-map)
-   :n "S" 'dob-mu4e-quickspam
-   :n "H" 'dob-mu4e-quickham
-   :n "x" 'mu4e-headers-mark-for-something
-   :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
-   :n "M-SPC" 'mu4e-view-scroll-up-or-next
-   :n "i" 'mu4e-select-other-view
-   :n "o" 'org-msg-mode
-   :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
-   :map (gnus-article-mode-map)
-   :n "M-SPC" 'mu4e-view-scroll-up-or-next
-   :n "i" 'mu4e-select-other-view)))
+(map!
+ :map (mu4e-headers-mode-map)
+ :n "S" 'dob-mu4e-quickspam
+ :n "H" 'dob-mu4e-quickham
+ :n "x" 'mu4e-headers-mark-for-something
+ :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
+ :n "M-SPC" 'mu4e-view-scroll-up-or-next
+ :n "i" 'mu4e-select-other-view
+ :n "o" 'org-msg-mode
+ :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
+ :map (gnus-article-mode-map)
+ :n "M-SPC" 'mu4e-view-scroll-up-or-next
+ :n "i" 'mu4e-select-other-view))
 
 
 
@@ -455,8 +455,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (require 'org-crypt)
   (org-crypt-use-before-save-magic)
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
-;; GPG key to use for encryption
-;; Either the Key ID or set to nil to use symmetric encryption.
+  ;; GPG key to use for encryption
+  ;; Either the Key ID or set to nil to use symmetric encryption.
   (setq org-crypt-key "E1E70D6E64BA8D1F74E78285E5001906A3FDE45E")
   (setq org-startup-indented t
         org-todo-keywords '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED"))
@@ -474,15 +474,15 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-quote-and-verse-blocks t)
 
   (setq org-super-agenda-groups
-       '(
-         (:name "Wekan"
-          :file-path "wekan"
-         )
-         (:name "EFF"
-          :tag "EFF")
-         (:name "Daylog"
-          :file-path "daylog")
-         ))
+        '(
+          (:name "Wekan"
+                 :file-path "wekan"
+                 )
+          (:name "EFF"
+                 :tag "EFF")
+          (:name "Daylog"
+                 :file-path "daylog")
+          ))
 
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
@@ -492,7 +492,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
           (select-window jwin)
-          (switch-to-buffer jbuf))
+        (switch-to-buffer jbuf))
       (goto-char jloc)
       (org-insert-todo-subheading nil)
       (dob-org-insert-time-now nil)
@@ -535,9 +535,9 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
   (map!
    (:prefix "C-c"
-    :desc "Add a new journal entry" "x" 'dob-add-journal-todo
-    :desc "Org store link" "M-c" 'org-store-link
-    :desc "Org insert link" "M-v" 'org-insert-link-global)))
+            :desc "Add a new journal entry" "x" 'dob-add-journal-todo
+            :desc "Org store link" "M-c" 'org-store-link
+            :desc "Org insert link" "M-v" 'org-insert-link-global)))
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
 (custom-set-faces
