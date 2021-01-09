@@ -440,7 +440,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
    :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
    :map (gnus-article-mode-map)
    :n "M-SPC" 'mu4e-view-scroll-up-or-next
-   :n "i" 'mu4e-select-other-view))
+   :n "i" 'mu4e-select-other-view)))
 
 
 
@@ -508,7 +508,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
-         (setq dob-org-file "~/Private/org/codetherapy.org")
+         (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
          (setq org-agenda-files '("~/Private/org/codetherapy")))
 
   (if (string-equal "yacht" (getenv "SHORTHOST"))
