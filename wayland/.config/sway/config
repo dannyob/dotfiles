@@ -279,6 +279,7 @@ hide_edge_borders --i3 smart_no_gaps
 exec ~/.local/bin/epicroot
 exec mako
 exec syncthing
+exec insync-headless
      
 for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
