@@ -445,6 +445,24 @@ If SUBTHREAD is non-nil, only fold the current subthread."
  :n "M-SPC" 'mu4e-view-scroll-up-or-next
  :n "i" 'mu4e-select-other-view))
 
+;; Sly-Mode
+
+(after! sly
+  (defun dob-switch-or-select-window (buf)
+    (interactive)
+    (message "switching")
+    (let ((w (get-buffer-window buf)))
+      (if w (select-window w) (switch-to-buffer buf))))
+  (defun dob-repl-or-code ()
+    (interactive)
+    (if (equal major-mode 'sly-mrepl-mode)
+        (sly-switch-to-most-recent 'lisp-mode)
+      (sly-mrepl 'dob-switch-or-select-window)))
+
+  ;; (define-key sly-mode-map (kbd "C-c C-z") 'dob-repl-or-code)
+  (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
+
+
 
 
 ;; Org-mode
