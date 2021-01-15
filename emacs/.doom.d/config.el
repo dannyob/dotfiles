@@ -115,10 +115,11 @@
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
 
-(define-key evil-normal-state-map "g\C-g" 'count-words)
-(define-key evil-normal-state-map "H" 'previous-buffer)
-(define-key evil-normal-state-map "L" 'next-buffer)
-
+(after! evil
+   (define-key evil-normal-state-map "g\C-g" 'count-words)
+   (define-key evil-normal-state-map "H" 'previous-buffer)
+   (define-key evil-normal-state-map "L" 'next-buffer))
+ 
 (map!
  (:leader
   :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
