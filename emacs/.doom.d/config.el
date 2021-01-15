@@ -39,7 +39,10 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(defvar dob-hidpi 1 "Scaling factor for HiDPI monitors")
+(if (>= (display-pixel-width) 2560)
+    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
+    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
+
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
 (setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
