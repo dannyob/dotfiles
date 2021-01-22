@@ -509,8 +509,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
-    (let* ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(cons (point) (current-buffer))))
-           (jbuf (cdar journal-loc))
+    (let* ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(list (point) (current-buffer))))
+           (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
           (select-window jwin)
