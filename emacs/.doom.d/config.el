@@ -368,6 +368,16 @@ If SUBTHREAD is non-nil, only fold the current subthread."
    :n "za" 'mu4e-headers-toggle-thread-folding
    :n "zM" 'mu4e-headers-fold-all)
 
+;; Apparently this helps with text breaking, etc?
+;;
+(add-hook 'message-mode-hook 'auto-fill-mode)
+(setq mu4e-compose-format-flowed t)
+(setq message-cite-reply-position 'below)
+
+; With just the above settings sent emails do not wrap correctly in mu4e:view. You may also want to set
+(setq-default fill-column 72)
+(setq fill-flowed-encode-column fill-column)
+
 ;; Below is more evilly correct but doesn't work with fold module in doom-emacs
 ;; because fold module remaps evil-fold-action keys.
 ;; (setq evil-fold-list (cl-remove-if (lambda (e) (eq (caar e) 'mu4e-headers-mode)) evil-fold-list))
