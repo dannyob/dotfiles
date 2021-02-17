@@ -13,6 +13,8 @@
 
 (setq org-list-allow-alphabetical nil)
 
+(setq org-super-agenda-mode t)
+
 ;; If we have native compilation, let's get compiling!
 (when (fboundp 'native-compile-async)
       (setq comp-async-jobs-number 2 ;; not using all cores
