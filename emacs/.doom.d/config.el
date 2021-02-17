@@ -233,9 +233,9 @@
 
   (setq mail-user-agent 'mu4e-user-agent)
   (setq
-   mu4e-sent-folder   "/sent"       ;; folder for sent messages
-   mu4e-drafts-folder "/drafts"     ;; unfinished messages
-   mu4e-trash-folder  "/trash")      ;; trashed messages
+   mu4e-sent-folder   "/Sent Items"       ;; folder for sent messages
+   mu4e-drafts-folder "/Drafts"     ;; unfinished messages
+   mu4e-trash-folder  "/Deleted Items")      ;; trashed messages
   (setq mu4e-use-fancy-chars t)
   (setq mu4e-attachment-dir "~/tmp")
   (setq mu4e-change-filenames-when-moving t)
