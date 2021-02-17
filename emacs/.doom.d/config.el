@@ -520,20 +520,33 @@ If SUBTHREAD is non-nil, only fold the current subthread."
                  :file-path "daylog")
           ))
 
+  (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
+
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
-    (let* ((journal-loc (org-ql-select (org-agenda-files) '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))) :action '(list (point) (current-buffer))))
+    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
            (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
           (select-window jwin)
         (switch-to-buffer jbuf))
-      (goto-char jloc)
+      (goto-char jloc))
       (org-insert-todo-subheading nil)
       (dob-org-insert-time-now nil)
       (org-todo "")
-      (insert " ")))
+      (insert " "))
+
+  (defun dob-goto-journal ()
+    "Jump to where journal entry should be added"
+    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
+           (jbuf (cadar journal-loc))
+           (jloc (caar journal-loc)))
+      (if-let (jwin (get-buffer-window jbuf))
+          (select-window jwin)
+        (switch-to-buffer jbuf))
+      (goto-char jloc)))
+
 
   (defun dob-daylog () (interactive)
          (setq org-attach-id-dir "~/Private/wiki/data/")
@@ -558,6 +571,19 @@ If SUBTHREAD is non-nil, only fold the current subthread."
            :base-directory "/home/danny/Private/org/codetherapy/"
            :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
            :publishing-function org-html-publish-to-html)))
+
+  ;; Another go at org-capture, too
+  ;;
+  (setq org-default-notes-file dob-org-file)
+  (setq org-capture-templates
+        '(("s"
+           "Scheduled Todo"
+           entry
+           (function (lambda () (dob-goto-journal)))
+           "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
+           :unnarrowed t
+           :immediate-finish t
+           :jump-to-captured t)))
 
   (setq orgit-export-alist
         (append orgit-export-alist

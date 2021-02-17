@@ -294,6 +294,7 @@ for_window [class="Mattermost"] mark talk2
 for_window [class="kitty"] mark shell1
 for_window [app_id="kitty"] mark shell2
 for_window [class="zoom"] mark zoom1
+for_window [class="zoom"] floating enable
 
 assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
