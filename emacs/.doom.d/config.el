@@ -406,8 +406,10 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (setq mu4e-refile-folder
         (defun dob-refile-to-archive (msg)
           (cond
-           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/missedspam")
-           ((mu4e-message-field msg :date) (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date))))
+           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/Junk Email")
+           ((mu4e-message-field msg :date)
+            (let ((year-folder (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date)))))
+              (if (string= year-folder "/archive2021") "/Archives" year-folder)))
            (t  (concat "/archive" (format-time-string "%Y"))))))
 
   ;; I prefer to be able to switch between org-msg-mode and not
