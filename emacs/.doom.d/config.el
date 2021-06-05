@@ -13,7 +13,9 @@
 
 (setq org-list-allow-alphabetical nil)
 
-(setq org-super-agenda-mode t)
+(setq org-roam-directory "~/Private/org/org-roam")
+
+(setq evil-want-C-u-scroll nil)
 
 ;; If we have native compilation, let's get compiling!
 (when (fboundp 'native-compile-async)
@@ -501,7 +503,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   ;; Either the Key ID or set to nil to use symmetric encryption.
   (setq org-crypt-key "E1E70D6E64BA8D1F74E78285E5001906A3FDE45E")
   (setq org-startup-indented t
-        org-todo-keywords '((sequence "TODO" "WAITING" "|" "CANCELED" "DONE" "DELEGATED"))
+        org-todo-keywords '((sequence "TODO" "WAITING" "|"  "DONE" "DELEGATED" "CANCELED"))
         org-bullets-bullet-list '(" ")
         org-ellipsis "  "
         org-pretty-entities t
@@ -515,8 +517,21 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
+
+  (setq org-agenda-custom-commands
+        '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
+          ("w" "Work Schedule" ((agenda "") (tags-todo "EFF") (tags-todo "-EFF")))))
+
   (setq org-super-agenda-groups
         '(
+          (:log t)
+          (:name "Schedule"
+           :time-grid t
+           )
+          (:name "Today"
+           :scheduled today)
           (:name "Wekan"
                  :file-path "wekan"
                  )
@@ -525,6 +540,14 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           (:name "Daylog"
                  :file-path "daylog")
           ))
+
+  (setq org-super-agenda-mode t)
+  (setq org-super-agenda-header-map nil)
+  (face-spec-set 'org-agenda-date '((t :height 1.5 :box t :inverse-video t)))
+  (face-spec-set 'org-agenda-structure '((t :height 1.1)))
+  (face-spec-set 'org-super-agenda-header'((t :height 1.5)))
+
+
 
   (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
