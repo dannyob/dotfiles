@@ -287,6 +287,7 @@ for_window [instance="Navigator"] mark browser3
 #for_window [window_role="browser"] mark browser4
 for_window [instance="brave-browser"] mark browser5
 for_window [instance="brave"] mark browser6
+for_window [app_id="Brave-browser"] mark browser6
 for_window [class="Emacs"] mark emacs1
 for_window [app_id="emacs"] mark emacs2
 for_window [instance="hexchat"] mark talk1
@@ -301,7 +302,7 @@ assign [class="Hexchat"] 4
 assign [class="Emacs"] 2
 assign [app_id="emacs"] 2
 assign [class="Firefox"] 1
-assign [class="Brave-browser"] 1
+assign [app_id="Brave-browser"] 1
 assign [class="Brave"] 1
 assign [instance="Navigator"] 1
 
