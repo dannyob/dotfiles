@@ -7,5 +7,5 @@ for category in $categories; do
     echo -n "Learning: $category     \t"
     mu find --format=links --clearlinks --linksdir=~/tmp/mudump tag:${category}-corpus
     echo "($(messages -s ~/tmp/mudump) samples)"
-    find -L ~/tmp/mudump -type f | grep -v noindex | while read f; do formail <$f; done | dbacl -h 16 -T email -l ${category}-mail
+    find -L ~/tmp/mudump -type f | grep -v noindex | while read f; do formail <$f; done | dbacl -h 17 -T email -l ${category}-mail
 done
