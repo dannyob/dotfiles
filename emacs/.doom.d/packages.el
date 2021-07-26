@@ -7,7 +7,7 @@
 
 (package! kaolin-themes)
 (package! beeminder)
-(package! org-plus-contrib)
+;; (package! org-plus-contrib)
 (package! org-ql)
 (package! vterm)
 (package! flycheck-clj-kondo)

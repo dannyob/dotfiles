@@ -9,10 +9,20 @@
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
 
-(setq dob-org-file "~/Private/org/daylog.org")
+;; Special stuff for WSL
+;; (if
+;;      (string-match "microsoft"
+;;                    (with-temp-buffer (shell-command "uname -r" t)
+;;  
+;;                                      (delete-char -1)
+;;                                      (buffer-string)))
+;;      (setq browse-url-browser-function 'browse-url-generic
+;;            browse-url-program-generic "PowerShell.exe"
+;;            browse-url-generic-args '("-Command" "Start-Process")))
+;; 
+;; (setq dob-org-file "~/Private/org/daylog.org")
 
 (setq org-list-allow-alphabetical nil)
-
 (setq org-roam-directory "~/Private/org/org-roam")
 
 (setq evil-want-C-u-scroll nil)
@@ -43,10 +53,11 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(if (>= (display-pixel-width) 2560)
-    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
-    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
+;;(if (>= (display-pixel-width) 2560)
+;;    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
+;;    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
 
+(defvar dob-hidpi 0.75)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
 (setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
