@@ -152,7 +152,7 @@ set guicursor=n-c:block,i-ci-ve:ver40,r-cr-v:hor20,o:hor50,a:blinkwait700-blinko
 
 call plug#begin()
 " Plug 'eraserhd/parinfer-rust'
-Plug 'jpalardy/vim-slime'
+Plug 'jpalardy/vim-slime', { 'branch' : 'main' }
 Plug 'tomtom/quickfixsigns_vim'
 " gc == comment/uncomment
 Plug 'tpope/vim-commentary' 
@@ -172,11 +172,11 @@ Plug 'unblevable/quick-scope'
 Plug 'mbbill/undotree'
 
 " PGP you know me
-Plug 'jamessan/vim-gnupg'
+Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
 " Dirty Emacs Experimentation
-"
-Plug 'jceb/vim-orgmode'
+
+Plug 'kristijanhusak/orgmode.nvim'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
