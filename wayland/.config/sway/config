@@ -21,6 +21,11 @@ set $term kitty
 # Note: it's recommended that you pass the final command to sway
 set $menu wofi --show=run,drun
 
+### Pipewire not pulseaudio
+exec  pipewire
+exec  pipewire-media-session
+exec  pipewire-pulse
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -74,6 +79,7 @@ mode 1920x1080@143.981003Hz
 # Read `man 5 sway-input` for more information about this section.
 
 input 2:10:TPPS/2_IBM_TrackPoint {
+      accel_profile adaptive
       pointer_accel -0.5
 }
 
