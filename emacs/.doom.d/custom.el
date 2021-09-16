@@ -30,7 +30,8 @@
                                       "\\s-+\\(" lisp-mode-symbol-regexp "\\)"))
                              2)))))
            (enhance-imenu-lisp "bookmarklet-command" "class" "command" "function" "mode" "parenscript" "user-class"))
-     (no-ytbyte-compile . t))))
+     (no-ytbyte-compile . t)))
+ '(warning-suppress-types '((nrepl-connected-hook))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
