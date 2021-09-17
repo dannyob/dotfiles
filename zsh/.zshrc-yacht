@@ -24,6 +24,10 @@ if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
     echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null
 fi
 
+function fixgpg {
+gpg-connect-agent updatestartuptty /bye
+}
+
 ###
 # LOCAL FUNCTIONS
 ###

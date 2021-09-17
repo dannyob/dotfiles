@@ -9,7 +9,7 @@
 (package! beeminder)
 ;; (package! org-plus-contrib)
 (package! org-ql)
-(package! vterm)
+;(package! vterm)
 (package! flycheck-clj-kondo)
 (package! dedicated)
 (package! org-pomodoro)

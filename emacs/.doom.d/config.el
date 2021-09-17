@@ -53,9 +53,9 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-;;(if (>= (display-pixel-width) 2560)
-;;    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
-;;    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
+;(if (>= (display-pixel-width) 2560)
+;    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
+;    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
 
 (defvar dob-hidpi 0.75)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
@@ -224,6 +224,31 @@
 
 (setenv "EMAIL_QUEUE_QUIET" "t")
 
+
+;; Wayland clipboard
+;;
+
+(setq wl-copy-process nil)
+(defun wl-copy (text)
+  (setq wl-copy-process (make-process :name "wl-copy"
+                                      :buffer nil
+                                      :command '("wl-copy" "-f" "-n")
+                                      :connection-type 'pipe))
+  (process-send-string wl-copy-process text)
+  (process-send-eof wl-copy-process))
+(defun wl-paste ()
+  (if (and wl-copy-process (process-live-p wl-copy-process))
+      nil ; should return nil if we're the current paste owner
+    (shell-command-to-string "wl-paste -n | tr -d \r")))
+(setq interprogram-cut-function 'wl-copy)
+(setq interprogram-paste-function 'wl-paste)
+
+;; Org-Roam
+(after! org-roam
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :if-new
+           (file+head "${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t))))
 
 ;; Mu4e!
 ;;
@@ -531,11 +556,23 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 
-  (setq org-agenda-custom-commands
-        '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
-          ("w" "Work Schedule" ((agenda "") (tags-todo "EFF") (tags-todo "-EFF")))))
+(setq dob/organization-task-id "a7e9c9b9-0517-4ac5-876a-a1036b63c3a2")
 
-  (setq org-super-agenda-groups
+(defun dob/clock-in-organization-task-as-default ()
+  (interactive)
+  (save-restriction
+    (widen)
+    (org-with-point-at (org-id-find dob/organization-task-id 'marker)
+      (org-clock-in '(16)))))
+
+;; (setq org-agenda-custom-commands
+;;       '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
+;;         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (cl-remove-if (lambda (x) (string-match ".*MyHabits.*" x)) org-agenda-files))))))))
+(setq org-agenda-custom-commands
+      '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
+        ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
+
+(setq org-super-agenda-groups
         '(
           (:log t)
           (:name "Schedule"
@@ -546,8 +583,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           (:name "Wekan"
                  :file-path "wekan"
                  )
-          (:name "EFF"
-                 :tag "EFF")
+          (:name "Filecoin"
+                 :tag "Filecoin")
           (:name "Daylog"
                  :file-path "daylog")
           ))
@@ -591,8 +628,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (defun dob-daylog () (interactive)
          (setq org-attach-id-dir "~/Private/wiki/data/")
          (setq dob-org-file "~/Private/org/daylog.org")
-         (setq org-link-abbrev-alist '(("att" . org-attach-expand-link)
-                                       ("people" . "file:///%(dob-person-filename)")
+         (setq org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
                                        ("wiki" . "%(dob-wiki-url)")))
          (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
 
@@ -640,6 +676,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
             :desc "Add a new journal entry" "x" 'dob-add-journal-todo
             :desc "Org store link" "M-c" 'org-store-link
             :desc "Org insert link" "M-v" 'org-insert-link-global)))
+
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
 (custom-set-faces
