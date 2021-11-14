@@ -1,0 +1,13 @@
+export HISTFILE=~/.cache/zshhistory
+export HISTSIZE=10000
+export SAVEHIST=10000
+#setopt INC_APPEND_HISTORY_TIME # doesn't show you other shell histories but it's still all saved, use fc -RI to manually import
+# See https://zsh.sourceforge.io/Doc/Release/Options.html#index-INC_005fAPPEND_005fHISTORY_005fTIME
+setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+source $HOME/.zshrc-yacht
+
+alias airpods="echo connect 74:9E:AF:AA:CC:11 | bluetoothctl"
