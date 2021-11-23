@@ -6,7 +6,27 @@
  '(custom-safe-themes
    '("0c6a36393d5782839b88e4bf932f20155cb4321242ce75dc587b4f564cb63d90" "2f1518e906a8b60fac943d02ad415f1d8b3933a5a7f75e307e6e9a26ef5bf570" "79278310dd6cacf2d2f491063c4ab8b129fee2a498e4c25912ddaa6c3c5b621e" default))
  '(safe-local-variable-values
-   '((eval cl-flet
+   '((eval modify-syntax-entry 43 "'")
+     (eval modify-syntax-entry 36 "'")
+     (eval modify-syntax-entry 126 "'")
+     (eval let
+           ((root-dir-unexpanded
+             (locate-dominating-file default-directory ".dir-locals.el")))
+           (when root-dir-unexpanded
+             (let*
+                 ((root-dir
+                   (expand-file-name root-dir-unexpanded))
+                  (root-dir*
+                   (directory-file-name root-dir)))
+               (unless
+                   (boundp 'geiser-guile-load-path)
+                 (defvar geiser-guile-load-path 'nil))
+               (make-local-variable 'geiser-guile-load-path)
+               (require 'cl-lib)
+               (cl-pushnew root-dir* geiser-guile-load-path :test #'string-equal))))
+     (eval setq-local guix-directory
+           (locate-dominating-file default-directory ".dir-locals.el"))
+     (eval cl-flet
            ((enhance-imenu-lisp
              (&rest keywords)
              (dolist
@@ -31,6 +51,7 @@
                              2)))))
            (enhance-imenu-lisp "bookmarklet-command" "class" "command" "function" "mode" "parenscript" "user-class"))
      (no-ytbyte-compile . t)))
+ '(send-mail-function 'mailclient-send-it)
  '(warning-suppress-types '((nrepl-connected-hook))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
