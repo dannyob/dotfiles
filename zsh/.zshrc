@@ -50,6 +50,7 @@ alias   more=less
 alias   clipin='wl-copy'
 alias   clipout='wl-paste'
 alias   mailq='msmtp-queue'
+alias   kat='kitty +kitten icat'
 
 ###
 # FUNCTIONS
