@@ -57,7 +57,8 @@
 ;    (defvar dob-hidpi 2 "Scaling factor for HiDPI monitors")
 ;    (defvar dob-hidpi 1 "Scaling factor for HiDPI monitors"))
 
-(defvar dob-hidpi 0.75)
+; (defvar dob-hidpi 0.75)
+(defvar dob-hidpi 1)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
 (setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
@@ -65,7 +66,8 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'tango)
+;; (setq doom-theme 'tango)
+(setq doom-theme 'kaolin-ocean)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -107,7 +109,7 @@
           `((".*" ,temporary-file-directory t)))
 
 (setq auto-save-interval 20)
-(setq auto-save-timeout 10)
+(setq auto-save-timeout 3)
 (setq delete-auto-save-files nil)
 (setq auto-save-default t)
 
@@ -115,6 +117,9 @@
 ;; does not include XDG_DATA_DIR's defaults, which are /usr/local/share/:/usr/share/
 
 (setenv "XDG_DATA_DIR" (concat (getenv "XDG_DATA_DIR") ":/usr/local/share:/usr/share"))
+
+
+;; Keyboard bindings
 (global-set-key (kbd "<redo>") 'undo-tree-redo)
 (global-set-key (kbd "<XF86Cut>") 'clipboard-kill-region)
 (global-set-key (kbd "<XF86Copy>") 'clipboard-kill-ring-save)
@@ -646,6 +651,10 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         '(("codetherapy-dev-blog"
            :base-directory "/home/danny/Private/org/codetherapy/"
            :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
+           :publishing-function org-html-publish-to-html)
+          ("dannyob-eth-blog"
+           :base-directory "/home/danny/Private/org/org-roam/daily/"
+           :publishing-directory "/ssh:danny@boat:/var/local/www/dannyob.eth/diary/"
            :publishing-function org-html-publish-to-html)))
 
   ;; Another go at org-capture, too
