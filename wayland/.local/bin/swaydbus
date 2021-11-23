@@ -1,2 +1,4 @@
 #!/bin/sh
+XDG_CURRENT_DESKTOP=sway
+declare -x XDG_CURRENT_DESKTOP
 dbus-run-session sway
