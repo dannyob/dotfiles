@@ -26,6 +26,9 @@ exec  pipewire
 exec  pipewire-media-session
 exec  pipewire-pulse
 
+# Cursor themes and size
+seat seat0 xcursor_theme Adwaita 36
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
