@@ -5,4 +5,4 @@ neovim/.config/nvim/.netrwhist
 /fonts/.fonts/.uuid
 /neovim/.config/nvim/plugged/
 /wayland/.local/bin/evscript
-emacs/.doom.d/custom.el
+/emacs/.doom.d/custom.el
