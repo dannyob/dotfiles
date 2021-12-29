@@ -1,6 +1,4 @@
 emulate sh -c 'source /etc/profile'
-#GUIX_PROFILE=$HOME/.guix-profile emulate sh  -c 'source $HOME/.guix-profile/etc/profile'
-#GUIX_PROFILE=$HOME/.config/guix/current emulate sh  -c 'source $HOME/.config/guix/current/etc/profile'
 declare -x SHORTHOST=`hostname`
 declare -x PATH=$HOME/.cargo/bin:$HOME/.local/bin:$PATH
 declare -x GUIX_LOCPATH=$GUIX_LOCPATH:$HOME/.guix-profile/lib/locale

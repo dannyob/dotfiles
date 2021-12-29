@@ -21,6 +21,14 @@ set $term kitty
 # Note: it's recommended that you pass the final command to sway
 set $menu wofi --show=run,drun
 
+### Pipewire not pulseaudio
+exec  pipewire
+exec  pipewire-pulse
+exec  wireplumber
+
+# Cursor themes and size
+seat seat0 xcursor_theme Adwaita 36
+
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
@@ -79,6 +87,7 @@ output "Unknown PA278CV M5LMQS078297" {
 # Read `man 5 sway-input` for more information about this section.
 
 input 2:10:TPPS/2_IBM_TrackPoint {
+      accel_profile adaptive
       pointer_accel -0.5
 }
 

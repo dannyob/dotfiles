@@ -1,2 +1,2 @@
 #!/bin/sh
-brave-browser -enable-features=UseOzonePlatform -ozone-platform=wayland
+flatpak run com.brave.Browser -enable-features=UseOzonePlatform -ozone-platform=wayland $*
