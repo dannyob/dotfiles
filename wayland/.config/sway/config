@@ -23,8 +23,8 @@ set $menu wofi --show=run,drun
 
 ### Pipewire not pulseaudio
 exec  pipewire
-exec  pipewire-media-session
 exec  pipewire-pulse
+exec  wireplumber
 
 # Cursor themes and size
 seat seat0 xcursor_theme Adwaita 36
