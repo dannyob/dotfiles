@@ -5,6 +5,7 @@
 ;; the command line, then restart Emacs for the changes to take effect.
 ;; Alternatively, use M-x doom/reload.
 
+(package! indium)
 (package! kaolin-themes)
 (package! beeminder)
 ;; (package! org-plus-contrib)
