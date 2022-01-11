@@ -1,2 +1,6 @@
 #!/bin/sh
+if test -f /usr/bin/brave-browser;  then
+    brave-browser $*
+else
 flatpak run com.brave.Browser -enable-features=UseOzonePlatform -ozone-platform=wayland $*
+fi
