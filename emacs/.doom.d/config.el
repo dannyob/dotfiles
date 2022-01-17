@@ -30,10 +30,20 @@
             comp-deferred-compilation-black-list
             '("autoloads.el")))
 
-;; I like tabs
-(when (fboundp 'tab-bar-mode)
-  (tab-bar-mode))
+;; I DO NOT like tabs
+;(when (fboundp 'tab-bar-mode)
+;  (tab-bar-mode))
 
+;; And I like context menus
+(when (fboundp 'context-menu-mode)
+  (context-menu-mode))
+
+;; And I like menu bars
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode))
+
+
+;; KEYBOARD
 (map!
  (:prefix "C-c"
   :desc "Start mu4e" "j" '=mu4e
@@ -134,6 +144,7 @@
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
 
+;; KEYBOARD
 (after! evil
    (define-key evil-normal-state-map "g\C-g" 'count-words)
    (define-key evil-normal-state-map "H" 'previous-buffer)
@@ -312,6 +323,7 @@
                                   :with-toc nil))
 
 
+  ;; KEYBOARD
   (map!
    (:prefix "C-c"
     :desc "Jump to Inbox" "j" (defun dob-jump-to-inbox () (interactive) (mu4e~headers-search-execute "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus AND NOT tag:notification-guess AND NOT tag:notification-corpus"  't))
@@ -405,6 +417,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
       (when (< 1 (length msgs))
         (mu4e~headers-fold-make-overlay first-marked-point last-marked-point (nreverse msgs))))))
 
+;; KEYBOARD
 (map!
    :map (mu4e-headers-mode-map)
    :n "za" 'mu4e-headers-toggle-thread-folding
@@ -493,6 +506,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (dob-mu4e-tag-as (mu4e-message-at-point) "notification-corpus")
   (mu4e-headers-mark-for-refile))
 
+;; KEYBOARD
 (map!
  :map (mu4e-headers-mode-map)
  :n "S" 'dob-mu4e-quickspam
@@ -522,6 +536,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         (sly-switch-to-most-recent 'lisp-mode)
       (sly-mrepl 'dob-switch-or-select-window)))
 
+  ;; KEYBOARD
   ;; (define-key sly-mode-map (kbd "C-c C-z") 'dob-repl-or-code)
   (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
 
@@ -530,6 +545,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
 ;; Org-mode
 ;;
+
 
 (after! org
   (require 'ol-info)
