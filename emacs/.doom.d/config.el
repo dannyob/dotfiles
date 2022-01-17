@@ -263,6 +263,12 @@
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :if-new
            (file+head "${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
+  (setq org-roam-dailies-capture-templates
+        `(("d" "default" entry
+           "* %T %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "#+title: %<%Y-%m-%d>\n\n* Aims\n* Log\n* Conclusions")
            :unnarrowed t))))
 
 ;; Mu4e!
