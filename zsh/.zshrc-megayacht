@@ -72,6 +72,10 @@ guixupgrade() {
 )
 }
 
+screencapture() {
+    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/$(date -Isec).png
+}
+
 ###
 ## zgen
 ###
