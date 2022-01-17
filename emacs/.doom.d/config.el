@@ -20,10 +20,6 @@
 ;;            browse-url-program-generic "PowerShell.exe"
 ;;            browse-url-generic-args '("-Command" "Start-Process")))
 ;; 
-;; (setq dob-org-file "~/Private/org/daylog.org")
-
-(setq org-list-allow-alphabetical nil)
-(setq org-roam-directory "~/Private/org/org-roam")
 
 (setq evil-want-C-u-scroll nil)
 
@@ -72,6 +68,9 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/Private/org/")
+(setq org-list-allow-alphabetical nil)
+(setq org-roam-directory "~/Private/org/wiki")
+
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -629,13 +628,17 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         (switch-to-buffer jbuf))
       (goto-char jloc)))
 
+;; (defun dob-add-journal-todo ()
+;;   (interactive)
+;;   (org-roam-dailies-capture-today))
+
 
   (defun dob-daylog () (interactive)
          (setq org-attach-id-dir "~/Private/wiki/data/")
          (setq dob-org-file "~/Private/org/daylog.org")
          (setq org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
                                        ("wiki" . "%(dob-wiki-url)")))
-         (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/" "~/todo.org"))))
+         (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
          (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
@@ -653,7 +656,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
            :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
            :publishing-function org-html-publish-to-html)
           ("dannyob-eth-blog"
-           :base-directory "/home/danny/Private/org/org-roam/daily/"
+           :base-directory "/home/danny/Private/org/wiki/daily/"
            :publishing-directory "/ssh:danny@boat:/var/local/www/dannyob.eth/diary/"
            :publishing-function org-html-publish-to-html)))
 
@@ -675,14 +678,18 @@ If SUBTHREAD is non-nil, only fold the current subthread."
                 '(("git.savannah.gnu.org/git[:/]\\(.+\\)$" "https://git.savannah.gnu.org/cgit/%n" "https://git.savannah.gnu.org/cgit/%n/log/?h=%r" "https://git.savannah.gnu.org/cgit/%n/commit/?id=%r"))))
 
   (setq org-log-done 'time)
+
   (defun dob-org-insert-time-now (arg)
     "Insert a timestamp with today's time and date."
     (interactive "P")
     (org-time-stamp '(16)))
 
+  ;; KEYBOARD
   (map!
    (:prefix "C-c"
-            :desc "Add a new journal entry" "x" 'dob-add-journal-todo
+            :desc "Add a new journal entry" "x" 'org-roam-dailies-capture-today
+            :desc "Add a new org-roam item" "y" 'org-roam-node-insert
+            :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
             :desc "Org store link" "M-c" 'org-store-link
             :desc "Org insert link" "M-v" 'org-insert-link-global)))
 
