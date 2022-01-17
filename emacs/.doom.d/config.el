@@ -573,6 +573,16 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
+;; org-transclusion
+(use-package! org-transclusion
+  :after org
+  :init
+  (map!
+   :map global-map "<f12>" #'org-transclusion-add
+   :leader
+   :prefix "n"
+   :desc "Org Transclusion Mode" "t" #'org-transclusion-mode))
+
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 
@@ -615,9 +625,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (face-spec-set 'org-agenda-structure '((t :height 1.1)))
   (face-spec-set 'org-super-agenda-header'((t :height 1.5)))
 
+ (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
-
-  (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
