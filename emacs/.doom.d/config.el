@@ -225,7 +225,10 @@
  'org-babel-load-languages
  '((gnuplot . t)
    (python . t)
+   (lisp . t)
    (scheme . t)))
+
+;; ;; ;; ;; ;; ;; ;; ;; ;; (setf org-babel-lisp-eval-fn "sly-eval")
 
 (setq geiser-active-implementations '(guile))
 
@@ -546,6 +549,9 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   ;; (define-key sly-mode-map (kbd "C-c C-z") 'dob-repl-or-code)
   (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
 
+
+ (after! company
+   (setq company-idle-delay nil))
 
 
 
