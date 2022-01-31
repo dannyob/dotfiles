@@ -271,7 +271,7 @@
         `(("d" "default" entry
            "* %T %?"
            :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<%Y-%m-%d>\n\n* Aims\n* Log\n* Conclusions")
+                              "#+title: %<%Y-%m-%d>\n\n* Aims\n* Log :JOURNAL:\n* Conclusions")
            :unnarrowed t))))
 
 ;; Mu4e!
@@ -675,7 +675,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          (setq dob-org-file "~/Private/org/daylog.org")
          (setq org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
                                        ("wiki" . "%(dob-wiki-url)")))
-         (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/" "~/todo.org"))))
+         (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/wiki/daily" "~/Private/org/" "~/todo.org"))))
 
   (defun dob-yacht () (interactive)
          (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
@@ -724,7 +724,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   ;; KEYBOARD
   (map!
    (:prefix "C-c"
-            :desc "Add a new journal entry" "x" 'org-roam-dailies-capture-today
+            :desc "Add a new journal entry" "x" 'dob-add-journal-todo
             :desc "Add a new org-roam item" "y" 'org-roam-node-insert
             :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
             :desc "Org store link" "M-c" 'org-store-link
