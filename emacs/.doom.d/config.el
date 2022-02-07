@@ -639,11 +639,13 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
  (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
-
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
-    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
+    (org-roam-dailies-goto-today)
+    (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+           (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+           (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
            (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
@@ -657,7 +659,9 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
   (defun dob-goto-journal ()
     "Jump to where journal entry should be added"
-    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
+    (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+           (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+           (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
            (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
