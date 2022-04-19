@@ -66,7 +66,7 @@
 ; (defvar dob-hidpi 0.75)
 (defvar dob-hidpi 1)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
-(setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
+(setq doom-variable-pitch-font (font-spec :family "Cream"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -144,7 +144,7 @@
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
 
-;; keyboard
+;; KEYBOARD
 (map!
  :desc "Count words" :n "g C-g" 'count-words
  :desc "Previous buffer" :n "H" 'previous-buffer
@@ -227,10 +227,11 @@
  '((gnuplot . t)
    (python . t)
    (lisp . t)
+   (deno . t)
    (scheme . t)))
 
 (setf org-babel-lisp-eval-fn "sly-eval")
-
+(add-to-list 'org-src-lang-modes '("deno" . typescript))
 (setq geiser-active-implementations '(guile))
 
 ;; Guix helpers
@@ -578,13 +579,28 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-agenda-span 3
-        org-agenda-start-day "-1d"
+        org-agenda-start-day "-2d"
         org-agenda-block-separator ""
         org-agenda-include-diary t
         org-archive-location "archives/%s_archive::"
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
+        org-fontify-quote-and-verse-blocks t))
+
+(use-package! plz)
+
+(defun dob-dannybot-send (message)
+  (plz 'post "https://hooks.slack.com/services/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"
+       :headers '(("Content-Type" . "application/json"))
+       :body (json-encode `(("text" . ,message)))
+       :as 'string
+       :then (lambda (str)
+               (message "Result: %s" str))))
+
+(defun dob-region-to-dannybot (beginning end)
+  (interactive "r")
+  (if (use-region-p)
+      (dob-dannybot-send (buffer-substring-no-properties beginning end))))
 
 ;; org-transclusion
 (use-package! org-transclusion
@@ -640,11 +656,13 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
  (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
-
   (defun dob-add-journal-todo ()
     "Add a new todo at the end of the journal subtree"
     (interactive)
-    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
+    (org-roam-dailies-goto-today)
+    (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+           (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+           (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
            (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
@@ -658,7 +676,9 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
   (defun dob-goto-journal ()
     "Jump to where journal entry should be added"
-    (let* ((journal-loc (org-ql-select (org-agenda-files) dob-journal-ql :action '(list (point) (current-buffer))))
+    (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+           (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+           (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
            (jbuf (cadar journal-loc))
            (jloc (caar journal-loc)))
       (if-let (jwin (get-buffer-window jbuf))
@@ -729,7 +749,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
             :desc "Add a new org-roam item" "y" 'org-roam-node-insert
             :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
             :desc "Org store link" "M-c" 'org-store-link
-            :desc "Org insert link" "M-v" 'org-insert-link-global)))
+            :desc "Org insert link" "M-v" 'org-insert-link-global))
 
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)

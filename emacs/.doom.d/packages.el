@@ -15,6 +15,7 @@
 (package! dedicated)
 (package! org-pomodoro)
 (package! org-transclusion)
+(package! ob-deno)
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...
@@ -29,6 +30,8 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
+
+(package! plz :recipe (:host github :repo "alphapapa/plz.el"))
 
 ;; To install a package directly from a particular repo, you'll need to specify
 ;; a `:recipe'. You'll find documentation on what `:recipe' accepts here:
