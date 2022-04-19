@@ -149,7 +149,7 @@
    (define-key evil-normal-state-map "g\C-g" 'count-words)
    (define-key evil-normal-state-map "H" 'previous-buffer)
    (define-key evil-normal-state-map "L" 'next-buffer))
- 
+
 (map!
  (:leader
   :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
@@ -579,13 +579,14 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-pretty-entities t
         org-hide-emphasis-markers t
         org-agenda-span 3
-        org-agenda-start-day "-1d"
+        org-agenda-start-day "-2d"
         org-agenda-block-separator ""
         org-agenda-include-diary t
         org-archive-location "archives/%s_archive::"
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
+        org-fontify-quote-and-verse-blocks t))
+
 (use-package! plz)
 
 (defun dob-dannybot-send (message)
@@ -748,7 +749,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
             :desc "Add a new org-roam item" "y" 'org-roam-node-insert
             :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
             :desc "Org store link" "M-c" 'org-store-link
-            :desc "Org insert link" "M-v" 'org-insert-link-global)))
+            :desc "Org insert link" "M-v" 'org-insert-link-global))
 
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
