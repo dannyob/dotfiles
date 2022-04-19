@@ -229,7 +229,7 @@
    (lisp . t)
    (scheme . t)))
 
-;; ;; ;; ;; ;; ;; ;; ;; ;; (setf org-babel-lisp-eval-fn "sly-eval")
+(setf org-babel-lisp-eval-fn "sly-eval")
 
 (setq geiser-active-implementations '(guile))
 
