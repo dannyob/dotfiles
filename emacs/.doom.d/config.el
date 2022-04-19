@@ -226,8 +226,10 @@
  '((gnuplot . t)
    (python . t)
    (lisp . t)
+   (deno . t)
    (scheme . t)))
 
+(add-to-list 'org-src-lang-modes '("deno" . typescript))
 ;; ;; ;; ;; ;; ;; ;; ;; ;; (setf org-babel-lisp-eval-fn "sly-eval")
 
 (setq geiser-active-implementations '(guile))
