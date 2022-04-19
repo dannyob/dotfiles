@@ -66,7 +66,7 @@
 ; (defvar dob-hidpi 0.75)
 (defvar dob-hidpi 1)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
-(setq doom-variable-pitch-font (font-spec :family "Iosevka Aile"))
+(setq doom-variable-pitch-font (font-spec :family "Cream"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
