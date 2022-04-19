@@ -145,13 +145,14 @@
 (global-set-key (kbd "M-v") 'yank)
 
 ;; KEYBOARD
-(after! evil
-   (define-key evil-normal-state-map "g\C-g" 'count-words)
-   (define-key evil-normal-state-map "H" 'previous-buffer)
-   (define-key evil-normal-state-map "L" 'next-buffer))
-
 (map!
- (:leader
+ :desc "Count words" :n "g C-g" 'count-words
+ :desc "Previous buffer" :n "H" 'previous-buffer
+ :desc "Next buffer" :n "L" 'next-buffer
+ :desc "Next window config" :n "M-l" 'winner-redo
+ :desc "Prev window config" :n "M-h" 'winner-undo)
+
+ (map! (:leader
   :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
   :desc "Open Messages Buffer" "b m" (lambda () (interactive) (switch-to-buffer (messages-buffer)))))
 
@@ -229,9 +230,8 @@
    (deno . t)
    (scheme . t)))
 
+(setf org-babel-lisp-eval-fn "sly-eval")
 (add-to-list 'org-src-lang-modes '("deno" . typescript))
-;; ;; ;; ;; ;; ;; ;; ;; ;; (setf org-babel-lisp-eval-fn "sly-eval")
-
 (setq geiser-active-implementations '(guile))
 
 ;; Guix helpers
