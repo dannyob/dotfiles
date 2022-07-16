@@ -76,6 +76,14 @@ screencapture() {
     grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/${1:-(date -Isec).png}
 }
 
+screenrecord() {
+    wf-recorder -g "$(slurp)" $*
+}
+
+fix_gpg() {
+echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null
+}
+
 ###
 ## zgen
 ###
