@@ -73,7 +73,19 @@ guixupgrade() {
 }
 
 screencapture() {
-    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/$(date -Isec).png
+    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/${1:-(date -Isec).png}
+}
+
+screenrecord() {
+    wf-recorder -g "$(slurp)" $*
+}
+
+wl-copymime() {
+    wl-copy -t$(file --mime-type $1 | cut -d: -f2) < $1
+}
+
+fix_gpg() {
+echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null
 }
 
 ###
