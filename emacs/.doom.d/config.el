@@ -6,8 +6,22 @@
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
 ;;
+(add-load-path! (concat doom-user-dir "/lisp/"))
+(require 'dob-org-push)
+
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
+
+(setq display-line-numbers-type nil)
+
+(add-hook 'lisp-mode-hook #'evil-cleverparens-mode)
+
+(setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
+(advice-add #'doom-modeline-segment--modals :override #'ignore)
+
+;; Focus new window after splitting
+(setq evil-split-window-below t
+      evil-vsplit-window-right t)
 
 ;; Special stuff for WSL
 ;; (if
