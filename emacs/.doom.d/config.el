@@ -234,7 +234,6 @@
         '(("d" "default" plain "%?" :if-new
            (file+head "${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)))
-
   (setq org-roam-dailies-capture-templates
         `(("d" "default" entry
            "* %T %?"
@@ -489,9 +488,10 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
 
 
+;; Company
+
 (after! company
   (setq company-idle-delay nil))
-
 
 
 ;; Org-mode
@@ -525,19 +525,6 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-quote-and-verse-blocks t))
 
 (use-package! plz)
-
-(defun dob-dannybot-send (message)
-  (plz 'post "https://hooks.slack.com/services/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"
-       :headers '(("Content-Type" . "application/json"))
-       :body (json-encode `(("text" . ,message)))
-       :as 'string
-       :then (lambda (str)
-               (message "Result: %s" str))))
-
-(defun dob-region-to-dannybot (beginning end)
-  (interactive "r")
-  (if (use-region-p)
-      (dob-dannybot-send (buffer-substring-no-properties beginning end))))
 
 ;; org-transclusion
 (use-package! org-transclusion
