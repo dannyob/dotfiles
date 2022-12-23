@@ -38,8 +38,8 @@ setopt hist_reduce_blanks
 # ALIASES
 ##
 
-# colored ls
-alias   ls='ls -F --color=auto' 
+# colored ls with hyperlinks
+alias   ls='ls -F --color=auto --hyperlink' 
 
 alias	ps='ps -ef'
 alias	cls='clear; tput reset'
@@ -50,7 +50,7 @@ alias   more=less
 alias   clipin='wl-copy'
 alias   clipout='wl-paste'
 alias   mailq='msmtp-queue'
-alias   kat='kitty +kitten icat'
+
 
 ###
 # FUNCTIONS

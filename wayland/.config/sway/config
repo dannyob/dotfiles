@@ -25,7 +25,7 @@ set $menu wofi --show=run,drun
 exec  pipewire
 exec  pipewire-pulse
 exec  wireplumber
-exec  ~/.guix-profile/libexec/xdg-desktop-portal -r
+exec  ~/.guix-profile/libexec/xdg-desktop-portal-gtk -r
 exec  ~/.guix-profile/libexec/xdg-desktop-portal-wlr -r
 
 # Cursor themes and size

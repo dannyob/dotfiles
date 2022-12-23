@@ -667,10 +667,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          :immediate-finish t
          :jump-to-captured t)))
 
-(setq orgit-export-alist
-               '(("git.savannah.gnu.org/git[:/]\\(.+\\)$" "https://git.savannah.gnu.org/cgit/%n" "https://git.savannah.gnu.org/cgit/%n/log/?h=%r" "https://git.savannah.gnu.org/cgit/%n/commit/?id=%r")))
-
-(setq org-log-done 'time)
+  (setq org-log-done 'time)
 
 (defun dob-org-insert-time-now (arg)
   "Insert a timestamp with today's time and date."

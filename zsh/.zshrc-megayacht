@@ -27,6 +27,13 @@ fi
 ###
 # LOCAL FUNCTIONS
 ###
+
+fixgpg() {
+    gpg-connect-agent /bye
+    GPG_TTY=$(tty)
+    export GPG_TTY
+}
+
 aptinstall() {
 	local commit
 	vared -c -p "Why are you installing $1? " commit
