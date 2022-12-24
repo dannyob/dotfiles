@@ -48,7 +48,7 @@ Channel and optionally message timestamp is given by URL."
       (org-narrow-to-element)
       (let ((slack-buf (generate-new-buffer "*slackbuf*")))
         (call-process-region (point-min) (point-max)
-                             "pandoc" nil slack-buf nil "-f" "org" "-t" "/home/danny/tmp/slack.lua")
+                             "pandoc" nil slack-buf nil "-f" "org" "-t" "~/.doom.d/lisp/dob-org-push-pandoc-slack-filter.lua")
         (widen)
         (org-set-property "PUSH" (if (url-target url)
                                      (dop-slack-update-message url slack-buf)
