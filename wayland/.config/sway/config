@@ -297,9 +297,8 @@ hide_edge_borders --i3 smart_no_gaps
 exec ~/.local/bin/epicroot
 exec mako
 exec syncthing
-exec insync-headless
 exec ~/.local/bin/onair &
-     
+
 for_window [app_id="Netscape"] mark browser1
 for_window [class="Firefox"] mark browser2
 for_window [instance="Navigator"] mark browser3
@@ -311,6 +310,7 @@ for_window [class="Emacs"] mark emacs1
 for_window [app_id="emacs"] mark emacs2
 for_window [instance="hexchat"] mark talk1
 for_window [class="Mattermost"] mark talk2
+for_window [class="Slack"] mark talk3
 for_window [class="kitty"] mark shell1
 for_window [app_id="kitty"] mark shell2
 for_window [class="zoom"] mark zoom1
@@ -318,6 +318,7 @@ for_window [class="zoom"] floating enable
 
 assign [class="Mattermost"] 4
 assign [class="Hexchat"] 4
+assign [class="Slack"] 4
 assign [class="Emacs"] 2
 assign [app_id="emacs"] 2
 assign [class="Firefox"] 1
