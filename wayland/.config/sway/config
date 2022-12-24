@@ -50,16 +50,17 @@ bindswitch lid:on output $laptop disable
 bindswitch lid:off output $laptop enable
 
 # My desktop setup
-output "Unknown VIOTEK GN24CB             " {
-mode 1920x1080@143.981003Hz
-pos 0 0
-scale 1
-}
 
 output "Unknown PA278CV M5LMQS078297" {
     mode 2560x1440@75Hz
+        pos 0 0
         scale 1.5
 }
+
+output "'Goldstar Company Ltd LG HDR 4K 208NTEP9G292" {
+    scale 1.5
+}
+
 ### Idle configuration
 #
 # Example configuration:
