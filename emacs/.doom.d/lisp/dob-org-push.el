@@ -30,19 +30,26 @@
 (require 'plz)
 (require 'doom)
 
-(defconst dop-slack-filter-filename (concat (or doom-user-dir (file-name-directory load-file-name))
-                                            "lisp/dob-org-push-pandoc-slack-filter.lua"))
-
-(defun dop--slack-secret-token ()
-  "Obtain our slack token from authinfo."
-  (funcall (plist-get (car (auth-source-search :host "slack.com" :user "token")) :secret)))
-
 (defun dop-subtree ()
   "Push current tree to destination defined by PUSH property URI."
   (let* ((sync-dest (cdr (assoc "PUSH" (org-entry-properties))))
          (parsed-sync-url (url-generic-parse-url sync-dest))
          (sync-type (url-type parsed-sync-url)))
-    (cond ((string-equal "slack" sync-type) (dop-to-slack parsed-sync-url)))))
+    (cond ((string-equal "slack" sync-type) (dop-to-slack parsed-sync-url))
+          ((string-equal "notion" sync-type) (dop-to-notion parsed-sync-url)))))
+
+(defun dop-buffer ()
+  "Push all nodes in current buffer that have PUSH property set."
+  (interactive)
+  (org-ql-select (current-buffer) '(property "PUSH")
+    :action #'dop-subtree))
+
+;; Slack implementation.
+(defconst dop-slack-filter-filename (concat (or doom-user-dir (file-name-directory load-file-name))
+                                            "lisp/dob-org-push-pandoc-slack-filter.lua"))
+(defun dop--slack-secret-token ()
+  "Obtain our slack token from authinfo."
+  (funcall (plist-get (car (auth-source-search :host "slack.com" :user "token")) :secret)))
 
 (defun dop-to-slack (url)
   "Push current tree to Slack.
@@ -80,8 +87,6 @@ Channel and optionally message timestamp is given by URL."
                                 ("Authorization" . ,token))
                      :body (json-encode payload)
                      :as #'json-read)))
-    (message (json-encode payload))
-    (message (json-encode response))
     response))
 
 (defun dop-slack-join-channel (url)
@@ -102,7 +107,6 @@ Requires that the URL include a message id in its fragment (or target) field."
   "Create a message in channel defined by URL, containing contents of SLACK-BUF."
   (dop-slack-join-channel url)
   (with-current-buffer slack-buf
-    (message (buffer-string))
     (let ((response (dop-slack-exec-with-url url "chat.postMessage" `(("text" . ,(buffer-string))))))
       (concat (url-recreate-url url) "#" (alist-get 'ts response)))))
 
@@ -113,11 +117,39 @@ Returns an URL with channel but no ID."
   (setf (url-target url) nil)
   (url-recreate-url url))
 
-(defun dop-buffer ()
-  "Push all nodes in current buffer that have PUSH property set."
-  (interactive)
-  (org-ql-select (current-buffer) '(property "PUSH")
-    :action #'dop-subtree))
+;; Notion implementation
+(defun dop--notion-secret-token ()
+  "Obtain our slack token from authinfo."
+  (funcall (plist-get (car (auth-source-search :host "notion.so" :user "token")) :secret)))
+
+(defun dop-to-notion (url)
+  "Push current tree to Notion.
+page and name is given by URL."
+  (if (assoc "PUSH-DELETE" (org-entry-properties))
+      (dop-notion-delete-url url)
+      (org-narrow-to-element)
+      (let ((notion-buf (generate-new-buffer "*notion-buf*")))
+        (call-process-region (point-min) (point-max)
+                             "pandoc" nil notion-buf nil "-f" "org" "-t" "gfm-raw_html")
+        (widen)
+        (org-set-property "PUSH" (dop-notion-post-buffer url notion-buf))
+      (kill-buffer notion-buf))))
+
+(defun dop-notion-post-buffer (url notion-buffer)
+  "Post NOTION-BUFFER contents to Notion page specified by URL."
+  (with-current-buffer notion-buffer
+    (let ((fname (concat temporary-file-directory (url-target url)))
+          (new-url (cl-copy-seq url)))
+      (setf (url-target new-url) nil)
+      (setf (url-type new-url) "https")
+      (write-region (point-min) (point-max) fname)
+      (call-process "python" nil '(:file "/tmp/dump.log") nil "-m" "md2notion" "--clear-previous"
+                    (dop--notion-secret-token) (url-recreate-url new-url) fname)))
+  (url-recreate-url url))
+
+(defun dop-notion-delete-url (url)
+  "Delete Notion entry at URL."
+  (message "Undefined"))
 
 (provide 'dob-org-push)
 ;; (setf (alist-get "dob-org-push" package-lint--allowed-prefix-mappings) "dop")
