@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: daylogtodo
-# key: dayt
-# --
-
-*** TODO `(progn (org-time-stamp '(16)) "")` $0 :EFF:

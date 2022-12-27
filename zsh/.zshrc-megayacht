@@ -80,7 +80,7 @@ guixupgrade() {
 }
 
 screencapture() {
-    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/${1:-(date -Isec).png}
+    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/${1:-$(date -Isec).png}
 }
 
 screenrecord() {

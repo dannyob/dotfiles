@@ -28,7 +28,7 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
-(package! plz :recipe (:host github :repo "alphapapa/plz.el"))
+(package! plz :recipe (:host github :repo "alphapapa/plz.el") :pin "80aeae0d201b06088d4b7543a603d97bdbccb948" )
 
 ;; To install a package directly from a particular repo, you'll need to specify
 ;; a `:recipe'. You'll find documentation on what `:recipe' accepts here:
