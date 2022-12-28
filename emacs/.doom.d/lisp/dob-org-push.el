@@ -16,12 +16,19 @@
 ;; A set of functions to push an org node to an external source, based on a
 ;; URI-like value in a "PUSH" property of the node. Current push values include:
 ;;
-;;   slack://[IGNORED FOR NOW]/[CHANNEL ID]/[MESSAGE TIMESSTAMP]
+;;   https://[IGNORED FOR NOW].slack.com/[CHANNEL ID]#[MESSAGE TIMESSTAMP]
+;;   https://www.notion.so/[NOTION-PAGE-URL]#[NAME OF SUBPAGE]
 ;;
-;; If you add a "PUSH-DELETE" property, the slack backend will delete the
-;; message, and reset the message timestamp.
+;; Slack requires a token stored as `password' in the `authinfo' file, with the
+;; `machine' field  `slack.com' and the `login' field set to `token`'.
 ;;
-;;; Code:
+;; Notion requires a token stored as `password' in the `authinfo' file, with the
+;; `machine' field  `notion.so' and the `login' field set to `token`'. You can
+;; obtain its value by inspecting your browser cookies on a logged-in
+;; (non-guest) session on Notion.so. (See https://github.com/jamalex/notion-py
+;; and https://github.com/Cobertos/md2notion for more details.)
+;;
+;;;;; Code:
 
 (require 'auth-source)
 (require 'url-parse)
@@ -30,13 +37,22 @@
 (require 'plz)
 (require 'doom)
 
+(defun dop-do-push (push-uri)
+  "Push current tree to destinarion defined by PUSH-URI."
+  (let* ((parsed-sync-url (url-generic-parse-url push-uri))
+         (sync-type (url-host parsed-sync-url))
+         (element-metadata (org-element-headline-parser)))
+    (org-narrow-to-element)
+    (let ((new-uri (cond ((string-match "slack.com" sync-type) (dop-to-slack parsed-sync-url))
+                         ((string-match "notion.so" sync-type) (dop-to-notion parsed-sync-url element-metadata)))))
+      (widen)
+      (message new-uri)
+      new-uri)))
+
 (defun dop-subtree ()
-  "Push current tree to destination defined by PUSH property URI."
-  (let* ((sync-dest (cdr (assoc "PUSH" (org-entry-properties))))
-         (parsed-sync-url (url-generic-parse-url sync-dest))
-         (sync-type (url-type parsed-sync-url)))
-    (cond ((string-equal "slack" sync-type) (dop-to-slack parsed-sync-url))
-          ((string-equal "notion" sync-type) (dop-to-notion parsed-sync-url)))))
+  "Iterate through each value of PUSH property in subtree."
+  (apply #'org-entry-put-multivalued-property (point) "PUSH"
+                                      (-map #'dop-do-push (org-entry-get-multivalued-property (point) "PUSH"))))
 
 (defun dop-buffer ()
   "Push all nodes in current buffer that have PUSH property set."
@@ -45,26 +61,27 @@
     :action #'dop-subtree))
 
 ;; Slack implementation.
-(defconst dop-slack-filter-filename (concat (or doom-user-dir (file-name-directory load-file-name))
-                                            "lisp/dob-org-push-pandoc-slack-filter.lua"))
+(defconst dop-slack-filter-filename
+  (concat (or doom-user-dir (file-name-directory load-file-name))
+          "lisp/dob-org-push-pandoc-slack-filter.lua")
+  "Pandoc filter to convert Markdown to Slack mrkdwn.")
+
 (defun dop--slack-secret-token ()
   "Obtain our slack token from authinfo."
   (funcall (plist-get (car (auth-source-search :host "slack.com" :user "token")) :secret)))
 
 (defun dop-to-slack (url)
   "Push current tree to Slack.
-Channel and optionally message timestamp is given by URL."
-  (if (assoc "PUSH-DELETE" (org-entry-properties))
-      (dop-slack-delete-message url)
-      (org-narrow-to-element)
+Channel and optionally message timestamp is given by URL.
+Returns new URL."
       (let ((slack-buf (generate-new-buffer "*slackbuf*")))
         (call-process-region (point-min) (point-max)
                              "pandoc" nil slack-buf nil "-f" "org" "-t" dop-slack-filter-filename)
-        (widen)
-        (org-set-property "PUSH" (if (url-target url)
-                                     (dop-slack-update-message url slack-buf)
-                                   (dop-slack-post-message url slack-buf)))
-      (kill-buffer slack-buf))))
+        (let ((new-url (if (url-target url)
+                           (dop-slack-update-message url slack-buf)
+                         (dop-slack-post-message url slack-buf))))
+          (kill-buffer slack-buf)
+          new-url)))
 
 (defun dop-slack-exec-with-url (url command payload)
   "Execute Slack API COMMAND with PAYLOAD and channel, ts from URL."
@@ -122,26 +139,26 @@ Returns an URL with channel but no ID."
   "Obtain our slack token from authinfo."
   (funcall (plist-get (car (auth-source-search :host "notion.so" :user "token")) :secret)))
 
-(defun dop-to-notion (url)
-  "Push current tree to Notion.
-page and name is given by URL."
-  (if (assoc "PUSH-DELETE" (org-entry-properties))
-      (dop-notion-delete-url url)
-      (org-narrow-to-element)
+(defun dop-to-notion (url metadata)
+  "Push current tree to Notion. page is given by URL, name by METADATA's title."
       (let ((notion-buf (generate-new-buffer "*notion-buf*")))
         (call-process-region (point-min) (point-max)
                              "pandoc" nil notion-buf nil "-f" "org" "-t" "gfm-raw_html")
-        (widen)
-        (org-set-property "PUSH" (dop-notion-post-buffer url notion-buf))
-      (kill-buffer notion-buf))))
+        (let ((new-uri (dop-notion-post-buffer url notion-buf metadata)))
+      (kill-buffer notion-buf)
+      new-uri)))
 
-(defun dop-notion-post-buffer (url notion-buffer)
+(defun dop--title-to-slug (metadata)
+  "Extract a slug from the title of the parsed headline stored as METADATA."
+  (replace-regexp-in-string "-+" "-"
+                            (replace-regexp-in-string "[^A-Za-z0-9-]" "-"
+                                                      (plist-get (cadr metadata) :raw-value))))
+
+(defun dop-notion-post-buffer (url notion-buffer metadata)
   "Post NOTION-BUFFER contents to Notion page specified by URL."
   (with-current-buffer notion-buffer
-    (let ((fname (concat temporary-file-directory (url-target url)))
+    (let ((fname (concat temporary-file-directory (dop--title-to-slug metadata)))
           (new-url (cl-copy-seq url)))
-      (setf (url-target new-url) nil)
-      (setf (url-type new-url) "https")
       (write-region (point-min) (point-max) fname)
       (call-process "python" nil '(:file "/tmp/dump.log") nil "-m" "md2notion" "--clear-previous"
                     (dop--notion-secret-token) (url-recreate-url new-url) fname)))
