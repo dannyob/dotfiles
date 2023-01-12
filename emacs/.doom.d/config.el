@@ -19,9 +19,14 @@
 (setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
 (advice-add #'doom-modeline-segment--modals :override #'ignore)
 
+;;; Windows, Popups and So On
+;;;
 ;; Focus new window after splitting
 (setq evil-split-window-below t
       evil-vsplit-window-right t)
+
+(after! vterm
+  (set-popup-rule! "*doom:vterm-popup:main" :size 0.25 :vslot -4 :select t :quit nil :ttl 0 :side 'right))
 
 ;; Special stuff for WSL
 ;; (if
