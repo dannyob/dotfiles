@@ -46,7 +46,7 @@
     (let ((new-uri (cond ((string-match "slack.com" sync-type) (dop-to-slack parsed-sync-url))
                          ((string-match "notion.so" sync-type) (dop-to-notion parsed-sync-url element-metadata)))))
       (widen)
-      (message new-uri)
+      (message "NEW URL: %s" new-uri)
       new-uri)))
 
 (defun dop-subtree ()
