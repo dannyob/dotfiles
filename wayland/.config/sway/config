@@ -20,11 +20,12 @@ set $term kitty
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
 set $menu wofi --show=run,drun
+set $winmenu winmenu
 
 ### Pipewire not pulseaudio
-exec  pipewire
-exec  pipewire-pulse
-exec  wireplumber
+#exec  pipewire
+#exec  pipewire-pulse
+#exec  wireplumber
 exec  ~/.guix-profile/libexec/xdg-desktop-portal-gtk -r
 exec  ~/.guix-profile/libexec/xdg-desktop-portal-wlr -r
 
@@ -110,7 +111,8 @@ input type:keyboard {
     bindsym $mod+Shift+q kill
 
     # start your launcher
-    bindsym $mod+p exec $menu
+    bindsym $mod+p exec $winmenu
+    bindsym $mod+Shift+p exec $menu
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
