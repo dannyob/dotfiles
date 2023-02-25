@@ -1,4 +1,4 @@
-set sendmail="prog:/home/danny/.guix-profile/bin/msmtp?-oi&-t&-f${sender}&-F\"Danny O'Brien\""
+set sendmail="prog:/home/danny/.guix-profile/bin/msmtpq?-oi&-t&-f${sender}&-F\"Danny O'Brien\""
 set visual="nvim"
 set hold
 set keepsave

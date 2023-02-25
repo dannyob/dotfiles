@@ -89,15 +89,15 @@ function Space()
 end
 
 function Subscript(s)
-  return "<sub>" .. s .. "</sub>"
+  return s
 end
 
 function Superscript(s)
-  return "<sup>" .. s .. "</sup>"
+  return s
 end
 
 function SmallCaps(s)
-  return '<span style="font-variant: small-caps;">' .. s .. '</span>'
+  return '*' .. s .. '*'
 end
 
 function Link(s, src, tit)
@@ -134,7 +134,7 @@ function Note(s)
 end
 
 function Span(s, attr)
-  return "<span" .. attributes(attr) .. ">" .. s .. "</span>"
+  return s
 end
 
 function Cite(s, cs)
@@ -164,7 +164,7 @@ function BlockQuote(s)
 end
 
 function HorizontalRule()
-  return "<hr/>"
+  return "---\n"
 end
 
 function CodeBlock(s, attr)

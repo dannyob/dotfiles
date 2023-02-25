@@ -91,6 +91,7 @@
       (enhance-imenu-lisp "bookmarklet-command" "class" "command" "function" "mode" "parenscript" "user-class"))
      (no-ytbyte-compile . t)))
  '(send-mail-function 'mailclient-send-it)
+ '(tracking-shorten-modes nil)
  '(warning-suppress-types
    '((org-element-cache)
      ((sly warning))

@@ -176,6 +176,7 @@ Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
 " Dirty Emacs Experimentation
 
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'kristijanhusak/orgmode.nvim'
 
 " Lisp 'n' Guile 'n' Guix

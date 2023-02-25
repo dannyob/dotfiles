@@ -19,9 +19,14 @@
 (setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
 (advice-add #'doom-modeline-segment--modals :override #'ignore)
 
+;;; Windows, Popups and So On
+;;;
 ;; Focus new window after splitting
 (setq evil-split-window-below t
       evil-vsplit-window-right t)
+
+(after! vterm
+  (set-popup-rule! "*doom:vterm-popup:main" :size 0.25 :vslot -4 :select t :quit nil :ttl 0 :side 'right))
 
 ;; Special stuff for WSL
 ;; (if
@@ -238,7 +243,9 @@
         `(("d" "default" entry
            "* %T %?"
            :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<%Y-%m-%d>\n\n* Log :JOURNAL:\n* Links etc")
+                              ,(with-temp-buffer
+                                (insert-file-contents "~/Private/wiki/templates/journal.org")
+                                (buffer-string)))
            :unnarrowed t))))
 
 ;; Mu4e!
@@ -419,6 +426,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
        (defun dob-refile-to-archive (msg)
          (cond
           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/Junk Email")
+          ((string-match "reply.github.com" (plist-get (car (mu4e-message-field msg :to)) :email))
+           "/github")
           ((mu4e-message-field msg :date)
            (let ((year-folder (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date)))))
              (if (string= year-folder "/archive2021") "/Archives" year-folder)))
@@ -655,12 +664,31 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          :immediate-finish t
          :jump-to-captured t)))
 
-  (setq org-log-done 'time)
+(setq org-log-done 'time)
 
 (defun dob-org-insert-time-now (arg)
   "Insert a timestamp with today's time and date."
   (interactive "P")
   (org-time-stamp '(16)))
+
+(defun dob-auth-secret (host login)
+  "Pull out a password from authinfo using HOST and LOGIN."
+  (funcall
+   (plist-get
+    (car (auth-source-search :host host :max 1 :login login)) :secret)))
+
+;; Circe and IRC!
+(after! circe
+  (setq circe-network-options
+        `(("ZNC-Libera"
+           :tls t
+           :nick "malaclyps"
+           :realname "Danny O'Brien"
+           :pass ,(dob-auth-secret "boat.endofgreatness.com" "znc")
+           :host "boat.endofgreatness.com"
+           :port "36667"
+           :channels ("#emacs-circe")
+           ))))
 
   ;; KEYBOARD
 (map!
@@ -670,6 +698,41 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
           :desc "Org store link" "M-c" 'org-store-link
           :desc "Org insert link" "M-v" 'org-insert-link-global))
+
+
+;; ChatGPT
+;;
+(defvar dob-current-conversation-id nil)
+(defvar dob-current-prompt-id nil)
+
+(defun dob-remove-nil-values (list)
+  (let (result)
+    (dolist (elem list result)
+      (when (cdr elem)
+        (setq result (cons elem result))))))
+
+
+(defun dob-converse (prompt &optional conversation-id parent-prompt-id)
+  "Feed a PROMPT to ChatGPT, keeping track of previous history via
+CONVERSATION-ID and PARENT-PROMPT-ID.  Relies on
+https://github.com/waylaidwanderer/node-chatgpt-api and chatgpt-api running
+locally."
+  (if conversation-id (setq dob-current-conversation-id conversation-id))
+  (if parent-prompt-id (setq dob-current-prompt-id parent-prompt-id))
+  (let* ((json (plz 'post "http://localhost:3000/conversation"
+                 :headers '(("Content-Type" . "application/json"))
+                 :body (json-encode (dob-remove-nil-values `(("message" . ,prompt)
+                                      ("conversationId" . ,conversation-id)
+                                      ("parentMessageid" . ,parent-prompt-id))))
+                 :as #'json-read
+                 :then 'sync))
+         (response (alist-get 'response json))
+         (conversation-id (alist-get 'conversationId json))
+         (message-id (alist-get 'messageId json)))
+    (setq dob-current-conversation-id conversation-id)
+    (setq dob-current-prompt-id message-id)
+    response))
+
 
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
