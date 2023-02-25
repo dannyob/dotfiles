@@ -243,7 +243,9 @@
         `(("d" "default" entry
            "* %T %?"
            :target (file+head "%<%Y-%m-%d>.org"
-                              "#+title: %<%Y-%m-%d>\n\n* Log :JOURNAL:\n* Links etc")
+                              ,(with-temp-buffer
+                                (insert-file-contents "~/Private/wiki/templates/journal.org")
+                                (buffer-string)))
            :unnarrowed t))))
 
 ;; Mu4e!
