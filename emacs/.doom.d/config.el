@@ -699,6 +699,41 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           :desc "Org store link" "M-c" 'org-store-link
           :desc "Org insert link" "M-v" 'org-insert-link-global))
 
+
+;; ChatGPT
+;;
+(defvar dob-current-conversation-id nil)
+(defvar dob-current-prompt-id nil)
+
+(defun dob-remove-nil-values (list)
+  (let (result)
+    (dolist (elem list result)
+      (when (cdr elem)
+        (setq result (cons elem result))))))
+
+
+(defun dob-converse (prompt &optional conversation-id parent-prompt-id)
+  "Feed a PROMPT to ChatGPT, keeping track of previous history via
+CONVERSATION-ID and PARENT-PROMPT-ID.  Relies on
+https://github.com/waylaidwanderer/node-chatgpt-api and chatgpt-api running
+locally."
+  (if conversation-id (setq dob-current-conversation-id conversation-id))
+  (if parent-prompt-id (setq dob-current-prompt-id parent-prompt-id))
+  (let* ((json (plz 'post "http://localhost:3000/conversation"
+                 :headers '(("Content-Type" . "application/json"))
+                 :body (json-encode (dob-remove-nil-values `(("message" . ,prompt)
+                                      ("conversationId" . ,conversation-id)
+                                      ("parentMessageid" . ,parent-prompt-id))))
+                 :as #'json-read
+                 :then 'sync))
+         (response (alist-get 'response json))
+         (conversation-id (alist-get 'conversationId json))
+         (message-id (alist-get 'messageId json)))
+    (setq dob-current-conversation-id conversation-id)
+    (setq dob-current-prompt-id message-id)
+    response))
+
+
 ;; Finally, I like a teeny modeline
 (setq doom-modeline-height 1)
 (custom-set-faces
