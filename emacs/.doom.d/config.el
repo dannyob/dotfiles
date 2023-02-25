@@ -426,6 +426,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
        (defun dob-refile-to-archive (msg)
          (cond
           ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/Junk Email")
+          ((string-match "reply.github.com" (plist-get (car (mu4e-message-field msg :to)) :email))
+           "/github")
           ((mu4e-message-field msg :date)
            (let ((year-folder (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date)))))
              (if (string= year-folder "/archive2021") "/Archives" year-folder)))
