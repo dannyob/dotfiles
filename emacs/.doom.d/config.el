@@ -664,12 +664,31 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          :immediate-finish t
          :jump-to-captured t)))
 
-  (setq org-log-done 'time)
+(setq org-log-done 'time)
 
 (defun dob-org-insert-time-now (arg)
   "Insert a timestamp with today's time and date."
   (interactive "P")
   (org-time-stamp '(16)))
+
+(defun dob-auth-secret (host login)
+  "Pull out a password from authinfo using HOST and LOGIN."
+  (funcall
+   (plist-get
+    (car (auth-source-search :host host :max 1 :login login)) :secret)))
+
+;; Circe and IRC!
+(after! circe
+  (setq circe-network-options
+        `(("ZNC-Libera"
+           :tls t
+           :nick "malaclyps"
+           :realname "Danny O'Brien"
+           :pass ,(dob-auth-secret "boat.endofgreatness.com" "znc")
+           :host "boat.endofgreatness.com"
+           :port "36667"
+           :channels ("#emacs-circe")
+           ))))
 
   ;; KEYBOARD
 (map!
