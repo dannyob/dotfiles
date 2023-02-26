@@ -27,18 +27,18 @@ fallback = ''
 [matching]
 
 "Keybase" = "🔑"
-"nyxt" = "🧭"
+"nyxt" = "─┼─"
 "kitty" = "🖥️"
-"Brave-browser" = "🦁"
-"emacs" = "🐃"
+"brave-browser" = "🦁"
+"Emacs" = "🐃"
 "zoom" = "📺"
 "Signal" = "🗨️"
 "slack" = ""
-"feh" = "🧭"
+"feh" = "🖼️"
 "pavucontrol" = "🎙️"
 "spot" = "🎹"
 
-'discord' = ''
+'discord' = 'D'
 'balena-etcher' = ''
 'Chia Blockchain' = ''
 'Steam' = ''
