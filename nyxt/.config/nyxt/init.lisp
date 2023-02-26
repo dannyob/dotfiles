@@ -17,8 +17,8 @@
 
 (defvar *my-search-engines*
   (list
-   '("b" "https://search.brave.com/search?q=~a")
-   '("g" "https://www.google.com/?q=~a")))
+   '("g" "https://www.google.com/?q=~a")
+   '("b" "https://search.brave.com/search?q=~a")))
 
 (define-configuration buffer
   ((search-engines (append %slot-default%
@@ -53,6 +53,19 @@
 
 (defvar +youtube-dl-command+ "youtube-dl"
   "/home/danny/.local/bin/yt-dlp")
+
+(define-configuration base-mode
+  ((keymap-scheme
+    (define-scheme (:name-prefix "my-base" :import %slot-default%)
+      scheme:vi-normal
+      (list "g b" (make-command switch-buffer* ()
+                    (switch-buffer :current-is-last-p t)))))))
+
+(define-configuration buffer
+  ((override-map
+    (let ((map (make-keymap "override-map")))
+                   (define-key map
+                     "C-w" 'delete-current-buffer)))))
 
 (define-configuration browser
   ((session-restore-prompt :always-restore)))
