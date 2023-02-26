@@ -14,12 +14,13 @@
 ;;      Alternatively, press 'gd' (or 'C-c g d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
-(doom! :input
+(doom! ;;:input
        ;;chinese
        ;;japanese
 
-       :completion company (vertico +icons)
-
+       :completion
+       (company +tng +childframe)
+       vertico
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;; (ivy +prescient +icons) ; a search engine for love and life
@@ -27,14 +28,14 @@
        :ui
        ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
-       ;;doom-dashboard    ; a nifty splash screen for Emacs
+       doom-dashboard    ; a nifty splash screen for Emacs
+       (emoji +unicode)
        ;;doom-quit         ; DOOM quit-message prompts when you quit Emacs
        ;;fill-column       ; a `fill-column' indicator
        hl-todo             ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        hydra
-       indent-guides     ; highlighted indent columns
-       modeline
-                                        ; snazzy, Atom-inspired modeline, plus API
+       indent-guides        ; highlighted indent columns
+       modeline             ; snazzy, Atom-inspired modeline, plus API
        navh-flash         ; blink cursor line after big motions
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
