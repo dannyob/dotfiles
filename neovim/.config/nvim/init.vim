@@ -182,11 +182,11 @@ Plug 'kristijanhusak/orgmode.nvim'
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
 Plug 'hiphish/info.vim'
-Plug 'guns/vim-sexp'
+"Plug 'guns/vim-sexp'
 "(Really a fork of TobBrandt/vim-scripts )
 Plug 'dannyob/vim-scripts' 
 Plug 'junegunn/rainbow_parentheses.vim'
-Plug 'tpope/vim-sexp-mappings-for-regular-people'
+"Plug 'tpope/vim-sexp-mappings-for-regular-people'
 call plug#end()
 
 " Plugin Setup
