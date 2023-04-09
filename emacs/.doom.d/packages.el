@@ -13,6 +13,7 @@
 (package! org-pomodoro)
 (package! org-transclusion)
 (package! ob-deno)
+(package! org-ai :recipe (:host github :repo "rksm/org-ai" ))
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...

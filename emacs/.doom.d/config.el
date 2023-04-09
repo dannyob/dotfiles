@@ -515,6 +515,11 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (require 'org-ql)
   (require 'org-attach)
   (require 'org-crypt)
+  (require 'org-ai)
+
+  (add-hook 'org-mode-hook #'org-ai-mode)
+  (org-ai-install-yasnippets)
+
   (org-crypt-use-before-save-magic)
   (setq org-tags-exclude-from-inheritance (quote ("crypt")))
   ;; GPG key to use for encryption
