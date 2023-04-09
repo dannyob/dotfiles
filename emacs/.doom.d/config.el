@@ -243,9 +243,9 @@
         `(("d" "default" entry
            "* %T %?"
            :target (file+head "%<%Y-%m-%d>.org"
-                              ,(if (file-exists-p   "~/Private/wiki/templates/journal.org")
+                              ,(if (file-exists-p   "~/Private/org/wiki/templates/journal.org")
                                    (with-temp-buffer
-                                     (insert-file-contents  "~/Private/wiki/templates/journal.org")
+                                     (insert-file-contents  "~/Private/org/wiki/templates/journal.org")
                                      (buffer-string))
                                  ""))
            :unnarrowed t))))
