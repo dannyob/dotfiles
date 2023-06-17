@@ -68,9 +68,8 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/Private/org/")
+(setq org-directory (file-truename (expand-file-name "~/Private/org/")))
 (setq org-list-allow-alphabetical nil)
-(setq org-roam-directory "~/Private/org/wiki")
 
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
@@ -235,6 +234,11 @@
 ;; Org-Roam
 ;;
 (after! org-roam
+  (setq org-roam-directory (expand-file-name "~/Private/org/wiki"))
+  (map! :map org-mode-map
+        "M-<left>" #'org-roam-dailies-goto-previous-note
+        "M-<right>" #'org-roam-dailies-goto-next-note)
+
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :if-new
            (file+head "${slug}.org" "#+title: ${title}\n")
@@ -521,7 +525,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (org-ai-install-yasnippets)
 
   (org-crypt-use-before-save-magic)
-  (setq org-tags-exclude-from-inheritance (quote ("crypt")))
+  (setq org-tags-exclude-from-inheritance (quote ("crypt" "PROJECT")))
   ;; GPG key to use for encryption
   ;; Either the Key ID or set to nil to use symmetric encryption.
   (setq org-crypt-key "E1E70D6E64BA8D1F74E78285E5001906A3FDE45E")
@@ -569,6 +573,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 ;;         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (cl-remove-if (lambda (x) (string-match ".*MyHabits.*" x)) org-agenda-files))))))))
 (setq org-agenda-custom-commands
       '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
+        ("p" "Projects" ((tags "PROJECT")))
         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
 
 (setq org-super-agenda-groups
@@ -600,7 +605,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   "Add a new todo at the end of the journal subtree"
   (interactive)
   (org-roam-dailies-goto-today)
-  (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+  (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
          (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
          (jbuf (cadar journal-loc))
