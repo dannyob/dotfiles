@@ -100,5 +100,7 @@ zstyle :compinstall filename '$HOME/.zshrc'
 autoload -U compinit
 compinit
 
+zstyle ':completion:*' file-sort date
+
 # Fix for TRAMP
 [ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
