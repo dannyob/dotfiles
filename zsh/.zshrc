@@ -1,5 +1,5 @@
 # last chance
-declare -x SHORTHOST=${SHORTHOST:=$(hostname)}
+declare -x SHORTHOST=${SHORTHOST:=$(hostname -s)}
 
 # I like vim-syle bindings
 bindkey -A viins main
