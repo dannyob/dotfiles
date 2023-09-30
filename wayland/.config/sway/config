@@ -358,6 +358,10 @@ bindsym $mod+shift+d mark shellX
 bindsym $mod+shift+z mark zoomX
 
 bindsym $mod+slash exec makoctl dismiss -a
+bindsym Mod1+v exec ydotool key 'shift+insert'
+bindsym Mod1+c exec ydotool key 'ctrl+insert'
+# alt-x messes with my emacs use
+# bindsym Mod1+x exec ydotool key 'shift+delete'
 
 workspace 3
 
