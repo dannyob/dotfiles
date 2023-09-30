@@ -1,0 +1,66 @@
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export HISTFILE=~/.cache/zshhistory
+export HISTSIZE=10000
+export SAVEHIST=10000
+
+#setopt INC_APPEND_HISTORY_TIME # doesn't show you other shell histories but it's still all saved, use fc -RI to manually import
+# See https://zsh.sourceforge.io/Doc/Release/Options.html#index-INC_005fAPPEND_005fHISTORY_005fTIME
+setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+
+###
+# Me!
+###
+
+declare -x DEBEMAIL=danny@spesh.com
+declare -x DEBFULLNAME="Danny O'Brien"
+declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
+
+###
+## zgen
+###
+source "${HOME}/.zgen/zgen.zsh"
+
+if ! zgen saved; then
+    zgen load zsh-users/zsh-syntax-highlighting
+    zgen load zsh-users/zsh-history-substring-search
+    zgen load twang817/zsh-fasd
+    zgen load zsh-users/zsh-completions src
+    zgen save
+fi
+
+###
+# Brewed guile
+###
+
+declare -x GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
+declare -x GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
+declare -x GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
+
+###
+# FASD
+###
+eval "$(fasd --init auto)"
+bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
+bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
+bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
+alias c='fasd_cd -d'
+alias cc='fasd_cd -d -i'
+alias v='f -e nvim' 
+
+###
+# TeX
+###
+PATH=$PATH:/Library/TeX/texbin
+
+# zsh-history-substring-search
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+zmodload zsh/terminfo
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+alias ls='gls -F --color=auto --hyperlink'

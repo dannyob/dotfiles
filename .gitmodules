@@ -1,5 +1,5 @@
 [submodule "emacs/.emacs.d"]
-	path = emacs/.emacs.d
+	path = emacs/.config/emacs
 	url = https://github.com/hlissner/doom-emacs
 [submodule "zsh/.zgen"]
 	path = zsh/.zgen
