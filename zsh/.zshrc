@@ -63,6 +63,10 @@ $EDITOR `which $1`
 
 alias vi=${EDITOR:-nvim}
 
+shellit() {
+    llm -t shellit $* | awk '/```/ {flag=1;next} /```/ {flag=0} flag'
+}
+
 # 10ms for key sequences
 KEYTIMEOUT=1
 
