@@ -28,6 +28,15 @@ fi
 # LOCAL FUNCTIONS
 ###
 
+tidyhtml() {
+    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute | pandoc -f markdown -t html
+}
+
+html2markdown() {
+    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute 
+}
+
+
 fixgpg() {
     gpg-connect-agent /bye
     GPG_TTY=$(tty)
