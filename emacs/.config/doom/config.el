@@ -234,7 +234,7 @@
 ;; Org-Roam
 ;;
 (after! org-roam
-  (setq org-roam-directory (expand-file-name "~/Private/org/wiki"))
+  (setq org-roam-directory (expand-file-name "~/Private/org/wiki/"))
   (map! :map org-mode-map
         "M-<left>" #'org-roam-dailies-goto-previous-note
         "M-<right>" #'org-roam-dailies-goto-next-note)
@@ -637,7 +637,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
 
 (defun dob-daylog () (interactive)
-       (setq org-attach-id-dir "~/Private/wiki/data/")
+       (setq org-attach-id-dir "~/Private/org/wiki/data/")
        (setq dob-org-file "~/Private/org/daylog.org")
        (setq org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
                                      ("wiki" . "%(dob-wiki-url)")))
