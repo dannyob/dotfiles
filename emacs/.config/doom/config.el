@@ -488,6 +488,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 (after! company
   (setq company-idle-delay nil))
 
+(when (file-directory-p "/usr/share/doc/hyperspec") (setq
+     common-lisp-hyperspec-root "file:///usr/share/doc/hyperspec/"))
 
 ;; Org-mode
 ;;
