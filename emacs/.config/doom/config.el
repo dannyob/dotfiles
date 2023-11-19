@@ -464,7 +464,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   :n "M-SPC" 'mu4e-view-scroll-up-or-next
   :n "i" 'mu4e-select-other-view))
 
-;; Sly-Mode
+;; Sly-Mode and Other Lispiness
+(load (expand-file-name "~/.roswell/helper.el")) ;; Get on board the ros train
 
 (after! sly
   (defun dob-switch-or-select-window (buf)
