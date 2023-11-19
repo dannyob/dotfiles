@@ -19,7 +19,7 @@
        ;;japanese
 
        :completion
-       (company +tng +childframe)
+       company
        vertico
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
