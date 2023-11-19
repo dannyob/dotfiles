@@ -14,11 +14,14 @@
 
 (setq display-line-numbers-type nil)
 
-(add-hook 'lisp-mode-hook #'evil-cleverparens-mode)
+(let ((my-info (expand-file-name "~/.local/share/info")))
+  (when (file-directory-p my-info)
+    (if (boundp 'Info-additional-directory-list)
+        (add-to-list 'Info-additional-directory-list my-info)
+      (setq Info-additional-directory-list (list my-info)))))
 
 (setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
 (advice-add #'doom-modeline-segment--modals :override #'ignore)
-
 ;;; Windows, Popups and So On
 ;;;
 ;; Focus new window after splitting
