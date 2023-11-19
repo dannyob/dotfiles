@@ -7,6 +7,7 @@
 
 (package! indium)
 (package! kaolin-themes)
+(package! flexoki-themes  :recipe (:host github :repo "crmsnbleyd/flexoki-emacs-theme"))
 (package! beeminder)
 (package! org-ql)
 (package! dedicated)
@@ -14,7 +15,6 @@
 (package! org-transclusion)
 (package! ob-deno)
 (package! org-ai :recipe (:host github :repo "rksm/org-ai" ))
-
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...
 ;(unpin! pinned-package)
