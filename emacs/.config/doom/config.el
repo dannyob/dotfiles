@@ -393,30 +393,10 @@ If SUBTHREAD is non-nil, only fold the current subthread."
  (setq-default fill-column 72)
  (setq fill-flowed-encode-column fill-column)
 
-;; Below is more evilly correct but doesn't work with fold module in doom-emacs
-;; because fold module remaps evil-fold-action keys.
-;; (setq evil-fold-list (cl-remove-if (lambda (e) (eq (caar e) 'mu4e-headers-mode)) evil-fold-list))
-;; (add-to-list 'evil-fold-list `((mu4e-headers-mode) :open-all nil :close-all ,(lambda () (call-interactively 'mu4e-headers-fold-all)) :toggle ,(lambda () (call-interactively 'mu4e-headers-toggle-thread-folding)) :open nil :open-rec  nil :close nil))
-
-   ;; Colorize headers based on tags
-   ;;
+ ;; Colorize headers based on tags
+ ;;
 
  (defvar dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro")  ("spam-guess". "gainsboro") ("notification-corpus" . "dark grey") ("notification-guess" . "dark gray")))
-
- ;; (defun dob-mu4e~headers-line-apply-tag-face (msg line)
- ;;   "Adjust LINE's face property based on the MSG's mailing-list value."
- ;;   (let* ((ml (mu4e-message-field msg :tags))
- ;;          (tagl (mapcar 'car dob-mu4e-tag-colors))
- ;;          (tag (cl-intersection ml tagl :test 'equal))
- ;;          (face (if tag
- ;;                    `(:foreground ,(assoc-default (cl-first tag) dob-mu4e-tag-colors))
- ;;                  'mu4e-header-face)))
- ;;     (when (fboundp 'add-face-text-property)
- ;;       (add-face-text-property 0 (length line) face t line))
- ;;     line))
-
- ;; (add-to-list 'mu4e~headers-line-handler-functions
- ;;              'dob-mu4e~headers-line-apply-tag-face)
 
  (setq mu4e-bookmarks
        '(
@@ -511,7 +491,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
 ;; Org-mode
 ;;
-
+;;
 
 (after! org
   (require 'ol-info)
