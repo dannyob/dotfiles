@@ -636,7 +636,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          :publishing-function org-html-publish-to-html)
         ("dannyob-eth-blog"
          :base-directory "/home/danny/Private/org/wiki/daily/"
-         :publishing-directory "/ssh:danny@boat:/var/local/www/dannyob.eth/diary/"
+         :publishing-directory "/home/danny/tmp/diary/"
          :publishing-function org-html-publish-to-html)))
 
   ;; Another go at org-capture, too
