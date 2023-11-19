@@ -1,0 +1,20 @@
+;; Stop Lisp from SCREAMING AT YOU.
+(setf *print-case* :downcase)
+;; Replace very deeply nested structures by '#' when printing.
+(setf *print-level* 50)
+;; Replace elements of very long sequences by '...' when printing.
+(setf *print-length* 200)
+
+#+sbcl
+(progn
+  (sb-ext:restrict-compiler-policy 'safety 3)
+  (sb-ext:restrict-compiler-policy 'debug 3))
+;;#+sbcl
+;;(require 'sb-aclrepl)
+
+;;; The following lines added by ql:add-to-init-file:
+#-quicklisp
+(let ((quicklisp-init (merge-pathnames "Private/quicklisp/setup.lisp"
+                                       (user-homedir-pathname))))
+  (when (probe-file quicklisp-init)
+    (load quicklisp-init)))
