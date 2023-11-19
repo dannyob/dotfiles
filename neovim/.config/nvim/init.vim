@@ -68,7 +68,7 @@ abbrev ogr org
 abbrev ahve have
 
 " o  - open url under curson
-map <Leader>o <Esc>:Utl<CR>
+"map <Leader>o <Esc>:Utl<CR>
 " d - insert todays date
 map <Leader>d <Esc>i<C-R>=strftime("%Y-%m-%dT%H:%M%z")<CR>
 " w
@@ -176,8 +176,8 @@ Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
 " Dirty Emacs Experimentation
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'kristijanhusak/orgmode.nvim'
+Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-orgmode/orgmode'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
@@ -209,3 +209,7 @@ let g:guile_highlight_reader_extensions=1
 let g:guile_highlight_goops=1
 let g:guile_highlight_api=1
 let g:guile_highlight_modules=1
+
+
+" Let's gooooo
+:lua require('dob')
