@@ -482,12 +482,6 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   ;; (define-key sly-mode-map (kbd "C-c C-z") 'dob-repl-or-code)
   (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
 
-
-;; Company
-
-(after! company
-  (setq company-idle-delay nil))
-
 (when (file-directory-p "/usr/share/doc/hyperspec") (setq
      common-lisp-hyperspec-root "file:///usr/share/doc/hyperspec/"))
 
