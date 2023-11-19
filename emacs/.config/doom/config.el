@@ -185,7 +185,7 @@
       (if (string-prefix-p "notmuch:id:" link)
           (with-temp-buffer
             (call-process-shell-command (format "notmuch search --output=files id:%s | xargs cat | email2vcard" (substring link 11)) nil t nil)
-            (beginning-of-buffer)
+            (goto-char (point-min))
             (setq filename (string-trim (thing-at-point 'line))))))
     (find-file-other-window filename)
     (org-insert-last-stored-link 1)))
