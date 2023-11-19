@@ -6,3 +6,4 @@ declare -x GUIX_LOCPATH=$GUIX_LOCPATH:$HOME/.guix-profile/lib/locale
 declare -x MAILDIR=$HOME/Private/mail
 declare -x XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/local/share/:/usr/share/
 declare -x XDG_SCREENSHOTS_DIR=$HOME/tmp
+declare -x PYTHONHISTFILE=$HOME/.cache/python_history
