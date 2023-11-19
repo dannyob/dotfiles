@@ -1,4 +1,5 @@
 emulate sh -c 'source /etc/profile'
+emulate sh -c 'source ~/.profile'
 declare -x SHORTHOST=`hostname`
 declare -x PATH=$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.deno/bin:$HOME/.config/emacs/bin:$PATH
 declare -x GUIX_LOCPATH=$GUIX_LOCPATH:$HOME/.guix-profile/lib/locale
