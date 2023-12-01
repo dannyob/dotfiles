@@ -130,6 +130,11 @@
                                     home-xdg-configuration-files-service-type
                                     `(("kitty/kitty.conf" ,(local-file "kitty/.config/kitty/kitty.conf"))))
 
+                    (simple-service 'dwl-guile-config
+                                    home-xdg-configuration-files-service-type
+                                    `(("dwl-guile/keys.scm" ,(local-file "dwl-guile/.config/dwl-guile/keys.scm"))
+                                      ("dwl-guile/init.scm" ,(local-file "dwl-guile/.config/dwl-guile/init.scm"))))
+
                     ;; Create and add the dtao-guile home service to your home configuration.
                     (service home-dtao-guile-service-type
                              (home-dtao-guile-configuration
@@ -202,7 +207,7 @@
                     ;; dwl:startup-hook in your Guile config.
                     ;;
                     ;; By default, this option is not used.
-                    (startup-command "kitty")
+                    ;; (startup-command "kitty <&-")
 
                     ;; If QT-applications should be rendered natively. Enabled by default.
                     ;; This will set QT_QPA_PLATFORM="wayland-egl" and install
@@ -217,8 +222,7 @@
                     ;; dynamically, without restarting dwl-guile.
                     (reload-config-on-change? #t)
 
-                    ;; Create a custom configuration for dwl.
-                    (config '((set-xkb-rules '((options . "compose:prsc,caps:hyper")))))))
+                    (config (list '((load "/home/danny/.config/dwl-guile/init.scm"))))))
 
                     ;; Catch locally installed fonts, also git dotfiles fonts
                     (simple-service 'additional-fonts-service
