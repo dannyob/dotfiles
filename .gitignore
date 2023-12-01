@@ -1,4 +1,5 @@
 *~
+.DS_Store
 /cachesymlinks/.python_history
 /neovim/.local/share/nvim/shada/
 /fonts/.fonts/.uuid
