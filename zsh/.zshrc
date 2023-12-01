@@ -1,5 +1,6 @@
 # last chance
 declare -x SHORTHOST=${SHORTHOST:=$(hostname -s)}
+[[ $SHORTHOST == *.local ]] && SHORTHOST=${SHORTHOST%.local}
 
 # I like vim-syle bindings
 bindkey -A viins main
