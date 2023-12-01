@@ -1,0 +1,2 @@
+#!/bin/sh
+/opt/homebrew/bin/emacsclient -e 'org-clock-heading'
