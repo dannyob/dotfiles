@@ -21,7 +21,11 @@
       (setq Info-additional-directory-list (list my-info)))))
 
 (setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
+
 (advice-add #'doom-modeline-segment--modals :override #'ignore)
+
+(setq find-file-visit-truename t) ;; Helps with confusing symlinks, especially with org-roam see https://www.orgroam.com/manual.html#Getting-Started
+
 ;;; Windows, Popups and So On
 ;;;
 ;; Focus new window after splitting
@@ -237,7 +241,7 @@
 ;; Org-Roam
 ;;
 (after! org-roam
-  (setq org-roam-directory (expand-file-name "~/Private/org/wiki/"))
+  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/"))
   (map! :map org-mode-map
         "M-<left>" #'org-roam-dailies-goto-previous-note
         "M-<right>" #'org-roam-dailies-goto-next-note)
