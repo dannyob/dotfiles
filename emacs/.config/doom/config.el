@@ -540,7 +540,21 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-archive-location "archives/%s_archive::"
         org-fontify-whole-heading-line t
         org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t))
+        org-fontify-quote-and-verse-blocks t)
+
+(defun write-current-clock-entry-to-file ()
+  (with-temp-file "~/.current-task")
+    (if (org-clocking-p)
+      (insert (org-clock-get-clock-string))
+      (insert "")))
+
+
+(advice-add 'org-clock-in :after #'write-current-clock-entry-to-file)
+(advice-add 'org-clock-out :after #'write-current-clock-entry-to-file)
+
+;; Repeat for org-clock-cancel and any other clock-related functions you want to track
+;; Example:
+(advice-add 'org-clock-cancel :after #'write-current-clock-entry-to-file))
 
 (use-package! plz)
 
