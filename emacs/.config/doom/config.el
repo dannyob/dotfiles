@@ -241,7 +241,7 @@
 ;; Org-Roam
 ;;
 (after! org-roam
-  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/"))
+  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/")))
   (map! :map org-mode-map
         "M-<left>" #'org-roam-dailies-goto-previous-note
         "M-<right>" #'org-roam-dailies-goto-next-note)
@@ -585,6 +585,19 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
 (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
+;; Old Journal code
+(defun dob-goto-journal ()
+  "Jump to where journal entry should be added"
+  (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+         (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+         (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
+         (jbuf (cadar journal-loc))
+         (jloc (caar journal-loc)))
+    (if-let (jwin (get-buffer-window jbuf))
+        (select-window jwin)
+      (switch-to-buffer jbuf))
+    (goto-char jloc)))
+
 (defun dob-add-journal-todo ()
   "Add a new todo at the end of the journal subtree"
   (interactive)
@@ -603,27 +616,28 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (org-todo "")
   (insert " "))
 
-(defun dob-goto-journal ()
-  "Jump to where journal entry should be added"
-  (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+(defun dob-add-journal-todo ()
+  "Add a new todo at the end of the journal subtree"
+  (interactive)
+  (org-roam-dailies-goto-today)
+  (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
+         (org-roam-today "~/Private/org/wiki/onebig.org")
          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
          (jbuf (cadar journal-loc))
          (jloc (caar journal-loc)))
     (if-let (jwin (get-buffer-window jbuf))
         (select-window jwin)
       (switch-to-buffer jbuf))
-    (goto-char jloc)))
-
-;; (defun dob-add-journal-todo ()
-;;   (interactive)
-;;   (org-roam-dailies-capture-today))
-
+    (goto-char jloc))
+  (org-insert-todo-subheading nil)
+  (dob-org-insert-time-now nil)
+  (org-todo "")
+  (insert " "))
 
 (defun dob-daylog () (interactive)
        (setq org-attach-id-dir "~/Private/org/wiki/data/")
        (setq dob-org-file "~/Private/org/daylog.org")
-       (setq org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
+       (pushnew! org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
                                      ("wiki" . "%(dob-wiki-url)")))
        (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/wiki/daily" "~/Private/org/" "~/todo.org"))))
 
@@ -695,6 +709,9 @@ If SUBTHREAD is non-nil, only fold the current subthread."
           :desc "Org store link" "M-c" 'org-store-link
           :desc "Org insert link" "M-v" 'org-insert-link-global))
 
+;; Great set of keys to make documentation browsing easier
+;;
+(require 'cc-doc-mode-ux) ;; in ~/..config/doom/lisp/
 
 ;; ChatGPT
 ;;
