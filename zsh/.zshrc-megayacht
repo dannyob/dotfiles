@@ -28,26 +28,6 @@ fi
 # LOCAL FUNCTIONS
 ###
 
-# Danny's patented do everything command
-»() {
-    # Write to my org-file log.
-    emacsclient -e '(progn (dob-add-journal-todo)(insert "'$*'")(save-buffer))'
-}
-
-tidyhtml() {
-    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute | pandoc -f markdown -t html
-}
-
-html2markdown() {
-    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute 
-}
-
-fixgpg() {
-    gpg-connect-agent /bye
-    GPG_TTY=$(tty)
-    export GPG_TTY
-}
-
 aptinstall() {
 	local commit
 	vared -c -p "Why are you installing $1? " commit
