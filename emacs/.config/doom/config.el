@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
@@ -242,7 +241,7 @@
 ;; Org-Roam
 ;;
 (after! org-roam
-  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/"))
+  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/")))
   (map! :map org-mode-map
         "M-<left>" #'org-roam-dailies-goto-previous-note
         "M-<right>" #'org-roam-dailies-goto-next-note)
