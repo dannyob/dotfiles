@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Create a temporary file
+TMPFILE=$(mktemp)
+
+# Write stdin to the temporary file
+cat - > "$TMPFILE"
+
+# Open the temporary file in Emacs
+emacsclient -e '(progn (dob-add-journal-todo)(insert-file-contents "'$TMPFILE'")(save-buffer))'
+
+# Optionally, remove the temporary file if you don't need it anymore
+rm "$TMPFILE"

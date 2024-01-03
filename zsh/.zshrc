@@ -68,9 +68,16 @@ shellit() {
     llm -t shellit $* | awk '/```/ {flag=1;next} /```/ {flag=0} flag'
 }
 
-»() {
-    # Write to my org-file log.
-    emacsclient -e '(progn (dob-add-journal-todo)(insert "'$*'")(save-buffer))'
+function »() {
+zmodload zsh/zselect
+local fds=(0)
+
+    # Run paste-into-journal if there is something on stdin OR if there are no arguments
+    if zselect -t 0 $fds 2> /dev/null || [[ $# -eq 0 ]]; then
+        paste-into-journal
+    else
+        emacsclient -e "(progn (dob-add-journal-todo)(insert \"$*\")(save-buffer))"
+    fi
 }
 
 tidyhtml() {
