@@ -68,6 +68,27 @@ shellit() {
     llm -t shellit $* | awk '/```/ {flag=1;next} /```/ {flag=0} flag'
 }
 
+»() {
+    # Write to my org-file log.
+    emacsclient -e '(progn (dob-add-journal-todo)(insert "'$*'")(save-buffer))'
+}
+
+tidyhtml() {
+    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute | pandoc -f markdown -t html
+}
+
+html2markdown() {
+    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute 
+}
+
+fixgpg() {
+    gpg-connect-agent /bye
+    GPG_TTY=$(tty)
+    export GPG_TTY
+}
+
+
+
 # 10ms for key sequences
 KEYTIMEOUT=1
 
