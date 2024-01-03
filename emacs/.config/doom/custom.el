@@ -176,12 +176,5 @@
      ((sly warning))
      ((sly warning))
      (nrepl-connected-hook))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(mode-line ((t (:height 80))))
- '(mode-line-inactive ((t (:height 80)))))
 (put 'projectile-ag 'disabled nil)
 (put 'projectile-grep 'disabled nil)
