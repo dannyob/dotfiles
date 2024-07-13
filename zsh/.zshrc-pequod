@@ -1,5 +1,6 @@
-
 eval "$(/opt/homebrew/bin/brew shellenv)"
+source "$HOME/.rye/env"
+
 export HISTFILE=~/.cache/zshhistory
 export HISTSIZE=10000
 export SAVEHIST=10000
@@ -68,7 +69,23 @@ bindkey -M vicmd 'j' history-substring-search-down
 zmodload zsh/terminfo
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+
+# Mac specials
 alias ls='gls -F --color=auto --hyperlink'
+alias clipin='pbcopy'
+alias clipout='pbpaste'
+
+function dob-st {
+ ( cd "/Users/danny/Library/Application Support/BraveSoftware/Brave-Browser/Default" 
+  sqlite3 'file:History?immutable=1' <<SQL
+    select '* [' || title || '](' || url || ')' 
+      from urls 
+      order by last_visit_time desc 
+      limit 10;
+SQL
+)
+}
+
 activ() {
     # Save pre-existing environment variables
     orig_vars=$(env | sed 's/=.*$//')
