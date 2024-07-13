@@ -94,7 +94,24 @@ fixgpg() {
     export GPG_TTY
 }
 
-
+# Stop Python Cache droppings
+case "${OSTYPE}" in
+    darwin*)
+        folder="${HOME}/Library/Caches/Python"
+        if [[ ! -d "${folder}" ]]; then mkdir -p "${folder}"; fi
+        export PYTHONPYCACHEPREFIX="${folder}"
+        ;;
+    linux-*)
+        folder="${HOME}/.cache/Python"
+        if [[ ! -d "${folder}" ]]; then mkdir -p "${folder}"; fi
+        export PYTHONPYCACHEPREFIX="${folder}"
+        ;;
+    *)
+        printf "WARNING: unsupported operating system '%s'; "`
+              `'not setting PYTHONPYCACHEPREFIX' "${OSTYPE}" >&2
+        return 1
+        ;;
+esac
 
 # 10ms for key sequences
 KEYTIMEOUT=1
