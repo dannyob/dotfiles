@@ -117,6 +117,8 @@ activ() {
             echo "Error: Failed to decrypt or source the secrets file." >&2
             return 1
         fi
+    else
+        echo "Warning: No secrets file $secrets_file" >&2
     fi
 
     # Activate the virtual environment
