@@ -38,9 +38,11 @@ fi
 # Brewed guile
 ###
 
-declare -x GUILE_LOAD_PATH="/opt/homebrew/share/guile/site/3.0"
-declare -x GUILE_LOAD_COMPILED_PATH="/opt/homebrew/lib/guile/3.0/site-ccache"
-declare -x GUILE_SYSTEM_EXTENSIONS_PATH="/opt/homebrew/lib/guile/3.0/extensions"
+export GUILE_LOAD_PATH=$GUILE_LOAD_PATH:/usr/local/share/guile/site/3.0/:/opt/homebrew/share/guile/site/3.0/
+export GUILE_LOAD_COMPILED_PATH=$GUILE_LOAD_COMPILED_PATH:/usr/local/lib/guile/3.0/site-ccache/:/opt/homebrew/share/guile/site/3.0/site-ccache
+export GUILE_SYSTEM_EXTENSIONS_PATH=$GUILE_SYSTEM_EXTENSIONS_PATH:/usr/local/lib/guile/3.0/extensions:/opt/homebrew/lib/guile/3.0/extensions
+export PATH=/usr/local/bin:$PATH
+
 
 ###
 # FASD
@@ -71,7 +73,8 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # Mac specials
-alias ls='gls -F --color=auto --hyperlink'
+fpath=(/opt/homebrew/share/zsh/site-functions/ "${fpath[@]}" )
+alias ls='gls -A -F --color=auto --hyperlink'
 alias clipin='pbcopy'
 alias clipout='pbpaste'
 
@@ -172,3 +175,4 @@ activ() {
     }
 }
 
+export PATH="/opt/homebrew/opt/protobuf@3/bin:$PATH"
