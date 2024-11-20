@@ -39,13 +39,13 @@
 ;; (if
 ;;      (string-match "microsoft"
 ;;                    (with-temp-buffer (shell-command "uname -r" t)
-;;  
+;;
 ;;                                      (delete-char -1)
 ;;                                      (buffer-string)))
 ;;      (setq browse-url-browser-function 'browse-url-generic
 ;;            browse-url-program-generic "PowerShell.exe"
 ;;            browse-url-generic-args '("-Command" "Start-Process")))
-;; 
+;;
 
 ;; I like context menus
 (when (fboundp 'context-menu-mode)
@@ -505,7 +505,7 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (map! :after sly-mrepl :map sly-mode-map "C-c C-z" #'dob-repl-or-code))
 
 (when (file-directory-p "/usr/share/doc/hyperspec") (setq
-     common-lisp-hyperspec-root "file:///usr/share/doc/hyperspec/"))
+                                                     common-lisp-hyperspec-root "file:///usr/share/doc/hyperspec/"))
 
 ;; Org-mode
 ;;
@@ -550,163 +550,161 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 
   ; Update more than just the modeline
 ; (advice-add 'org-clock-update-mode-line :after #'write-current-clock-entry-to-file))
-(run-with-timer 0 10 'write-current-clock-entry-to-file)
+ (run-with-timer 0 10 'write-current-clock-entry-to-file)
 
 ; Maybe Doom already does this GC hack?
-(add-function :after after-focus-change-function 'garbage-collect)
+ (add-function :after after-focus-change-function 'garbage-collect)
 
-(use-package! plz)
+ (use-package! plz)
 
 ;; org-transclusion
-(use-package! org-transclusion
-  :after org
-  :init
-  (map!
-   :map global-map "<f12>" #'org-transclusion-add
-   :leader
-   :prefix "n"
-   :desc "Org Transclusion Mode" "t" #'org-transclusion-mode))
+ (use-package! org-transclusion
+   :after org
+   :init
+   (map!
+    :map global-map "<f12>" #'org-transclusion-add
+    :leader
+    :prefix "n"
+    :desc "Org Transclusion Mode" "t" #'org-transclusion-mode))
 
-(setq org-clock-persist 'history)
-(org-clock-persistence-insinuate)
+ (setq org-clock-persist 'history)
+ (org-clock-persistence-insinuate)
 
-(setq dob/organization-task-id "a7e9c9b9-0517-4ac5-876a-a1036b63c3a2")
+ (setq dob/organization-task-id "a7e9c9b9-0517-4ac5-876a-a1036b63c3a2")
 
-(defun dob/clock-in-organization-task-as-default ()
-  (interactive)
-  (save-restriction
-    (widen)
-    (org-with-point-at (org-id-find dob/organization-task-id 'marker)
-      (org-clock-in '(16)))))
+ (defun dob/clock-in-organization-task-as-default ()
+   (interactive)
+   (save-restriction
+     (widen)
+     (org-with-point-at (org-id-find dob/organization-task-id 'marker)
+       (org-clock-in '(16)))))
 
 ;; (setq org-agenda-custom-commands
 ;;       '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
 ;;         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (cl-remove-if (lambda (x) (string-match ".*MyHabits.*" x)) org-agenda-files))))))))
-(setq org-agenda-custom-commands
-      '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
-        ("p" "Projects" ((tags "PROJECT")))
-        ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
+ (setq org-agenda-custom-commands
+       '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
+         ("p" "Projects" ((tags "PROJECT")))
+         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
 
-(setq org-super-agenda-groups
-        '(
-          (:log t)
-          (:name "Schedule"
-           :time-grid t)
-           
-          (:name "Today"
-           :scheduled today)
-          (:name "Wekan"
-                 :file-path "wekan")
-                 
-          (:name "Filecoin"
-                 :tag "Filecoin")
-          (:name "Daylog"
-                 :file-path "daylog")))
-          
+ (setq org-super-agenda-groups
+         '(
+           (:log t)
+           (:name "Schedule"
+            :time-grid t)
 
-(setq org-super-agenda-mode t)
-(setq org-super-agenda-header-map nil)
-(face-spec-set 'org-agenda-date '((t :height 1.5 :box t :inverse-video t)))
-(face-spec-set 'org-agenda-structure '((t :height 1.1)))
-(face-spec-set 'org-super-agenda-header'((t :height 1.5)))
+           (:name "Today"
+            :scheduled today)
+           (:name "Wekan"
+                  :file-path "wekan")
 
-(defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
+           (:name "Filecoin"
+                  :tag "Filecoin")
+           (:name "Daylog"
+                  :file-path "daylog")))
+
+
+ (setq org-super-agenda-mode t)
+ (setq org-super-agenda-header-map nil)
+ (face-spec-set 'org-agenda-date '((t :height 1.5 :box t :inverse-video t)))
+ (face-spec-set 'org-agenda-structure '((t :height 1.1)))
+ (face-spec-set 'org-super-agenda-header'((t :height 1.5)))
+
+ (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
 ;; Old Journal code
-(defun dob-goto-journal ()
-  "Jump to where journal entry should be added"
-  (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-         (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
-         (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-         (jbuf (cadar journal-loc))
-         (jloc (caar journal-loc)))
-    (if-let (jwin (get-buffer-window jbuf))
-        (select-window jwin)
-      (switch-to-buffer jbuf))
-    (goto-char jloc)))
+ (defun dob-goto-journal ()
+   "Jump to where journal entry should be added"
+   (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
+          (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
+          (jbuf (cadar journal-loc))
+          (jloc (caar journal-loc)))
+     (if-let (jwin (get-buffer-window jbuf))
+         (select-window jwin)
+       (switch-to-buffer jbuf))
+     (goto-char jloc)))
 
-(defun dob-add-journal-todo ()
-  "Add a new todo at the end of the journal subtree"
-  (interactive)
-  (org-roam-dailies-goto-today)
-  (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
-         (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
-         (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-         (jbuf (cadar journal-loc))
-         (jloc (caar journal-loc)))
-    (if-let (jwin (get-buffer-window jbuf))
-        (select-window jwin)
-      (switch-to-buffer jbuf))
-    (goto-char jloc))
-  (org-insert-todo-subheading nil)
-  (dob-org-insert-time-now nil)
-  (org-todo "")
-  (insert " "))
+ (defun dob-add-journal-todo ()
+   "Add a new todo at the end of the journal subtree"
+   (interactive)
+   (org-roam-dailies-goto-today)
+   (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
+          (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
+          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
+          (jbuf (cadar journal-loc))
+          (jloc (caar journal-loc)))
+     (if-let (jwin (get-buffer-window jbuf))
+         (select-window jwin)
+       (switch-to-buffer jbuf))
+     (goto-char jloc))
+   (org-insert-todo-subheading nil)
+   (dob-org-insert-time-now nil)
+   (org-todo "")
+   (insert " "))
 
-(defun dob-add-journal-todo ()
-  "Add a new todo at the end of the journal subtree"
-  (interactive)
-  (org-roam-dailies-goto-today)
-  (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
-         (org-roam-today "~/Private/org/wiki/onebig.org")
-         (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-         (jbuf (cadar journal-loc))
-         (jloc (caar journal-loc)))
-    (if-let (jwin (get-buffer-window jbuf))
-        (select-window jwin)
-      (switch-to-buffer jbuf))
-    (goto-char jloc))
-  (org-insert-todo-subheading nil)
-  (dob-org-insert-time-now nil)
-  (org-todo "")
-  (insert " "))
+ (defun dob-add-journal-todo ()
+   "Add a new todo at the end of the journal subtree"
+   (interactive)
+   (org-roam-dailies-goto-today)
+   (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
+          (org-roam-today "~/Private/org/wiki/onebig.org")
+          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
+          (jbuf (cadar journal-loc))
+          (jloc (caar journal-loc)))
+     (if-let (jwin (get-buffer-window jbuf))
+         (select-window jwin)
+       (switch-to-buffer jbuf))
+     (goto-char jloc))
+   (org-insert-todo-subheading nil)
+   (dob-org-insert-time-now nil)
+   (org-todo "")
+   (insert " "))
 
-(defun dob-daylog () (interactive)
-       (setq org-attach-id-dir "~/Private/org/wiki/data/")
-       (setq dob-org-file "~/Private/org/daylog.org")
-       (pushnew! org-link-abbrev-alist '("people" . "file:///%(dob-person-filename)"))
-       (pushnew! org-link-abbrev-alist '("wiki" . "%(dob-wiki-url)"))
-       (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/wiki/daily" "~/Private/org/" "~/todo.org"))))
+ (defun dob-daylog () (interactive)
+        (setq org-attach-id-dir "~/Private/org/wiki/data/")
+        (setq dob-org-file "~/Private/org/daylog.org")
+        (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki/onebig.org"))))
 
-(defun dob-yacht () (interactive)
-       (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
-       (setq org-agenda-files '("~/Private/org/codetherapy")))
+ (defun dob-yacht () (interactive)
+        (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
+        (setq org-agenda-files '("~/Private/org/codetherapy")))
 
-(if (string-equal "yacht" (getenv "SHORTHOST"))
-    (dob-yacht)
-  (dob-daylog))
+ (if (string-equal "yacht" (getenv "SHORTHOST"))
+     (dob-yacht)
+   (dob-daylog))
 
-  ;; OMG Org Publishing AGAIN??
-(setq org-export-with-broken-links 'mark)
-(setq org-publish-project-alist
-      '(("codetherapy-dev-blog"
-         :base-directory "/home/danny/Private/org/codetherapy/"
-         :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
-         :publishing-function org-html-publish-to-html)
-        ("dannyob-eth-blog"
-         :base-directory "/home/danny/Private/org/wiki/daily/"
-         :publishing-directory "/home/danny/tmp/diary/"
-         :publishing-function org-html-publish-to-html)))
+   ;; OMG Org Publishing AGAIN??
+ (setq org-export-with-broken-links 'mark)
+ (setq org-publish-project-alist
+       '(("codetherapy-dev-blog"
+          :base-directory "/home/danny/Private/org/codetherapy/"
+          :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
+          :publishing-function org-html-publish-to-html)
+         ("dannyob-eth-blog"
+          :base-directory "/home/danny/Private/org/wiki/daily/"
+          :publishing-directory "/home/danny/tmp/diary/"
+          :publishing-function org-html-publish-to-html)))
 
-  ;; Another go at org-capture, too
-  ;;
-(setq org-default-notes-file dob-org-file)
-(setq org-capture-templates
-      '(("s"
-         "Scheduled Todo"
-         entry
-         (function (lambda () (dob-goto-journal)))
-         "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
-         :unnarrowed t
-         :immediate-finish t
-         :jump-to-captured t)))
+   ;; Another go at org-capture, too
+   ;;
+ (setq org-default-notes-file dob-org-file)
+ (setq org-capture-templates
+       '(("s"
+          "Scheduled Todo"
+          entry
+          (function (lambda () (dob-goto-journal)))
+          "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
+          :unnarrowed t
+          :immediate-finish t
+          :jump-to-captured t)))
 
-(setq org-log-done 'time)
+ (setq org-log-done 'time)
 
-(defun dob-org-insert-time-now (arg)
-  "Insert a timestamp with today's time and date."
-  (interactive "P")
-  (org-time-stamp '(16))))
+ (defun dob-org-insert-time-now (arg)
+   "Insert a timestamp with today's time and date."
+   (interactive "P")
+   (org-time-stamp '(16))))
 
 
 
@@ -750,8 +748,8 @@ and return text after SEPARATOR (defaults to ':')."
            :pass ,(dob-auth-secret "boat.endofgreatness.com" "znc")
            :host "boat.endofgreatness.com"
            :port "36667"
-           :channels ("#emacs-circe")
-           ))))
+           :channels ("#emacs-circe")))))
+
 
   ;; KEYBOARD
 (map!
