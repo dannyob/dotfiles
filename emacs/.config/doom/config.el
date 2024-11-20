@@ -718,6 +718,28 @@ If SUBTHREAD is non-nil, only fold the current subthread."
    (plist-get
     (car (auth-source-search :host host :max 1 :login login)) :secret)))
 
+;; GPT
+;;
+(defun dob-get-value-from-pw (search-text &optional separator encrypted-file)
+  "Search for line containing SEARCH-TEXT in ENCRYPTED-FILE (defaults to ~/Private/pw.gpg)
+and return text after SEPARATOR (defaults to ':')."
+  (let ((sep (or separator ":"))
+        (file (or encrypted-file "~/Private/pw.gpg")))
+    (with-temp-buffer
+      (call-process "gpg" nil t nil "--quiet" "--decrypt" (expand-file-name file))
+      (goto-char (point-min))
+      (if (search-forward search-text nil t)
+          (progn
+            (beginning-of-line)
+            (if (re-search-forward (concat ".*" search-text ".*?" sep " *\\(.*\\)") (line-end-position) t)
+                (string-trim (match-string 1))
+              nil))
+        nil))))
+
+(gptel-make-anthropic "Claude"
+  :stream t
+  :key (lambda () (dob-get-value-from-pw "ANTHROPIC_API_KEY" "=")))
+
 ;; Circe and IRC!
 (after! circe
   (setq circe-network-options
@@ -744,38 +766,6 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 ;;
 (require 'cc-doc-mode-ux) ;; in ~/..config/doom/lisp/
 
-;; ChatGPT
-;;
-(defvar dob-current-conversation-id nil)
-(defvar dob-current-prompt-id nil)
-
-(defun dob-remove-nil-values (list)
-  (let (result)
-    (dolist (elem list result)
-      (when (cdr elem)
-        (setq result (cons elem result))))))
-
-
-(defun dob-converse (prompt &optional conversation-id parent-prompt-id)
-  "Feed a PROMPT to ChatGPT, keeping track of previous history via
-CONVERSATION-ID and PARENT-PROMPT-ID.  Relies on
-https://github.com/waylaidwanderer/node-chatgpt-api and chatgpt-api running
-locally."
-  (if conversation-id (setq dob-current-conversation-id conversation-id))
-  (if parent-prompt-id (setq dob-current-prompt-id parent-prompt-id))
-  (let* ((json (plz 'post "http://localhost:3000/conversation"
-                 :headers '(("Content-Type" . "application/json"))
-                 :body (json-encode (dob-remove-nil-values `(("message" . ,prompt)
-                                      ("conversationId" . ,conversation-id)
-                                      ("parentMessageid" . ,parent-prompt-id))))
-                 :as #'json-read
-                 :then 'sync))
-         (response (alist-get 'response json))
-         (conversation-id (alist-get 'conversationId json))
-         (message-id (alist-get 'messageId json)))
-    (setq dob-current-conversation-id conversation-id)
-    (setq dob-current-prompt-id message-id)
-    response))
 
 
 ;; NOW IT IS TIME FOR THE CUSTOMARY CUSTOMIZATION
