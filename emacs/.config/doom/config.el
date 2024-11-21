@@ -542,19 +542,18 @@ If SUBTHREAD is non-nil, only fold the current subthread."
         org-fontify-done-headline t
         org-fontify-quote-and-verse-blocks t)
 
-(defun write-current-clock-entry-to-file ()
-  (with-temp-file "~/.current-task")
-    (if (org-clocking-p)
-      (insert (org-clock-get-clock-string))
-      (insert "")))
+  (defun write-current-clock-entry-to-file (&optional refresh)
+    (with-temp-file "~/.current-task"
+      (if (org-clocking-p)
+          (insert (org-clock-get-clock-string))
+        (insert ""))))
 
+  ; Update more than just the modeline
+; (advice-add 'org-clock-update-mode-line :after #'write-current-clock-entry-to-file))
+(run-with-timer 0 10 'write-current-clock-entry-to-file)
 
-(advice-add 'org-clock-in :after #'write-current-clock-entry-to-file)
-(advice-add 'org-clock-out :after #'write-current-clock-entry-to-file)
-
-;; Repeat for org-clock-cancel and any other clock-related functions you want to track
-;; Example:
-(advice-add 'org-clock-cancel :after #'write-current-clock-entry-to-file))
+; Maybe Doom already does this GC hack?
+(add-function :after after-focus-change-function 'garbage-collect)
 
 (use-package! plz)
 
@@ -665,8 +664,8 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 (defun dob-daylog () (interactive)
        (setq org-attach-id-dir "~/Private/org/wiki/data/")
        (setq dob-org-file "~/Private/org/daylog.org")
-       (pushnew! org-link-abbrev-alist '(("people" . "file:///%(dob-person-filename)")
-                                     ("wiki" . "%(dob-wiki-url)")))
+       (pushnew! org-link-abbrev-alist '("people" . "file:///%(dob-person-filename)"))
+       (pushnew! org-link-abbrev-alist '("wiki" . "%(dob-wiki-url)"))
        (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki" "~/Private/org/wiki/daily" "~/Private/org/" "~/todo.org"))))
 
 (defun dob-yacht () (interactive)
@@ -707,7 +706,11 @@ If SUBTHREAD is non-nil, only fold the current subthread."
 (defun dob-org-insert-time-now (arg)
   "Insert a timestamp with today's time and date."
   (interactive "P")
-  (org-time-stamp '(16)))
+  (org-time-stamp '(16))))
+
+
+
+;; Authorization!!
 
 (defun dob-auth-secret (host login)
   "Pull out a password from authinfo using HOST and LOGIN."
