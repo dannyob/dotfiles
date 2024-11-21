@@ -9,7 +9,8 @@
  '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(package-selected-packages '(aggressive-indent vterm debbugs))
  '(safe-local-variable-values
-   '((eval progn
+   '((org-agenda-files . ".")
+     (eval progn
       (require 'lisp-mode)
       (defun emacs27-lisp-fill-paragraph
           (&optional justify)
@@ -178,3 +179,10 @@
      (nrepl-connected-hook))))
 (put 'projectile-ag 'disabled nil)
 (put 'projectile-grep 'disabled nil)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:height 80))))
+ '(mode-line-inactive ((t (:height 80)))))
