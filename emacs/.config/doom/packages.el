@@ -31,6 +31,8 @@
 
 (package! plz :recipe (:host github :repo "alphapapa/plz.el") :pin "80aeae0d201b06088d4b7543a603d97bdbccb948" )
 
+(package! ement :recipe (:host github :repo "alphapapa/ement.el"))
+
 ;; To install a package directly from a particular repo, you'll need to specify
 ;; a `:recipe'. You'll find documentation on what `:recipe' accepts here:
 ;; https://github.com/raxod502/straight.el#the-recipe-format
