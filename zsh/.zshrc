@@ -40,7 +40,7 @@ setopt hist_reduce_blanks
 ##
 
 # colored ls with hyperlinks
-alias   ls='ls -F --color=auto --hyperlink' 
+alias   ls='ls -A -F --group-directories-first --sort=extension --color=auto --hyperlink' 
 
 alias	ps='ps -ef'
 alias	cls='clear; tput reset'
