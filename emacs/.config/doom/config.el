@@ -7,10 +7,16 @@
 ;; clients, file templates and snippets.
 ;;
 (add-load-path! (concat doom-user-dir "/lisp/"))
+;; Fun set of utilities to push org to Notion and Slack
 (require 'dob-org-push)
+;; Great set of keys to make documentation browsing easier
+(require 'cc-doc-mode-ux) ;; in ~/..config/doom/lisp/
 
+;; Name etc
 (setq user-full-name "Danny O'Brien"
       user-mail-address "danny@spesh.com")
+
+(setq dob-org-file (expand-file-name "~/Private/org/wiki/onebig.org"))
 
 (setq display-line-numbers-type nil)
 
@@ -20,7 +26,7 @@
         (add-to-list 'Info-additional-directory-list my-info)
       (setq Info-additional-directory-list (list my-info)))))
 
-(setq auth-sources '("~/.authinfo.gpg" "~/Private/dotfiles/authinfo"))
+(setq auth-sources '("~/.authinfo.gpg"))
 
 (advice-add #'doom-modeline-segment--modals :override #'ignore)
 
@@ -64,14 +70,13 @@
 ; (defvar dob-hidpi 0.75)
 (defvar dob-hidpi 1)
 (setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
-(setq doom-variable-pitch-font (font-spec :family "Cream"))
 (setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 ;; (setq doom-theme 'tango)
-(setq doom-theme 'kaolin-ocean)
+(setq doom-theme 'doom-rogue-light)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
