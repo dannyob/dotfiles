@@ -1,7 +1,8 @@
 "shhh! no bell or visualbell
 set noerrorbells novisualbell t_vb=
-let mapleader = " "
-let maplocalleader = "_"
+let mapleader = ","
+let maplocalleader = " "
+colorscheme zaibatsu
 
 " read/write a shared file, don't store items that are bigger than 100K.
 set shada='20,s100
@@ -10,7 +11,7 @@ set shada='20,s100
 set laststatus=2
 
 " automatically put cuts into the clipboard
-set clipboard+=unnamedplus
+"set clipboard+=unnamedplus
  
 " Try to pick colors that look good on dark background
 set background=dark
@@ -58,10 +59,11 @@ set display=lastline,uhex " stop showing @@@@@ instead of last line
 let html_use_css = 1  " use stylesheets when generating html
 
 " Don't want tmp and undo files cluttering up directories
-set directory=~/tmp,.,/var/tmp,/tmp
-set undodir=~/.cache/undos,.
-
+set directory=~/tmp,/var/tmp,/tmp,.
+set undodir=~/.cache/undos//,.
+set backupdir=~/tmp,/var/tmp,/tmp,.
 set undofile
+set nobackup
 
 " Typos etc
 abbrev ogr org
@@ -155,7 +157,7 @@ call plug#begin()
 Plug 'jpalardy/vim-slime', { 'branch' : 'main' }
 Plug 'tomtom/quickfixsigns_vim'
 " gc == comment/uncomment
-Plug 'tpope/vim-commentary' 
+" Plug 'tpope/vim-commentary' 
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
@@ -176,12 +178,14 @@ Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
 " Dirty Emacs Experimentation
 
-Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 Plug 'nvim-orgmode/orgmode'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
 Plug 'hiphish/info.vim'
+"Plug 'Olical/conjure'
 "Plug 'guns/vim-sexp'
 "(Really a fork of TobBrandt/vim-scripts )
 Plug 'dannyob/vim-scripts' 
@@ -213,3 +217,4 @@ let g:guile_highlight_modules=1
 
 " Let's gooooo
 :lua require('dob')
+
