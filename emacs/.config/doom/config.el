@@ -41,18 +41,6 @@
 (after! vterm
   (set-popup-rule! "*doom:vterm-popup:main" :size 0.25 :vslot -4 :select t :quit nil :ttl 0 :side 'right))
 
-;; Special stuff for WSL
-;; (if
-;;      (string-match "microsoft"
-;;                    (with-temp-buffer (shell-command "uname -r" t)
-;;
-;;                                      (delete-char -1)
-;;                                      (buffer-string)))
-;;      (setq browse-url-browser-function 'browse-url-generic
-;;            browse-url-program-generic "PowerShell.exe"
-;;            browse-url-generic-args '("-Command" "Start-Process")))
-;;
-
 ;; I like context menus
 (when (fboundp 'context-menu-mode)
   (context-menu-mode))
@@ -61,54 +49,21 @@
 (when (fboundp 'menu-bar-mode)
   (menu-bar-mode))
 
-;; KEYBOARD
-(map!
- (:prefix "C-c"
-  :desc "Start mu4e" "j" '=mu4e
-  :desc "Start mu4e" "h" '=mu4e))
+(after! 'evil
+ (setq evil-want-C-u-scroll nil))
 
-; (defvar dob-hidpi 0.75)
-(defvar dob-hidpi 1)
-(setq doom-font (font-spec :family "Iosevka" :size (* 16 dob-hidpi)))
-(setq doom-big-font (font-spec :family "Iosevka Aile" :size (* 24 dob-hidpi)))
+(map! :n "C-u" #'universal-argument
+      :i "C-u" #'universal-argument
+      :v "C-u" #'universal-argument)
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
-;; (setq doom-theme 'tango)
-(setq doom-theme 'doom-rogue-light)
-
-;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory (file-truename (expand-file-name "~/Private/org/")))
 (setq org-list-allow-alphabetical nil)
 
-
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
-
-;; Here are some additional functions/macros that could help you configure Doom:
-;;
-;; - `load!' for loading external *.el files relative to this one
-;; - `use-package' for configuring packages
-;; - `after!' for running code after a package has loaded
-;; - `add-load-path!' for adding directories to the `load-path', relative to
-;;   this file. Emacs searches the `load-path' when you load packages with
-;;   `require' or `use-package'.
-;; - `map!' for binding new keys
-;;
-;; To get information about any of these functions/macros, move the cursor over
-;; the highlighted symbol at press 'K' (non-evil users must press 'C-c g k').
-;; This will open documentation for it, including demos of how they are used.
-;;
-;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
-;; they are implemented.
-
 (if (file-exists-p "~/.guix-profile/bin/emacsql-sqlite")
     (setq emacsql-sqlite-executable  "~/.guix-profile/bin/emacsql-sqlite"))
 
-(let ((tempdir (concat (getenv "HOME") "/tmp/")))
+(let ((tempdir (concat (getenv "HOME") "/tmp/emacs/")))
   (if (file-directory-p tempdir)
       (setq temporary-file-directory tempdir)))
 
@@ -128,19 +83,11 @@
 (setenv "XDG_DATA_DIR" (concat (getenv "XDG_DATA_DIR") ":/usr/local/share:/usr/share"))
 
 
-;; Keyboard bindings
-(global-set-key (kbd "<redo>") 'undo-tree-redo)
-(global-set-key (kbd "<XF86Cut>") 'clipboard-kill-region)
-(global-set-key (kbd "<XF86Copy>") 'clipboard-kill-ring-save)
-(global-set-key (kbd "<XF86Paste>") 'clipboard-yank)
-(global-set-key (kbd "<mouse-8>") 'previous-buffer)
-(global-set-key (kbd "<mouse-9>") 'next-buffer)
-
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c i") 'org-clock-in)
 (global-set-key (kbd "C-c o") 'org-clock-out)
 (global-set-key (kbd "C-c g") 'org-clock-goto)
-(global-set-key (kbd "C-x C-b") 'ivy-switch-buffer) ;; I hate typing C-x C-b when I meant C-x b
+(global-set-key (kbd "C-x C-b") 'consult-buffer) ;; I hate typing C-x C-b when I meant C-x b
 (global-set-key (kbd "M-c") 'kill-ring-save)
 (global-set-key (kbd "M-v") 'yank)
 
@@ -155,53 +102,6 @@
 (map! (:leader
        :desc "Open Scratch Buffer" "b s" 'doom/switch-to-scratch-buffer
        :desc "Open Messages Buffer" "b m" (lambda () (interactive) (switch-to-buffer (messages-buffer)))))
-
-(defun dob-from ()
-  (interactive)
-  (save-excursion
-    (let ((to-content
-           (save-restriction (message-narrow-to-headers)
-                             (message-fetch-field "to")))
-          (cc-content
-           (save-restriction (message-narrow-to-headers)
-                             (message-fetch-field "cc"))))
-      (message-goto-body)
-      (if (re-search-forward "From:[[:space:]]+\\(.*\\)$" nil t)
-          (let* ((matchdata (match-data))
-                 (start (nth 2 matchdata))
-                 (end (nth 3 matchdata))
-                 (from-names (buffer-substring start end)))
-            (message-goto-to)
-            (message-delete-line)
-            (insert (concat "To: " from-names "\n"))
-            (message-goto-cc)
-            (end-of-line)
-            (unless (s-blank-str-p cc-content) (insert ", "))
-            (insert to-content))))))
-
-(defun dob-person-filename (person-name)
-  (let* ((name-file  (downcase (replace-regexp-in-string "[^[:alnum:]]" "-" (string-trim person-name))))
-         (filename (concat "~/Private/wiki/people/" name-file ".org")))
-    filename))
-
-(defun dob-person-make-region (start end)
-  "Create a file for a mentioned person"
-  (interactive "r")
-  (let* ((person-name (buffer-substring start end))
-         (filename (dob-person-filename person-name)))
-    (org-store-link start)
-    (let ((link (caar org-stored-links)))
-      (if (string-prefix-p "notmuch:id:" link)
-          (with-temp-buffer
-            (call-process-shell-command (format "notmuch search --output=files id:%s | xargs cat | email2vcard" (substring link 11)) nil t nil)
-            (goto-char (point-min))
-            (setq filename (string-trim (thing-at-point 'line))))))
-    (find-file-other-window filename)
-    (org-insert-last-stored-link 1)))
-
-(defun dob-person-make (person-name)
-  (interactive "MPerson:")
-  (find-file-other-window (dob-person-filename person-name)))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -260,26 +160,7 @@
 ;; Org-Roam
 ;;
 (after! org-roam
-  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/")))
-  (map! :map org-mode-map
-        "M-<left>" #'org-roam-dailies-goto-previous-note
-        "M-<right>" #'org-roam-dailies-goto-next-note)
-
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?" :if-new
-           (file+head "${slug}.org" "#+title: ${title}\n")
-           :unnarrowed t)))
-  (setq org-roam-dailies-capture-templates
-        `(("d" "default" entry
-           "* %T %?"
-           :target (file+head "%<%Y-%m-%d>.org"
-                              ,(if (file-exists-p   "~/Private/org/wiki/templates/journal.org")
-                                   (with-temp-buffer
-                                     (insert-file-contents  "~/Private/org/wiki/templates/journal.org")
-                                     (buffer-string))
-                                 ""))
-           :unnarrowed t))))
-
+  (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/"))))
 ;; Mu4e!
 ;;
 (after! mu4e
@@ -323,172 +204,20 @@
   (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
   (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
 
-  ;; Funky Thread Folding!
-  ;; From: https://gist.github.com/felipeochoa/614308ac9d2c671a5830eb7847985202
-  ;;
- (defun mu4e~headers-msg-unread-p (msg)
-   "Check if MSG is unread."
-   (let ((flags (mu4e-message-field msg :flags)))
-     (and (member 'unread flags) (not (member 'trashed flags)))))
-
- (defvar mu4e-headers-folding-slug-function
-   (lambda (headers) (format " (%d)" (length headers)))
-   "Function to call to generate the slug that will be appended to folded threads.
-This function receives a single argument HEADERS, which is a list
-of headers about to be folded.")
-
- (defun mu4e~headers-folded-slug (headers)
-   "Generate a string to append to the message line indicating the fold status.
-HEADERS is a list with the messages being folded (including the root header)."
-   (funcall mu4e-headers-folding-slug-function headers))
-
- (defun mu4e~headers-fold-make-overlay (beg end headers)
-   "Hides text between BEG and END using an overlay.
-HEADERS is a list with the messages being folded (including the root header)."
-   (let ((o (make-overlay beg end)))
-     (overlay-put o 'mu4e-folded-thread t)
-     (overlay-put o 'face '(background-color . "#FF0000"))
-     ;; (overlay-put o 'display (concat (mu4e~headers-folded-slug headers) "\n"))
-     (overlay-put o 'evaporate t)
-     (overlay-put o 'invisible t)))
-
- (defun mu4e~headers-fold-find-overlay (loc)
-   "Find and return the 'mu4e-folded-thread overlay at LOC, or return nil."
-   (cl-dolist (o (overlays-in (1- loc) (1+ loc)))
-     (when (overlay-get o 'mu4e-folded-thread)
-       (cl-return o))))
-
- (defun mu4e-headers-fold-all ()
-   "Fold all the threads in the current view."
-   (interactive)
-   (let ((thread-id "") msgs fold-start fold-end)
-     (mu4e-headers-for-each
-      (lambda (msg)
-        (end-of-line)
-        (push msg msgs)
-        (let ((this-thread-id (mu4e~headers-get-thread-info msg 'thread-id)))
-          (if (string= thread-id this-thread-id)
-              (setq fold-end (point))
-            (when (< 1 (length msgs))
-              (mu4e~headers-fold-make-overlay fold-start fold-end (nreverse msgs)))
-            (setq fold-start (point)
-                  fold-end (point)
-                  msgs nil
-                  thread-id this-thread-id)))))
-     (when (< 1 (length msgs))
-       (mu4e~headers-fold-make-overlay fold-start fold-end (nreverse msgs)))))
-
- (defun mu4e-headers-toggle-thread-folding (&optional subthread)
-   "Toggle the folding state for the thread at point.
-If SUBTHREAD is non-nil, only fold the current subthread."
-   ;; Folding is accomplished using an overlay that starts at the end
-   ;; of the parent line and ends at the end of the last descendant
-   ;; line. If there's no overlay, it means it isn't folded
-   (interactive "P")
-   (if-let ((o (mu4e~headers-fold-find-overlay (point-at-eol))))
-       (delete-overlay o)
-     (let* ((msg (mu4e-message-at-point))
-            (thread-id (mu4e~headers-get-thread-info msg 'thread-id))
-            (path-re (concat "^" (mu4e~headers-get-thread-info msg 'path)))
-            msgs first-marked-point last-marked-point)
-       (mu4e-headers-for-each
-        (lambda (submsg)
-          (when (and (string= thread-id (mu4e~headers-get-thread-info submsg 'thread-id))
-                     (or (not subthread)
-                         (string-match-p path-re (mu4e~headers-get-thread-info submsg 'path))))
-            (push msg msgs)
-            (setq last-marked-point (point-at-eol))
-            (unless first-marked-point
-              (setq first-marked-point last-marked-point)))))
-       (when (< 1 (length msgs))
-         (mu4e~headers-fold-make-overlay first-marked-point last-marked-point (nreverse msgs))))))
-
-;; KEYBOARD
- (map!
-    :map (mu4e-headers-mode-map)
-    :n "za" 'mu4e-headers-toggle-thread-folding
-    :n "zM" 'mu4e-headers-fold-all)
+  :n "zM" 'mu4e-headers-fold-all)
 
 ;; Apparently this helps with text breaking, etc?
 ;;
- (add-hook 'message-mode-hook 'auto-fill-mode)
- (setq mu4e-compose-format-flowed t)
- (setq message-cite-reply-position 'below)
+(add-hook 'message-mode-hook 'auto-fill-mode)
+(setq mu4e-compose-format-flowed t)
+(setq message-cite-reply-position 'below)
 
 ; With just the above settings sent emails do not wrap correctly in mu4e:view. You may also want to set
- (setq-default fill-column 72)
- (setq fill-flowed-encode-column fill-column)
+(setq-default fill-column 72)
+(setq fill-flowed-encode-column fill-column)
 
  ;; Colorize headers based on tags
  ;;
-
- (defvar dob-mu4e-tag-colors '(("boring-guess" . "gray") ("boring-corpus" . "gray") ("spam-corpus" . "gainsboro")  ("spam-guess". "gainsboro") ("notification-corpus" . "dark grey") ("notification-guess" . "dark gray")))
-
- (setq mu4e-bookmarks
-       '(
-         ;; (:name "Unread messages" :query "flag:unread AND NOT flag:trashed" :key 117)
-         (:name "Today's messages" :query "date:today..now" :key 116)
-         ;; (:name "Last 7 days" :query "date:7d..now" :hide-unread t :key 119)
-         (:name "Inbox (No lists)" :query  "m:/INBOX AND NOT list:/.*/ AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 122)
-         (:name "Inbox (Clean)" :query "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus" :key 118)
-         (:name "Suspected Spam" :query "m:/INBOX AND (tag:spam-guess OR tag:spam-corpus)" :key 120)
-         (:name "Suspected Boring And Notifications" :query "m:/INBOX AND (tag:boring-guess OR tag:boring-corpus OR tag:notification-guess tag:notification-corpus)" :key 121)))
-
- (setq mu4e-refile-folder
-       (defun dob-refile-to-archive (msg)
-         (cond
-          ((cl-intersection (mu4e-message-field msg :tags) '("spam-guess" "spam-corpus") :test 'equal) "/Junk Email")
-          ((string-match "reply.github.com" (plist-get (car (mu4e-message-field msg :to)) :email))
-           "/github")
-          ((mu4e-message-field msg :date)
-           (let ((year-folder (concat "/archive" (format-time-string "%Y" (mu4e-message-field msg :date)))))
-             (if (string= year-folder "/archive2021") "/Archives" year-folder)))
-          (t  (concat "/archive" (format-time-string "%Y"))))))
-
-  ;; I prefer to be able to switch between org-msg-mode and not
- (remove-hook 'mu4e-compose-pre-hook 'org-msg-mode)
-
- (defun dob-mu4e-my-tags (msg)
-   (let ((tags (mu4e-message-field msg :tags)))
-     (cl-remove-if-not
-      (lambda ($x) (string-match-p (rx (| "-guess" "-corpus")) $x)) tags)))
-
- (defun dob-mu4e-tag-as (msg tag)
-   (let* ((my-tags (dob-mu4e-my-tags msg))
-          (del-my-tags (mapcar (lambda ($x) (concat "-" $x)) my-tags))
-          (add-tag (list (concat "+" tag))))
-     (mu4e-action-retag-message msg (string-join (append add-tag del-my-tags) ","))))
-
- (defun dob-mu4e-quickspam ()
-   (interactive)
-   (dob-mu4e-tag-as (mu4e-message-at-point) "spam-corpus")
-   (mu4e-headers-mark-for-refile))
-
- (defun dob-mu4e-quickham ()
-   (interactive)
-   (dob-mu4e-tag-as (mu4e-message-at-point) "ham-corpus")
-   (mu4e-headers-mark-for-refile))
-
- (defun dob-mu4e-quicknotification ()
-   (interactive)
-   (dob-mu4e-tag-as (mu4e-message-at-point) "notification-corpus")
-   (mu4e-headers-mark-for-refile))
-
-;; KEYBOARD
- (map!
-  :map (mu4e-headers-mode-map)
-  :n "S" 'dob-mu4e-quickspam
-  :n "H" 'dob-mu4e-quickham
-  :n "N" 'dob-mu4e-quicknotification
-  :n "x" 'mu4e-headers-mark-for-something
-  :n "e" (defun dob-mu4e-mark-execute () (interactive) "Execute marked items." (mu4e-mark-execute-all t))
-  :n "M-SPC" 'mu4e-view-scroll-up-or-next
-  :n "i" 'mu4e-select-other-view
-  :n "o" 'org-msg-mode
-  :n "T"  (defun dob-mu4e-refile-thread () (interactive) "Mark whole thread for refiling" (mu4e-headers-mark-thread-using-markpair '(refile)))
-  :map (gnus-article-mode-map)
-  :n "M-SPC" 'mu4e-view-scroll-up-or-next
-  :n "i" 'mu4e-select-other-view))
 
 ;; Sly-Mode and Other Lispiness
 ;; (load (expand-file-name "~/.roswell/helper.el")) ;; Get on board the ros train
@@ -522,10 +251,6 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (require 'org-ql)
   (require 'org-attach)
   (require 'org-crypt)
-  (require 'org-ai)
-
-  (add-hook 'org-mode-hook #'org-ai-mode)
-  (org-ai-install-yasnippets)
 
   (org-crypt-use-before-save-magic)
   (setq org-tags-exclude-from-inheritance (quote ("crypt" "PROJECT")))
@@ -534,33 +259,30 @@ If SUBTHREAD is non-nil, only fold the current subthread."
   (setq org-crypt-key "E1E70D6E64BA8D1F74E78285E5001906A3FDE45E")
   (setq org-startup-indented t
         org-todo-keywords '((sequence "TODO" "WAITING" "|"  "DONE" "DELEGATED" "CANCELED"))
-        org-bullets-bullet-list '(" ")
-        org-ellipsis "  "
-        org-pretty-entities t
-        org-hide-emphasis-markers t
         org-agenda-span 3
         org-agenda-start-day "-2d"
         org-agenda-block-separator ""
-        org-agenda-include-diary t
-        org-archive-location "archives/%s_archive::"
-        org-fontify-whole-heading-line t
-        org-fontify-done-headline t
-        org-fontify-quote-and-verse-blocks t)
+        org-archive-location "archives/%s_archive::")
 
-  (defun write-current-clock-entry-to-file (&optional refresh)
-    (with-temp-file "~/.current-task"
-      (if (org-clocking-p)
-          (insert (org-clock-get-clock-string))
-        (insert ""))))
-
-  ; Update more than just the modeline
-; (advice-add 'org-clock-update-mode-line :after #'write-current-clock-entry-to-file))
  (run-with-timer 0 10 'write-current-clock-entry-to-file)
 
-; Maybe Doom already does this GC hack?
- (add-function :after after-focus-change-function 'garbage-collect)
+ (defun write-current-clock-entry-to-file (args)
+   "Write the current Org clock entry directly to a file."
+   (let ((file-path "~/.current-task")
+         (content (if (org-clocking-p)
+                      (org-clock-get-clock-string)
+                    "")))
+     ;; Write the content directly to the file
+     (message args)
+     (write-region content nil file-path)))
 
- (use-package! plz)
+; Maybe Doom already does this GC hack?
+ (add-function :after after-focus-change-function 'garbage-collect))
+(advice-add 'org-clock-in :after #'write-current-clock-entry-to-file)
+(advice-add 'org-clock-out :after #'write-current-clock-entry-to-file)
+(advice-add 'org-clock-cancel :after #'write-current-clock-entry-to-file)
+
+(use-package! plz
 
 ;; org-transclusion
  (use-package! org-transclusion
@@ -590,23 +312,23 @@ If SUBTHREAD is non-nil, only fold the current subthread."
  (setq org-agenda-custom-commands
        '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
          ("p" "Projects" ((tags "PROJECT")))
-         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
+         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files))))))))))
 
- (setq org-super-agenda-groups
-         '(
-           (:log t)
-           (:name "Schedule"
-            :time-grid t)
+(setq org-super-agenda-groups
+        '(
+          (:log t)
+          (:name "Schedule"
+           :time-grid t)
 
-           (:name "Today"
-            :scheduled today)
-           (:name "Wekan"
-                  :file-path "wekan")
+          (:name "Today"
+           :scheduled today)
+          (:name "Wekan"
+                 :file-path "wekan")
 
-           (:name "Filecoin"
-                  :tag "Filecoin")
-           (:name "Daylog"
-                  :file-path "daylog")))
+          (:name "Filecoin"
+                 :tag "Filecoin")
+          (:name "Daylog"
+                 :file-path "daylog"))
 
 
  (setq org-super-agenda-mode t)
@@ -689,9 +411,20 @@ If SUBTHREAD is non-nil, only fold the current subthread."
          ("dannyob-eth-blog"
           :base-directory "/home/danny/Private/org/wiki/daily/"
           :publishing-directory "/home/danny/tmp/diary/"
-          :publishing-function org-html-publish-to-html)))
+          :publishing-function org-html-publish-to-html))))
+;;
+   ;; OMG Org Publishing AGAIN??
+(setq org-export-with-broken-links 'mark)
+(setq org-publish-project-alist
+      '(("codetherapy-dev-blog"
+         :base-directory "/home/danny/Private/org/codetherapy/"
+         :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
+         :publishing-function org-html-publish-to-html)
+        ("dannyob-eth-blog"
+         :base-directory "/home/danny/Private/org/wiki/daily/"
+         :publishing-directory "/home/danny/tmp/diary/"
+         :publishing-function org-html-publish-to-html))
 
-   ;; Another go at org-capture, too
    ;;
  (setq org-default-notes-file dob-org-file)
  (setq org-capture-templates
