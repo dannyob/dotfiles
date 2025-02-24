@@ -92,6 +92,16 @@
 (global-set-key (kbd "M-v") 'yank)
 
 ;; KEYBOARD
+;;
+
+;; I prefer these the other way to the default on Macs
+(when (eq system-type 'darwin)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super))
+
+
+
+(when ())
 (map!
  :desc "Count words" :n "g C-g" 'count-words
  :desc "Previous buffer" :n "H" 'previous-buffer
