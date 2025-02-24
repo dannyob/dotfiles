@@ -30,6 +30,7 @@ if ! zgen saved; then
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-history-substring-search
     zgen load twang817/zsh-fasd
+    zgen load wookayin/fzf-fasd
     zgen load zsh-users/zsh-completions src
     zgen save
 fi
@@ -42,7 +43,6 @@ export GUILE_LOAD_PATH=$GUILE_LOAD_PATH:/usr/local/share/guile/site/3.0/:/opt/ho
 export GUILE_LOAD_COMPILED_PATH=$GUILE_LOAD_COMPILED_PATH:/usr/local/lib/guile/3.0/site-ccache/:/opt/homebrew/share/guile/site/3.0/site-ccache
 export GUILE_SYSTEM_EXTENSIONS_PATH=$GUILE_SYSTEM_EXTENSIONS_PATH:/usr/local/lib/guile/3.0/extensions:/opt/homebrew/lib/guile/3.0/extensions
 export PATH=/usr/local/bin:$PATH
-
 
 ###
 # FASD
@@ -73,7 +73,9 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # Mac specials
-fpath=(/opt/homebrew/share/zsh/site-functions/ "${fpath[@]}" )
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
 alias ls='gls -A -F --color=auto --hyperlink'
 alias clipin='pbcopy'
 alias clipout='pbpaste'
@@ -87,6 +89,12 @@ function dob-st {
       limit 10;
 SQL
 )
+}
+
+function dob-toplink {
+local url=$(osascript -e 'tell application "Brave" to return URL of active tab of front window')
+local title=$(osascript -e 'tell application "Brave" to return title of active tab of front window' )
+echo "[$title]($url)"
 }
 
 activ() {
@@ -177,9 +185,15 @@ activ() {
     }
 }
 
+alias guix="ssh -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 'guix'" 
+alias guix-env='f(){ ssh -X -I $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 /home/admin/.guix-profile/bin/$@;  unset -f f; }; f'
+alias guix-app='f(){ ssh -X -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 /home/admin/.guix-profile/bin/$@;  unset -f f; }; f'
+alias guix-shell="ssh -X -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001"
+
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export PATH="/opt/homebrew/opt/protobuf@3/bin:$PATH"
+[[ -f "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
