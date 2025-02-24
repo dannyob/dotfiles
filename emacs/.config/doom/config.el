@@ -1,4 +1,4 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
@@ -10,7 +10,7 @@
 ;; Fun set of utilities to push org to Notion and Slack
 (require 'dob-org-push)
 ;; Great set of keys to make documentation browsing easier
-(require 'cc-doc-mode-ux) ;; in ~/..config/doom/lisp/
+(require 'cc-doc-mode-ux) 
 
 ;; Name etc
 (setq user-full-name "Danny O'Brien"
@@ -33,7 +33,6 @@
 (setq find-file-visit-truename t) ;; Helps with confusing symlinks, especially with org-roam see https://www.orgroam.com/manual.html#Getting-Started
 
 ;;; Windows, Popups and So On
-;;;
 ;; Focus new window after splitting
 (setq evil-split-window-below t
       evil-vsplit-window-right t)
@@ -101,7 +100,6 @@
 
 
 
-(when ())
 (map!
  :desc "Count words" :n "g C-g" 'count-words
  :desc "Previous buffer" :n "H" 'previous-buffer
@@ -138,7 +136,7 @@
 ;; Clipboards
 ;;
 
-(when  (eq system-type 'darwin)
+(when (eq system-type 'darwin)
   (defun copy-from-osx ()
     (shell-command-to-string "pbpaste"))
 
@@ -171,63 +169,6 @@
 ;;
 (after! org-roam
   (setq org-roam-directory (file-truename (expand-file-name "~/Private/org/wiki/"))))
-;; Mu4e!
-;;
-(after! mu4e
-  (setq
-   mail-envelope-from 'header
-   mail-specify-envelope-from t
-   message-kill-buffer-on-exit t
-   message-sendmail-envelope-from 'header
-   message-sendmail-extra-arguments '("--read-envelope-from")
-   message-sendmail-f-is-evil t
-   mml-secure-openpgp-encrypt-to-self t
-   send-mail-function (quote sendmail-send-it)
-   message-send-mail-function 'message-send-mail-with-sendmail
-   sendmail-program "msmtpq"
-   user-mail-address (cond ((cl-search "fil" (file-truename (getenv "MAILDIR"))) "danny@fil.org")
-                           ((cl-search "codetherapy" (file-truename (getenv "MAILDIR"))) "danny@codetherapy.space")
-                           (t "danny@spesh.com")))
-
-  (setq mail-user-agent 'mu4e-user-agent)
-  (setq
-   mu4e-sent-folder   "/Sent Items"       ;; folder for sent messages
-   mu4e-drafts-folder "/Drafts"     ;; unfinished messages
-   mu4e-trash-folder  "/Deleted Items")      ;; trashed messages
-  (setq mu4e-use-fancy-chars t)
-  (setq mu4e-attachment-dir "~/tmp")
-  (setq mu4e-change-filenames-when-moving t)
-  (setq mu4e-get-mail-command "syncandspam")
-  (setq mu4e-split-view nil)
-
-  (setq org-mime-export-options '(:section-numbers nil
-                                  :with-author nil
-                                  :with-toc nil))
-
-   ;; KEYBOARD
-  (map!
-   (:prefix "C-c"
-    :desc "Jump to Inbox" "j" (defun dob-jump-to-inbox () (interactive) (mu4e~headers-search-execute "m:/INBOX AND NOT tag:spam-guess AND NOT tag:spam-corpus AND NOT tag:boring-guess AND NOT tag:boring-corpus AND NOT tag:notification-guess AND NOT tag:notification-corpus"  't))
-    :desc "Jump to Current Headers" "h" (lambda () (interactive (let ((i (get-buffer "*mu4e-headers*"))) (if i (switch-to-buffer "*mu4e-headers*") (dob-jump-to-inbox)))))))
-
-  (setq mu4e-action-tags-completion-list '("spam-corpus"  "ham-corpus"  "boring-corpus" "notification-corpus"))
-  (add-to-list 'mu4e-headers-actions '("tTag message" . mu4e-action-retag-message))
-  (add-to-list 'mu4e-view-actions '("tTag message" . mu4e-action-retag-message))
-
-  :n "zM" 'mu4e-headers-fold-all)
-
-;; Apparently this helps with text breaking, etc?
-;;
-(add-hook 'message-mode-hook 'auto-fill-mode)
-(setq mu4e-compose-format-flowed t)
-(setq message-cite-reply-position 'below)
-
-; With just the above settings sent emails do not wrap correctly in mu4e:view. You may also want to set
-(setq-default fill-column 72)
-(setq fill-flowed-encode-column fill-column)
-
- ;; Colorize headers based on tags
- ;;
 
 ;; Sly-Mode and Other Lispiness
 ;; (load (expand-file-name "~/.roswell/helper.el")) ;; Get on board the ros train
@@ -274,26 +215,6 @@
         org-agenda-block-separator ""
         org-archive-location "archives/%s_archive::")
 
- (run-with-timer 0 10 'write-current-clock-entry-to-file)
-
- (defun write-current-clock-entry-to-file (args)
-   "Write the current Org clock entry directly to a file."
-   (let ((file-path "~/.current-task")
-         (content (if (org-clocking-p)
-                      (org-clock-get-clock-string)
-                    "")))
-     ;; Write the content directly to the file
-     (message args)
-     (write-region content nil file-path)))
-
-; Maybe Doom already does this GC hack?
- (add-function :after after-focus-change-function 'garbage-collect))
-(advice-add 'org-clock-in :after #'write-current-clock-entry-to-file)
-(advice-add 'org-clock-out :after #'write-current-clock-entry-to-file)
-(advice-add 'org-clock-cancel :after #'write-current-clock-entry-to-file)
-
-(use-package! plz
-
 ;; org-transclusion
  (use-package! org-transclusion
    :after org
@@ -316,13 +237,10 @@
      (org-with-point-at (org-id-find dob/organization-task-id 'marker)
        (org-clock-in '(16)))))
 
-;; (setq org-agenda-custom-commands
-;;       '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
-;;         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (cl-remove-if (lambda (x) (string-match ".*MyHabits.*" x)) org-agenda-files))))))))
  (setq org-agenda-custom-commands
        '(("n" "Agenda and all TODOs" ((agenda "") (alltodo "")))
          ("p" "Projects" ((tags "PROJECT")))
-         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files))))))))))
+         ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
 
 (setq org-super-agenda-groups
         '(
@@ -338,7 +256,7 @@
           (:name "Filecoin"
                  :tag "Filecoin")
           (:name "Daylog"
-                 :file-path "daylog"))
+                 :file-path "daylog")))
 
 
  (setq org-super-agenda-mode t)
@@ -349,81 +267,8 @@
 
  (defvar dob-journal-ql  '(and (tags "JOURNAL") (not (ancestors (tags "JOURNAL")))))
 
-;; Old Journal code
- (defun dob-goto-journal ()
-   "Jump to where journal entry should be added"
-   (let* ((org-roam-daily-directory (expand-file-name org-roam-dailies-directory org-roam-directory))
-          (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
-          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-          (jbuf (cadar journal-loc))
-          (jloc (caar journal-loc)))
-     (if-let (jwin (get-buffer-window jbuf))
-         (select-window jwin)
-       (switch-to-buffer jbuf))
-     (goto-char jloc)))
-
- (defun dob-add-journal-todo ()
-   "Add a new todo at the end of the journal subtree"
-   (interactive)
-   (org-roam-dailies-goto-today)
-   (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
-          (org-roam-today (concat org-roam-daily-directory (format-time-string "%Y-%m-%d.org")))
-          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-          (jbuf (cadar journal-loc))
-          (jloc (caar journal-loc)))
-     (if-let (jwin (get-buffer-window jbuf))
-         (select-window jwin)
-       (switch-to-buffer jbuf))
-     (goto-char jloc))
-   (org-insert-todo-subheading nil)
-   (dob-org-insert-time-now nil)
-   (org-todo "")
-   (insert " "))
-
- (defun dob-add-journal-todo ()
-   "Add a new todo at the end of the journal subtree"
-   (interactive)
-   (org-roam-dailies-goto-today)
-   (let* ((org-roam-daily-directory (file-truename (expand-file-name org-roam-dailies-directory org-roam-directory)))
-          (org-roam-today "~/Private/org/wiki/onebig.org")
-          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
-          (jbuf (cadar journal-loc))
-          (jloc (caar journal-loc)))
-     (if-let (jwin (get-buffer-window jbuf))
-         (select-window jwin)
-       (switch-to-buffer jbuf))
-     (goto-char jloc))
-   (org-insert-todo-subheading nil)
-   (dob-org-insert-time-now nil)
-   (org-todo "")
-   (insert " "))
-
- (defun dob-daylog () (interactive)
-        (setq org-attach-id-dir "~/Private/org/wiki/data/")
-        (setq dob-org-file "~/Private/org/daylog.org")
-        (setq org-agenda-files (cl-remove-if-not 'file-exists-p '("~/Private/org/wiki/onebig.org"))))
-
- (defun dob-yacht () (interactive)
-        (setq dob-org-file "~/Private/org/codetherapy/yacht.org")
-        (setq org-agenda-files '("~/Private/org/codetherapy")))
-
- (if (string-equal "yacht" (getenv "SHORTHOST"))
-     (dob-yacht)
-   (dob-daylog))
-
-   ;; OMG Org Publishing AGAIN??
- (setq org-export-with-broken-links 'mark)
- (setq org-publish-project-alist
-       '(("codetherapy-dev-blog"
-          :base-directory "/home/danny/Private/org/codetherapy/"
-          :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
-          :publishing-function org-html-publish-to-html)
-         ("dannyob-eth-blog"
-          :base-directory "/home/danny/Private/org/wiki/daily/"
-          :publishing-directory "/home/danny/tmp/diary/"
-          :publishing-function org-html-publish-to-html))))
 ;;
-   ;; OMG Org Publishing AGAIN??
+;; OMG Org Publishing AGAIN??
 (setq org-export-with-broken-links 'mark)
 (setq org-publish-project-alist
       '(("codetherapy-dev-blog"
@@ -433,38 +278,51 @@
         ("dannyob-eth-blog"
          :base-directory "/home/danny/Private/org/wiki/daily/"
          :publishing-directory "/home/danny/tmp/diary/"
-         :publishing-function org-html-publish-to-html))
+         :publishing-function org-html-publish-to-html)))
 
-   ;;
- (setq org-default-notes-file dob-org-file)
- (setq org-capture-templates
-       '(("s"
-          "Scheduled Todo"
-          entry
-          (function (lambda () (dob-goto-journal)))
-          "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
-          :unnarrowed t
-          :immediate-finish t
-          :jump-to-captured t)))
+  ;; Another go at org-capture, too
+  ;;
+(setq org-default-notes-file dob-org-file)
+(setq org-capture-templates
+      '(("t" "Todo Inbox" entry
+         (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
+         "*** TODO %?\n" :prepend nil)
 
- (setq org-log-done 'time)
+        ("s" "Scheduled Todo" entry
+         (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
+         "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
+         :unnarrowed t
+         :immediate-finish t
+         :jump-to-captured t)))
 
- (defun dob-org-insert-time-now (arg)
-   "Insert a timestamp with today's time and date."
-   (interactive "P")
-   (org-time-stamp '(16))))
+ (setq org-log-done 'time))
 
+(defun dob-org-insert-time-now (arg)
+  "Insert a timestamp with today's time and date."
+  (interactive "P")
+  (org-time-stamp '(16)))
 
-
-;; Authorization!!
+(defun dob-add-journal-todo ()
+  "Add a new todo at the end of the journal subtree"
+  (interactive)
+  (let* ((org-roam-today "~/Private/org/wiki/onebig.org")
+         (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
+         (jbuf (cadar journal-loc))
+         (jloc (caar journal-loc)))
+    (if-let (jwin (get-buffer-window jbuf))
+        (select-window jwin)
+      (switch-to-buffer jbuf))
+    (goto-char jloc))
+  (org-insert-todo-subheading nil)
+  (dob-org-insert-time-now nil)
+  (org-todo "")
+  (insert " "))
 
 (defun dob-auth-secret (host login)
-  "Pull out a password from authinfo using HOST and LOGIN."
-  (funcall
-   (plist-get
-    (car (auth-source-search :host host :max 1 :login login)) :secret)))
-
-;; GPT
+  "Pull out a password from authinfo using HOST and LOGIN. Returns nil if not found."
+  (let ((auth-info (car (auth-source-search :max 1 :host host :login login))))
+    (when auth-info
+      (funcall (plist-get auth-info :secret)))))
 ;;
 (defun dob-get-value-from-pw (search-text &optional separator encrypted-file)
   "Search for line containing SEARCH-TEXT in ENCRYPTED-FILE (defaults to ~/Private/pw.gpg)
@@ -482,9 +340,17 @@ and return text after SEPARATOR (defaults to ':')."
               nil))
         nil))))
 
-(gptel-make-anthropic "Claude"
-  :stream t
-  :key (lambda () (dob-get-value-from-pw "ANTHROPIC_API_KEY" "=")))
+(after! gptel
+  (gptel-make-anthropic "Claude"
+                              :stream t
+                              :key (lambda () (dob-get-value-from-pw "ANTHROPIC_API_KEY" "="))))
+
+(after! spell-fu
+  ;; TODO workround for https://github.com/doomemacs/doomemacs/issues/6246
+  (unless (file-exists-p ispell-personal-dictionary)
+    (make-directory (file-name-directory ispell-personal-dictionary) t)
+    (with-temp-file ispell-personal-dictionary
+      (insert (format "personal_ws-1.1 %s 0\n" ispell-dictionary)))))
 
 ;; Circe and IRC!
 (after! circe
@@ -506,13 +372,4 @@ and return text after SEPARATOR (defaults to ':')."
           :desc "Add a new org-roam item" "y" 'org-roam-node-insert
           :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
           :desc "Org store link" "M-c" 'org-store-link
-          :desc "Org insert link" "M-v" 'org-insert-link-global))
-
-;; Great set of keys to make documentation browsing easier
-;;
-(require 'cc-doc-mode-ux) ;; in ~/..config/doom/lisp/
-
-
-
-;; NOW IT IS TIME FOR THE CUSTOMARY CUSTOMIZATION
-;;
+         :desc "Org insert link" "M-v" 'org-insert-link-global))
