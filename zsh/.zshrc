@@ -94,6 +94,83 @@ fixgpg() {
     export GPG_TTY
 }
 
+dob-mkindex () {
+	local dir="${1:-.}" recursive=false title="" show_hidden=false 
+	while [[ $# -gt 0 ]]
+	do
+		case $1 in
+			(-r|--recursive) recursive=true 
+				shift ;;
+			(-t|--title) title="$2" 
+				shift 2 ;;
+			(-a|--all) show_hidden=true 
+				shift ;;
+			(-h|--help) echo "Usage: dob-mkindex [OPTIONS] [DIRECTORY]
+Options: -r (recursive), -t TITLE (custom title), -a (include hidden), -h (help)"
+				return 0 ;;
+			(-*) echo "Unknown option: $1" >&2
+				return 1 ;;
+			(*) dir="$1" 
+				shift ;;
+		esac
+	done
+	dir=$(cd "$dir" && pwd)  || {
+		echo "Directory '$dir' not found" >&2
+		return 1
+	}
+	[[ -z "$title" ]] && title="Index of $(basename "$dir")" 
+	_gen_html () {
+		local d="$1" 
+		local t="$2" 
+		local h="$3" 
+		local f="$d/index.html" 
+		cat > "$f" <<EOF
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>$t</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#333}
+h1{color:#2c3e50;border-bottom:2px solid #3498db;padding-bottom:.5rem}.file-list{list-style:none;padding:0}
+.file-list li{margin:.5rem 0;padding:.5rem}.file-list a{text-decoration:none;color:#3498db;display:flex;align-items:center}
+.file-list a:hover{text-decoration:underline}.icon{margin-right:.5rem}</style></head><body><h1>$t</h1><ul class="file-list">
+EOF
+		[[ "$d" != "/" ]] && echo '<li><a href="../"><span class="icon">↩️</span>../</a></li>' >> "$f"
+		find "$d" -maxdepth 1 -type d ! -path "$d" $([ "$h" = false ] && echo "! -name '.*'") -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
+		do
+			local bn=$(basename "$item") 
+			[[ "$bn" != "." && "$bn" != ".." ]] && echo "<li><a href=\"$bn/\"><span class=\"icon\">📁</span>$bn/</a></li>" >> "$f"
+		done
+		find "$d" -maxdepth 1 -type f $([ "$h" = false ] && echo "! -name '.*'") -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
+		do
+			local bn=$(basename "$item") 
+			if [[ "$bn" != "index.html" ]]
+			then
+				local icon="📄" 
+				case "${bn##*.}" in
+					(jpg|jpeg|png|gif|svg|webp) icon="🖼️"  ;;
+					(mp3|wav|ogg|m4a) icon="🎵"  ;;
+					(mp4|avi|mkv|mov) icon="🎬"  ;;
+					(pdf) icon="📕"  ;;
+					(txt|md) icon="📝"  ;;
+					(zip|tar|gz|rar) icon="📦"  ;;
+					(html|htm) icon="🌐"  ;;
+					(js) icon="⚡"  ;;
+					(py) icon="🐍"  ;;
+				esac
+				echo "<li><a href=\"$bn\"><span class=\"icon\">$icon</span>$bn</a></li>" >> "$f"
+			fi
+		done
+		echo "</ul><div style=\"text-align:center;margin-top:2rem;color:#666;font-size:.9em\">Generated $(date)</div></body></html>" >> "$f"
+		echo "Generated: $f"
+	}
+	_gen_html "$dir" "$title" "$show_hidden"
+	if [[ "$recursive" == true ]]
+	then
+		find "$dir" -type d ! -path "$dir" $([ "$show_hidden" = false ] && echo "! -path '*/.*'") -print0 2> /dev/null | while IFS= read -r -d '' subdir
+		do
+			_gen_html "$subdir" "Index of $(basename "$subdir")" "$show_hidden"
+		done
+	fi
+}
+
+
 # Stop Python Cache droppings
 case "${OSTYPE}" in
     darwin*)
