@@ -97,6 +97,23 @@ local title=$(osascript -e 'tell application "Brave" to return title of active t
 echo "[$title]($url)"
 }
 
+function dob-update-llm-plugins {
+    echo "Getting current plugins..."
+    local plugins=$(llm plugins | jq -r '.[].name')
+
+    echo "Updating llm..."
+    brew upgrade llm
+
+    echo "Reinstalling plugins..."
+    echo $plugins | while read plugin; do
+        echo "Installing $plugin..."
+        llm install -U $plugin
+    done
+
+    echo "Done! Current plugins:"
+    llm plugins
+}
+
 activ() {
     # Save pre-existing environment variables
     orig_vars=$(env | sed 's/=.*$//')
