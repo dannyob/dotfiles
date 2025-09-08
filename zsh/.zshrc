@@ -23,7 +23,7 @@ setopt auto_pushd
 # we can cd to stuff added with 'hash -d'
 setopt cdable_vars
 # stops the prompt overwriting non-cr'd results
-unsetopt promptcr 
+unsetopt promptcr
 # echo back history substitutions instead of just doing them
 setopt hist_verify
 # Multiple zsh shells share their history
@@ -40,7 +40,7 @@ setopt hist_reduce_blanks
 ##
 
 # colored ls with hyperlinks
-alias   ls='ls -A -F --group-directories-first --sort=extension --color=auto --hyperlink' 
+alias   ls='ls -A -F --group-directories-first --sort=extension --color=auto --hyperlink'
 
 alias	ps='ps -ef'
 alias	cls='clear; tput reset'
@@ -85,7 +85,7 @@ tidyhtml() {
 }
 
 html2markdown() {
-    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute 
+    pandoc -f html-native_divs-native_spans -t markdown-raw_html-raw_attribute
 }
 
 fixgpg() {
@@ -95,22 +95,22 @@ fixgpg() {
 }
 
 dob-mkindex () {
-	local dir="${1:-.}" recursive=false title="" show_hidden=false 
+	local dir="${1:-.}" recursive=false title="" show_hidden=false
 	while [[ $# -gt 0 ]]
 	do
 		case $1 in
-			(-r|--recursive) recursive=true 
+			(-r|--recursive) recursive=true
 				shift ;;
-			(-t|--title) title="$2" 
+			(-t|--title) title="$2"
 				shift 2 ;;
-			(-a|--all) show_hidden=true 
+			(-a|--all) show_hidden=true
 				shift ;;
 			(-h|--help) echo "Usage: dob-mkindex [OPTIONS] [DIRECTORY]
 Options: -r (recursive), -t TITLE (custom title), -a (include hidden), -h (help)"
 				return 0 ;;
 			(-*) echo "Unknown option: $1" >&2
 				return 1 ;;
-			(*) dir="$1" 
+			(*) dir="$1"
 				shift ;;
 		esac
 	done
