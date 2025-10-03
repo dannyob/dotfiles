@@ -118,12 +118,35 @@ Options: -r (recursive), -t TITLE (custom title), -a (include hidden), -h (help)
 		echo "Directory '$dir' not found" >&2
 		return 1
 	}
-	[[ -z "$title" ]] && title="Index of $(basename "$dir")" 
+	[[ -z "$title" ]] && title="Index of $(basename "$dir")"
+
+	_get_icon () {
+		local filename="$1"
+		local icon="📄"
+		case "${filename##*.}" in
+			(jpg|jpeg|png|gif|svg|webp) icon="🖼️"  ;;
+			(mp3|wav|ogg|m4a) icon="🎵"  ;;
+			(mp4|avi|mkv|mov) icon="🎬"  ;;
+			(pdf) icon="📕"  ;;
+			(txt|md) icon="📝"  ;;
+			(zip|tar|gz|rar) icon="📦"  ;;
+			(html|htm) icon="🌐"  ;;
+			(js) icon="⚡"  ;;
+			(py) icon="🐍"  ;;
+		esac
+		echo "$icon"
+	}
+
 	_gen_html () {
-		local d="$1" 
-		local t="$2" 
-		local h="$3" 
-		local f="$d/index.html" 
+		local d="$1"
+		local t="$2"
+		local h="$3"
+		local f="$d/index.html"
+
+		# Build find filter arguments
+		local hide_args=()
+		[[ "$h" = false ]] && hide_args=(! -name ".*")
+
 		cat > "$f" <<EOF
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>$t</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#333}
@@ -132,38 +155,36 @@ h1{color:#2c3e50;border-bottom:2px solid #3498db;padding-bottom:.5rem}.file-list
 .file-list a:hover{text-decoration:underline}.icon{margin-right:.5rem}</style></head><body><h1>$t</h1><ul class="file-list">
 EOF
 		[[ "$d" != "/" ]] && echo '<li><a href="../"><span class="icon">↩️</span>../</a></li>' >> "$f"
-		find "$d" -maxdepth 1 -type d ! -path "$d" $([ "$h" = false ] && echo "! -name '.*'") -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
+
+		# List directories
+		find -L "$d" -maxdepth 1 -type d ! -path "$d" "${hide_args[@]}" -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
 		do
-			local bn=$(basename "$item") 
+			local bn=$(basename "$item")
 			[[ "$bn" != "." && "$bn" != ".." ]] && echo "<li><a href=\"$bn/\"><span class=\"icon\">📁</span>$bn/</a></li>" >> "$f"
 		done
-		find "$d" -maxdepth 1 -type f $([ "$h" = false ] && echo "! -name '.*'") -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
+
+		# List files
+		find -L "$d" -maxdepth 1 -type f "${hide_args[@]}" -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
 		do
-			local bn=$(basename "$item") 
+			local bn=$(basename "$item")
 			if [[ "$bn" != "index.html" ]]
 			then
-				local icon="📄" 
-				case "${bn##*.}" in
-					(jpg|jpeg|png|gif|svg|webp) icon="🖼️"  ;;
-					(mp3|wav|ogg|m4a) icon="🎵"  ;;
-					(mp4|avi|mkv|mov) icon="🎬"  ;;
-					(pdf) icon="📕"  ;;
-					(txt|md) icon="📝"  ;;
-					(zip|tar|gz|rar) icon="📦"  ;;
-					(html|htm) icon="🌐"  ;;
-					(js) icon="⚡"  ;;
-					(py) icon="🐍"  ;;
-				esac
+				local icon=$(_get_icon "$bn")
 				echo "<li><a href=\"$bn\"><span class=\"icon\">$icon</span>$bn</a></li>" >> "$f"
 			fi
 		done
+
 		echo "</ul><div style=\"text-align:center;margin-top:2rem;color:#666;font-size:.9em\">Generated $(date)</div></body></html>" >> "$f"
 		echo "Generated: $f"
 	}
+
 	_gen_html "$dir" "$title" "$show_hidden"
+
 	if [[ "$recursive" == true ]]
 	then
-		find "$dir" -type d ! -path "$dir" $([ "$show_hidden" = false ] && echo "! -path '*/.*'") -print0 2> /dev/null | while IFS= read -r -d '' subdir
+		local path_filter=()
+		[[ "$show_hidden" = false ]] && path_filter=(! -path "*/.*")
+		find -L "$dir" -type d ! -path "$dir" "${path_filter[@]}" -print0 2> /dev/null | while IFS= read -r -d '' subdir
 		do
 			_gen_html "$subdir" "Index of $(basename "$subdir")" "$show_hidden"
 		done
