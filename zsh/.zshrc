@@ -395,3 +395,7 @@ zstyle ':completion:*' file-sort date
 
 # Fix for TRAMP
 [ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
+
+# Wasmer
+export WASMER_DIR="/Users/danny/.wasmer"
+[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
