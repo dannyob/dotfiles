@@ -10,7 +10,7 @@
 ;; Fun set of utilities to push org to Notion and Slack
 (require 'dob-org-push)
 ;; Great set of keys to make documentation browsing easier
-(require 'cc-doc-mode-ux) 
+(require 'cc-doc-mode-ux)
 
 ;; Name etc
 (setq user-full-name "Danny O'Brien"
@@ -81,6 +81,22 @@
 
 (setenv "XDG_DATA_DIR" (concat (getenv "XDG_DATA_DIR") ":/usr/local/share:/usr/share"))
 
+
+;; Functions to track current task in ~/.current-task
+(defun dob-write-current-task-to-file ()
+  "Write current clocked task headline to ~/.current-task file."
+  (when (org-clocking-p)
+    (with-temp-file "~/.current-task"
+      (insert (org-clock-get-clock-string)))))
+
+(defun dob-clear-current-task-file ()
+  "Clear the ~/.current-task file by writing an empty string."
+  (with-temp-file "~/.current-task"
+    (insert "")))
+
+;; Add advice to org-clock functions
+(advice-add 'org-clock-in :after (lambda (&rest _) (dob-write-current-task-to-file)))
+(advice-add 'org-clock-out :after (lambda (&rest _) (dob-clear-current-task-file)))
 
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c i") 'org-clock-in)
@@ -213,6 +229,7 @@
         org-agenda-span 3
         org-agenda-start-day "-2d"
         org-agenda-block-separator ""
+        org-agenda-files (list dob-org-file)
         org-archive-location "archives/%s_archive::")
 
 ;; org-transclusion
@@ -242,21 +259,21 @@
          ("p" "Projects" ((tags "PROJECT")))
          ("w" "Work Schedule" ((agenda "") (tags-todo "FILECOIN") (tags-todo "-FILECOIN" ((org-agenda-files (--remove (s-matches? "MyHabits.org" it) (org-agenda-files)))))))))
 
-(setq org-super-agenda-groups
-        '(
-          (:log t)
-          (:name "Schedule"
-           :time-grid t)
+ (setq org-super-agenda-groups
+         '(
+           (:log t)
+           (:name "Schedule"
+            :time-grid t)
 
-          (:name "Today"
-           :scheduled today)
-          (:name "Wekan"
-                 :file-path "wekan")
+           (:name "Today"
+            :scheduled today)
+           (:name "Wekan"
+                  :file-path "wekan")
 
-          (:name "Filecoin"
-                 :tag "Filecoin")
-          (:name "Daylog"
-                 :file-path "daylog")))
+           (:name "Filecoin"
+                  :tag "Filecoin")
+           (:name "Daylog"
+                  :file-path "daylog")))
 
 
  (setq org-super-agenda-mode t)
@@ -269,31 +286,31 @@
 
 ;;
 ;; OMG Org Publishing AGAIN??
-(setq org-export-with-broken-links 'mark)
-(setq org-publish-project-alist
-      '(("codetherapy-dev-blog"
-         :base-directory "/home/danny/Private/org/codetherapy/"
-         :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
-         :publishing-function org-html-publish-to-html)
-        ("dannyob-eth-blog"
-         :base-directory "/home/danny/Private/org/wiki/daily/"
-         :publishing-directory "/home/danny/tmp/diary/"
-         :publishing-function org-html-publish-to-html)))
+ (setq org-export-with-broken-links 'mark)
+ (setq org-publish-project-alist
+       '(("codetherapy-dev-blog"
+          :base-directory "/home/danny/Private/org/codetherapy/"
+          :publishing-directory "/ssh:danny@boat:/var/local/www/codetherapy.space/notes/"
+          :publishing-function org-html-publish-to-html)
+         ("dannyob-eth-blog"
+          :base-directory "/home/danny/Private/org/wiki/daily/"
+          :publishing-directory "/home/danny/tmp/diary/"
+          :publishing-function org-html-publish-to-html)))
 
-  ;; Another go at org-capture, too
-  ;;
-(setq org-default-notes-file dob-org-file)
-(setq org-capture-templates
-      '(("t" "Todo Inbox" entry
-         (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
-         "*** TODO %?\n" :prepend nil)
+   ;; Another go at org-capture, too
+   ;;
+ (setq org-default-notes-file dob-org-file)
+ (setq org-capture-templates
+       '(("t" "Todo Inbox" entry
+          (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
+          "*** TODO %?\n" :prepend nil)
 
-        ("s" "Scheduled Todo" entry
-         (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
-         "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
-         :unnarrowed t
-         :immediate-finish t
-         :jump-to-captured t)))
+         ("s" "Scheduled Todo" entry
+          (file+headline "~/Private/org/wiki/onebig.org" "Todo Inbox")
+          "* TODO %^{Scheduling Todo}\nSCHEDULED: %T\n:PROPERTIES:\n:Effort: %^{Effort|5m|10m|15m|20m|30m}\n:END:"
+          :unnarrowed t
+          :immediate-finish t
+          :jump-to-captured t)))
 
  (setq org-log-done 'time))
 
@@ -302,21 +319,36 @@
   (interactive "P")
   (org-time-stamp '(16)))
 
-(defun dob-add-journal-todo ()
+(defun dob-add-journal-todo (&optional todo-text)
   "Add a new todo at the end of the journal subtree"
   (interactive)
-  (let* ((org-roam-today "~/Private/org/wiki/onebig.org")
+  (let* ((original-buffer (current-buffer))
+         (original-window (selected-window))
+         (org-roam-today "~/Private/org/wiki/onebig.org")
          (journal-loc (org-ql-select org-roam-today dob-journal-ql :action '(list (point) (current-buffer))))
          (jbuf (cadar journal-loc))
          (jloc (caar journal-loc)))
     (if-let (jwin (get-buffer-window jbuf))
         (select-window jwin)
       (switch-to-buffer jbuf))
-    (goto-char jloc))
-  (org-insert-todo-subheading nil)
-  (dob-org-insert-time-now nil)
-  (org-todo "")
-  (insert " "))
+    (goto-char jloc)
+   (org-insert-todo-subheading nil)
+   (dob-org-insert-time-now nil)
+   (org-todo "")
+   (insert " ")
+   (when todo-text
+     (insert todo-text)
+     (select-window original-window)
+     (switch-to-buffer original-buffer))))
+
+(defun ai-add-journal (todo-text)
+  (let ((original-buffer (current-buffer))
+        (original-window (selected-window)))
+    (dob-add-journal-todo (concat "✨ " todo-text))
+    (message "hello")
+    (select-window original-window)
+    (switch-to-buffer original-buffer)))
+
 
 (defun dob-auth-secret (host login)
   "Pull out a password from authinfo using HOST and LOGIN. Returns nil if not found."
@@ -373,3 +405,148 @@ and return text after SEPARATOR (defaults to ':')."
           :desc "Insert a ORG timestamp" "t" 'dob-org-insert-time-now
           :desc "Org store link" "M-c" 'org-store-link
          :desc "Org insert link" "M-v" 'org-insert-link-global))
+
+;; Custom function to find OneBig.org buffer
+(defun ai-find-onebig ()
+  "Find or create the OneBig.org buffer, and return the buffer. Useful for doing
+  in-emacs modifications of OneBig"
+  (interactive)
+  (let* ((onebig-path (expand-file-name "~/Private/nextcloud/org/wiki/OneBig.org"))
+         (buffer (find-buffer-visiting onebig-path)))
+    (if buffer
+        buffer
+      (find-file-noselect onebig-path))))
+
+(defun buffer-whole-string (buffer)
+  "Return a whole buffer as a string. Useful for dumping a buffer into an AI conversation."
+  (with-current-buffer buffer
+    (save-restriction
+      (widen)
+      (buffer-substring-no-properties (point-min) (point-max)))))
+
+(defun ai-get-onebig ()
+  "Shortcut to dump a OneBig into an AI prompt/conversation."
+  (buffer-whole-string (ai-find-onebig)))
+
+;; Function to quickly mark items as done in an action plan buffer
+(defun ai-mark-item-done ()
+  "Mark the current line with [X] if it has [ ]."
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (when (search-forward "[ ]" (line-end-position) t)
+      (replace-match "[X]"))))
+
+;; Function to count completed vs total action items
+(defun ai-action-plan-progress ()
+  "Count and display completed tasks vs total tasks in buffer."
+  (interactive)
+  (let ((completed 0)
+        (total 0))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\\[[ X]\\]" nil t)
+        (setq total (1+ total))
+        (when (string= (match-string 0) "[X]")
+          (setq completed (1+ completed)))))
+    (message "%d of %d items completed (%.1f%%)"
+             completed total
+             (if (> total 0) (* 100.0 (/ completed (float total))) 0.0))))
+
+;; Bind these to convenient keys in markdown-mode
+(map! :map markdown-mode-map
+      :n "C-c d" #'ai-mark-item-done
+      :i "C-c d" #'ai-mark-item-done
+      :n "C-c p" #'ai-action-plan-progress
+      :i "C-c p" #'ai-action-plan-progress)
+
+;; Function to quickly add TODOs to the OneBig.org inbox
+(defun ai-add-todo (headline &optional scheduled description)
+  "Add a new TODO item to the Todo Inbox in OneBig.org.
+HEADLINE is the title of the todo item.
+SCHEDULED is an optional date string like \"<2025-03-15 Sat>\".
+DESCRIPTION is an optional string with bullet points (use - for each line)."
+  (interactive "sTodo headline: \nsScheduled (optional, format <YYYY-MM-DD Day>): \nsDescription (optional): ")
+  (let ((original-buffer (current-buffer))
+        (original-window (selected-window)))
+    (with-current-buffer (ai-find-onebig)
+      (org-find-exact-headline-in-buffer "Todo Inbox")
+      (goto-char (point-at-eol))
+      (insert "\n** TODO " headline)
+      (when (and scheduled (not (string-empty-p scheduled)))
+        (insert "\nSCHEDULED: " scheduled))
+      (when (and description (not (string-empty-p description)))
+        (insert "\n" description))
+      (save-buffer))
+    (select-window original-window)
+    (switch-to-buffer original-buffer)
+    (message "Todo added to inbox: %s" headline)))
+
+;; AI assistant helper function
+(defun ai-load-context ()
+  "Load onebig.org and return a summary of current priorities.
+   Use this as the first function when starting a conversation with Claude."
+  (let ((onebig-content (ai-get-onebig))
+        (today (format-time-string "%Y-%m-%d"))
+        (summary ""))
+    (setq summary (concat "OneBig.org loaded successfully. Today is " today ".
+
+"
+                          "Current priorities:
+"
+                          "1. Check TODO items scheduled for today
+"
+                          "2. Review recent journal entries
+"
+                          "3. Process inbox items
+
+"
+                          "Use (ai-get-onebig) for the full content if needed."))
+    summary))
+
+;; AI-assisted capture functions for Danny's workflow
+
+(defun ai-quick-capture (text)
+  "Quickly add TEXT to the Capture section in OneBig.org with timestamp."
+  (interactive "sCapture: ")
+  (with-current-buffer (ai-find-onebig)
+    (goto-char (point-min))
+    (when (re-search-forward "^\\* Capture" nil t)
+      (org-end-of-subtree)
+      (insert (format "\n** <%s> %s\n"
+                      (format-time-string "%Y-%m-%d %a %H:%M")
+                      text))
+      (save-buffer)
+      (message "Captured: %s" text))))
+
+(defun ai-capture-meeting (person topic notes)
+  "Capture meeting notes with PERSON about TOPIC."
+  (interactive "sMet with: \nsAbout: \nsNotes: ")
+  (ai-quick-capture
+   (format "MEETING: %s - Topic: %s\n   %s" person topic notes)))
+
+(defun ai-capture-aspiration (goal)
+  "Capture an aspiration or reminder."
+  (interactive "sRemember to: ")
+  (ai-quick-capture (format "ASPIRATION: %s" goal)))
+
+(defun ai-capture-fact (fact)
+  "Capture a fact or piece of information."
+  (interactive "sFact/Info: ")
+  (ai-quick-capture (format "FACT: %s" fact)))
+
+(defun ai-process-captures ()
+  "Review and process items from Capture section interactively."
+  (interactive)
+  (with-current-buffer (ai-find-onebig)
+    (goto-char (point-min))
+    (when (re-search-forward "^\\* Capture" nil t)
+      (org-narrow-to-subtree)
+      (message "Processing captures. Use C-c C-w to refile items."))))
+
+;; Add keybindings for quick access
+(global-set-key (kbd "C-c c q") 'ai-quick-capture)
+(global-set-key (kbd "C-c c m") 'ai-capture-meeting)
+(global-set-key (kbd "C-c c a") 'ai-capture-aspiration)
+(global-set-key (kbd "C-c c f") 'ai-capture-fact)
+(global-set-key (kbd "C-c c p") 'ai-process-captures)
