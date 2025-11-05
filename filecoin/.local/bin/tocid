@@ -1,0 +1,46 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.8"
+# dependencies = [
+#     "base58",
+# ]
+# ///
+
+import sys
+import base58
+import base64
+
+def main():
+    try:
+        # Read bytes from stdin
+        input_data = sys.stdin.buffer.read()
+        
+        if not input_data:
+            print("Error: No input data provided", file=sys.stderr)
+            sys.exit(1)
+        
+        # Check size limitation for identity hash (64 bytes)
+        if len(input_data) > 127:
+            print(f"Error: Input data is {len(input_data)} bytes, but identity hash is limited to 127 bytes", file=sys.stderr)
+            sys.exit(1)
+        
+        # Create identity multihash manually
+        # Identity multihash: 0x00 (identity) + length + data
+        mh_bytes = bytes([0x00, len(input_data)]) + input_data
+        
+        # Create CID v1 with raw codec manually  
+        # CID v1: 0x01 (version) + 0x55 (raw codec) + multihash
+        cid_bytes = bytes([0x01, 0x55]) + mh_bytes
+        
+        # Encode in base32 (RFC 4648)
+        cid_b32 = base64.b32encode(cid_bytes).decode('ascii').lower().rstrip('=')
+        
+        # Add multibase prefix for base32
+        print('b' + cid_b32)
+        
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
