@@ -64,8 +64,15 @@ $EDITOR `which $1`
 
 alias vi=${EDITOR:-nvim}
 
-shellit() {
-    llm -t shellit $* | awk '/```/ {flag=1;next} /```/ {flag=0} flag'
+# c/o https://codeberg.org/EvanHahn/dotfiles/src/commit/843b9ee13d949d346a4a73ccee2a99351aed285b/home/zsh/.config/zsh/aliases.zsh#L43-L51
+tempe () {
+  cd "$(mktemp -d)"
+  chmod -R 0700 .
+  if [[ $# -eq 1 ]]; then
+    \mkdir -p "$1"
+    cd "$1"
+    chmod -R 0700 .
+  fi
 }
 
 function »() {
@@ -389,7 +396,7 @@ zstyle ':completion:*' group-name ''
 # Initialize autocompletion
 zstyle :compinstall filename '$HOME/.zshrc'
 autoload -U compinit
-compinit
+compinit -i
 
 zstyle ':completion:*' file-sort date
 
@@ -399,3 +406,6 @@ zstyle ':completion:*' file-sort date
 # Wasmer
 export WASMER_DIR="/Users/danny/.wasmer"
 [ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+
+# Video summarization directory
+[[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]] && export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/

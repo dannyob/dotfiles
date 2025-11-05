@@ -26,6 +26,7 @@ declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
 ###
 source "${HOME}/.zgen/zgen.zsh"
 
+
 if ! zgen saved; then
     zgen load zsh-users/zsh-syntax-highlighting
     zgen load zsh-users/zsh-history-substring-search
@@ -64,6 +65,11 @@ PATH=$PATH:/Library/TeX/texbin
 # Qlot
 ###
 PATH="/Users/danny/.qlot/bin:$PATH"
+
+###
+# Homebrew Ruby
+###
+PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 
 # zsh-history-substring-search
 bindkey -M vicmd 'k' history-substring-search-up
@@ -112,6 +118,10 @@ function dob-update-llm-plugins {
 
     echo "Done! Current plugins:"
     llm plugins
+}
+
+dob-chrome-rdp()  {
+/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir=$HOME/Private/rdp-chrome/
 }
 
 activ() {
