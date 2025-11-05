@@ -14,8 +14,10 @@
 (package! org-pomodoro)
 (package! org-transclusion)
 (package! ob-deno)
-(package! org-ai :recipe (:host github :repo "rksm/org-ai" ))
-(package! gptel)
+(package! sly-asdf)
+
+(package! consult-omni
+  :recipe (:host github :repo "armindarvish/consult-omni" :files (:defaults "sources/*.el")))
 
 ;; Doom's packages are pinned to a specific commit and updated from release to
 ;; release. The `unpin!' macro allows you to unpin single packages...
@@ -31,7 +33,7 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
 
-(package! plz :recipe (:host github :repo "alphapapa/plz.el") :pin "80aeae0d201b06088d4b7543a603d97bdbccb948" )
+(package! plz :recipe (:host github :repo "alphapapa/plz.el") :pin "80aeae0d201b06088d4b7543a603d97bdbccb948")
 (package! ement :recipe (:host github :repo "alphapapa/ement.el"))
 (package! arei :recipe (:host sourcehut :repo "abcdw/emacs-arei"))
 
