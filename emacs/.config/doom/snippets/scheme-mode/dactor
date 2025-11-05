@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# contributor: Danny O'Brien <danny@spesh.com>
+# name: d-actor
+# group: spritely
+# uuid:
+# key: dactor
+# condition: t
+# --
+(define-actor (^$1 _bcom $2)
+  (methods (($3 $4)
+            ($0))))

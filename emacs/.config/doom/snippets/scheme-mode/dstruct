@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: define-record-type
+# uuid:
+# key: drec
+# condition: t
+# contributor: Danny O'Brien <danny@spesh.com>
+# --
+(define-record-type <$1>
+  (make-$1 $2)
+  $1?
+  ($2 $1-$2 set-$1-$2!))
