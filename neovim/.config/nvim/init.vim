@@ -180,13 +180,14 @@ Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'nvim-treesitter/nvim-treesitter-textobjects'
-Plug 'nvim-orgmode/orgmode'
+" Plug 'nvim-orgmode/orgmode'
 
 " Lisp 'n' Guile 'n' Guix
 " For all this Guix Info goodness
 Plug 'hiphish/info.vim'
 "Plug 'Olical/conjure'
 "Plug 'guns/vim-sexp'
+Plug 'liquidz/elin'
 "(Really a fork of TobBrandt/vim-scripts )
 Plug 'dannyob/vim-scripts' 
 Plug 'junegunn/rainbow_parentheses.vim'
@@ -214,7 +215,4 @@ let g:guile_highlight_goops=1
 let g:guile_highlight_api=1
 let g:guile_highlight_modules=1
 
-
-" Let's gooooo
-:lua require('dob')
 
