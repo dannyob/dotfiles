@@ -1,226 +1,32 @@
-eval "$(/opt/homebrew/bin/brew shellenv)"
+###
+# pequod (macOS) machine-specific configuration
+###
+
+# Rye (Python)
 source "$HOME/.rye/env"
 
+# History
 export HISTFILE=~/.cache/zshhistory
 export HISTSIZE=10000
 export SAVEHIST=10000
-
-#setopt INC_APPEND_HISTORY_TIME # doesn't show you other shell histories but it's still all saved, use fc -RI to manually import
-# See https://zsh.sourceforge.io/Doc/Release/Options.html#index-INC_005fAPPEND_005fHISTORY_005fTIME
-setopt SHARE_HISTORY
 setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_SAVE_NO_DUPS
 
 ###
-# Me!
+# Additional PATH entries
 ###
-
-declare -x DEBEMAIL=danny@spesh.com
-declare -x DEBFULLNAME="Danny O'Brien"
-declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
-
-###
-## zgen
-###
-source "${HOME}/.zgen/zgen.zsh"
-
-
-if ! zgen saved; then
-    zgen load zsh-users/zsh-syntax-highlighting
-    zgen load zsh-users/zsh-history-substring-search
-    zgen load twang817/zsh-fasd
-    zgen load wookayin/fzf-fasd
-    zgen load zsh-users/zsh-completions src
-    zgen save
-fi
+PATH=$PATH:/Library/TeX/texbin                      # TeX
+PATH="/Users/danny/.qlot/bin:$PATH"                 # Qlot (Common Lisp)
+PATH="/opt/homebrew/opt/ruby/bin:$PATH"             # Homebrew Ruby
+PATH="/opt/homebrew/opt/protobuf@3/bin:$PATH"       # Protobuf
+export PATH
 
 ###
-# Brewed guile
+# Guix VM aliases (Guix running in a VM on this Mac)
 ###
-
-export GUILE_LOAD_PATH=$GUILE_LOAD_PATH:/usr/local/share/guile/site/3.0/:/opt/homebrew/share/guile/site/3.0/
-export GUILE_LOAD_COMPILED_PATH=$GUILE_LOAD_COMPILED_PATH:/usr/local/lib/guile/3.0/site-ccache/:/opt/homebrew/share/guile/site/3.0/site-ccache
-export GUILE_SYSTEM_EXTENSIONS_PATH=$GUILE_SYSTEM_EXTENSIONS_PATH:/usr/local/lib/guile/3.0/extensions:/opt/homebrew/lib/guile/3.0/extensions
-export PATH=/usr/local/bin:$PATH
-
-###
-# FASD
-###
-eval "$(fasd --init auto)"
-bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
-bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
-bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
-alias c='fasd_cd -d'
-alias cc='fasd_cd -d -i'
-alias v='f -e nvim' 
-
-###
-# TeX
-###
-PATH=$PATH:/Library/TeX/texbin
-
-###
-# Qlot
-###
-PATH="/Users/danny/.qlot/bin:$PATH"
-
-###
-# Homebrew Ruby
-###
-PATH="/opt/homebrew/opt/ruby/bin:$PATH"
-
-# zsh-history-substring-search
-bindkey -M vicmd 'k' history-substring-search-up
-bindkey -M vicmd 'j' history-substring-search-down
-zmodload zsh/terminfo
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
-# Mac specials
-if type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
-fi
-alias ls='gls -A -F --color=auto --hyperlink'
-alias clipin='pbcopy'
-alias clipout='pbpaste'
-
-function dob-st {
- ( cd "/Users/danny/Library/Application Support/BraveSoftware/Brave-Browser/Default" 
-  sqlite3 'file:History?immutable=1' <<SQL
-    select '* [' || title || '](' || url || ')' 
-      from urls 
-      order by last_visit_time desc 
-      limit 10;
-SQL
-)
-}
-
-function dob-toplink {
-local url=$(osascript -e 'tell application "Brave" to return URL of active tab of front window')
-local title=$(osascript -e 'tell application "Brave" to return title of active tab of front window' )
-echo "[$title]($url)"
-}
-
-function dob-update-llm-plugins {
-    echo "Getting current plugins..."
-    local plugins=$(llm plugins | jq -r '.[].name')
-
-    echo "Updating llm..."
-    brew upgrade llm
-
-    echo "Reinstalling plugins..."
-    echo $plugins | while read plugin; do
-        echo "Installing $plugin..."
-        llm install -U $plugin
-    done
-
-    echo "Done! Current plugins:"
-    llm plugins
-}
-
-dob-chrome-rdp()  {
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir=$HOME/Private/rdp-chrome/
-}
-
-activ() {
-    # Save pre-existing environment variables
-    orig_vars=$(env | sed 's/=.*$//')
-
-    # Deactivate existing virtual environment if one is active
-    if type deactivate >/dev/null 2>&1; then
-        deactivate
-    fi
-
-    # Check if .venv directory exists
-    if [ ! -d ".venv" ]; then
-        echo "Error: No .venv directory found in the current directory." >&2
-        return 1
-    fi
-
-    # Set VENV_ROOT environment variable
-    export VENV_ROOT="$(pwd)"
-
-    # Get the current directory name
-    current_dir=$(basename "$VENV_ROOT")
-
-    # Decrypt and source the secrets file
-    secrets_file="$HOME/Private/secrets/$current_dir/env.gpg"
-    if [ -f "$secrets_file" ]; then
-        if ! gpg --quiet --decrypt "$secrets_file" | source /dev/stdin; then
-            echo "Error: Failed to decrypt or source the secrets file." >&2
-            return 1
-        fi
-    else
-        echo "Warning: No secrets file $secrets_file" >&2
-    fi
-
-    # Activate the virtual environment
-    if ! source .venv/bin/activate; then
-        echo "Error: Failed to activate the virtual environment." >&2
-        return 1
-    fi
-
-    # Save the original cd function
-    if [ -n "$(declare -f cd)" ]; then
-        eval "original_cd() $(declare -f cd)"
-    fi
-
-    # Redefine the cd function
-    cd() {
-        if [ "$#" -eq 0 ]; then
-            builtin cd "$VENV_ROOT"
-        else
-            builtin cd "$@"
-        fi
-    }
-
-    # Record new environment variables
-    export VENV_NEWVARS=$(comm -13 <(echo "$orig_vars" | sort) <(env | sed 's/=.*$//' | sort) | tr '\n' '\0')
-
-    # Define custom deactiv function
-    deactiv() {
-        # Unset all new variables
-        while IFS= read -r -d '' var; do
-            if [[ "$var" != "VENV_NEWVARS" ]]; then
-                unset "$var"
-            fi
-        done <<< "$VENV_NEWVARS"
-
-        # Restore original cd function
-        if type original_cd >/dev/null 2>&1; then
-            eval "cd() $(declare -f original_cd)"
-            unset -f original_cd
-        else
-            unset -f cd
-        fi
-
-        # Unset VENV_ROOT and VENV_NEWVARS
-        unset VENV_ROOT
-        unset VENV_NEWVARS
-
-        # Call the original deactivate function
-        if type deactivate >/dev/null 2>&1; then
-            deactivate
-        else
-            echo "Warning: Could not find the deactivate function" >&2
-        fi
-
-        # Unset this custom deactiv function
-        unset -f deactiv
-    }
-}
-
-alias guix="ssh -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 'guix'" 
+alias guix="ssh -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 'guix'"
 alias guix-env='f(){ ssh -X -I $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 /home/admin/.guix-profile/bin/$@;  unset -f f; }; f'
 alias guix-app='f(){ ssh -X -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001 /home/admin/.guix-profile/bin/$@;  unset -f f; }; f'
 alias guix-shell="ssh -X -i $HOME/.guix/ssh-cert/msg_rsa admin@127.0.0.1 -p 9001"
-
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-export PATH="/opt/homebrew/opt/protobuf@3/bin:$PATH"
-[[ -f "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"

@@ -1,0 +1,47 @@
+###
+# Linux-specific configuration
+###
+
+# GNU ls (native on Linux)
+alias ls='ls -A -F --group-directories-first --sort=extension --color=auto --hyperlink'
+
+# Wayland clipboard
+alias clipin='wl-copy'
+alias clipout='wl-paste'
+
+###
+# Wayland functions
+###
+
+screencapture() {
+    grim -g "$(slurp)" $(xdg-user-dir SCREENSHOTS)/${1:-$(date -Isec).png}
+}
+
+screenrecord() {
+    wf-recorder -g "$(slurp)" $*
+}
+
+wl-copymime() {
+    wl-copy -t$(file --mime-type $1 | cut -d: -f2) < $1
+}
+
+###
+# Debian-specific
+###
+if [[ -f /etc/debian_version ]]; then
+    aptinstall() {
+        local commit
+        vared -c -p "Why are you installing $1? " commit
+        if sudo apt-get install $1; then
+            cat >>~/ChangeLog<<EOF
+$(date -Imin)  $DEBFULLNAME  <$DEBEMAIL>
+
+	* $commit
+
+	% sudo apt-get install $1
+EOF
+        else
+            echo "Not logged!"
+        fi
+    }
+fi

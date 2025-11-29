@@ -1,83 +1,83 @@
-# last chance
+# Hostname detection
 declare -x SHORTHOST=${SHORTHOST:=$(hostname -s)}
 [[ $SHORTHOST == *.local ]] && SHORTHOST=${SHORTHOST%.local}
 
-# I like vim-syle bindings
-bindkey -A viins main
-
-# My prompt, which if pasted, is null action under zsh so you can copy and paste
-declare -x PS1=': %m %1(j.[%j].) %~%#; '
-
-if [[ -n $GUIX_ENVIRONMENT ]]
-then
-declare -x PS1=': [] %m %1(j.[%j].) %~%#; '
-fi
-
-# More generous umask -- people in my user group can also write my files
-umask 002
-
-# allow directories to be typed without 'cd'
-setopt auto_cd
-# always push directories
-setopt auto_pushd
-# we can cd to stuff added with 'hash -d'
-setopt cdable_vars
-# stops the prompt overwriting non-cr'd results
-unsetopt promptcr
-# echo back history substitutions instead of just doing them
-setopt hist_verify
-# Multiple zsh shells share their history
-setopt share_history
-# Compact listings of shell history
-setopt list_packed
-# Ignore repeated commands
-setopt hist_ignore_dups
-# Remove superfluous blank lines
-setopt hist_reduce_blanks
-
-##
-# ALIASES
-##
-
-# colored ls with hyperlinks
-alias   ls='ls -A -F --group-directories-first --sort=extension --color=auto --hyperlink'
-
-alias	ps='ps -ef'
-alias	cls='clear; tput reset'
-alias 	rm='rm -i'
-alias	mv='mv -i'
-alias 	cp='cp -i'
-alias   more=less
-alias   clipin='wl-copy'
-alias   clipout='wl-paste'
-alias   mailq='msmtp-queue'
-
+###
+# Me!
+###
+declare -x DEBEMAIL=danny@spesh.com
+declare -x DEBFULLNAME="Danny O'Brien"
+declare -x EMAIL="$DEBFULLNAME <$DEBEMAIL>"
 
 ###
-# FUNCTIONS
+# Key bindings
+###
+# vim-style bindings
+bindkey -A viins main
+# 10ms for key sequences
+KEYTIMEOUT=1
+
+###
+# Prompt
+###
+# If pasted, is null action under zsh so you can copy and paste
+declare -x PS1=': %m %1(j.[%j].) %~%#; '
+
+if [[ -n $GUIX_ENVIRONMENT ]]; then
+    declare -x PS1=': [] %m %1(j.[%j].) %~%#; '
+fi
+
+###
+# Shell options
+###
+umask 002                    # More generous umask
+setopt auto_cd               # Allow directories to be typed without 'cd'
+setopt auto_pushd            # Always push directories
+setopt cdable_vars           # cd to stuff added with 'hash -d'
+unsetopt promptcr            # Stops prompt overwriting non-cr'd results
+setopt hist_verify           # Echo back history substitutions
+setopt share_history         # Multiple zsh shells share their history
+setopt list_packed           # Compact listings of shell history
+setopt hist_ignore_dups      # Ignore repeated commands
+setopt hist_reduce_blanks    # Remove superfluous blank lines
+
+###
+# Core aliases
+###
+alias ps='ps -ef'
+alias cls='clear; tput reset'
+alias rm='rm -i'
+alias mv='mv -i'
+alias cp='cp -i'
+alias more=less
+alias mailq='msmtp-queue'
+alias vi=${EDITOR:-nvim}
+alias llmw='llm --tool Patch --tool Todo --cl 0'
+
+###
+# Core functions
 ###
 
 # Quickly edit executable scripts
 vimbin() {
-$EDITOR `which $1`
+    $EDITOR `which $1`
 }
 
-alias vi=${EDITOR:-nvim}
-
-# c/o https://codeberg.org/EvanHahn/dotfiles/src/commit/843b9ee13d949d346a4a73ccee2a99351aed285b/home/zsh/.config/zsh/aliases.zsh#L43-L51
-tempe () {
-  cd "$(mktemp -d)"
-  chmod -R 0700 .
-  if [[ $# -eq 1 ]]; then
-    \mkdir -p "$1"
-    cd "$1"
+# Create and cd to temp directory
+tempe() {
+    cd "$(mktemp -d)"
     chmod -R 0700 .
-  fi
+    if [[ $# -eq 1 ]]; then
+        \mkdir -p "$1"
+        cd "$1"
+        chmod -R 0700 .
+    fi
 }
 
+# Paste into journal or add todo
 function »() {
-zmodload zsh/zselect
-local fds=(0)
+    zmodload zsh/zselect
+    local fds=(0)
 
     # Run paste-into-journal if there is something on stdin OR if there are no arguments
     if zselect -t 0 $fds 2> /dev/null || [[ $# -eq 0 ]]; then
@@ -101,101 +101,82 @@ fixgpg() {
     export GPG_TTY
 }
 
-dob-mkindex () {
-	local dir="${1:-.}" recursive=false title="" show_hidden=false
-	while [[ $# -gt 0 ]]
-	do
-		case $1 in
-			(-r|--recursive) recursive=true
-				shift ;;
-			(-t|--title) title="$2"
-				shift 2 ;;
-			(-a|--all) show_hidden=true
-				shift ;;
-			(-h|--help) echo "Usage: dob-mkindex [OPTIONS] [DIRECTORY]
+dob-mkindex() {
+    local dir="${1:-.}" recursive=false title="" show_hidden=false
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            (-r|--recursive) recursive=true; shift ;;
+            (-t|--title) title="$2"; shift 2 ;;
+            (-a|--all) show_hidden=true; shift ;;
+            (-h|--help)
+                echo "Usage: dob-mkindex [OPTIONS] [DIRECTORY]
 Options: -r (recursive), -t TITLE (custom title), -a (include hidden), -h (help)"
-				return 0 ;;
-			(-*) echo "Unknown option: $1" >&2
-				return 1 ;;
-			(*) dir="$1"
-				shift ;;
-		esac
-	done
-	dir=$(cd "$dir" && pwd)  || {
-		echo "Directory '$dir' not found" >&2
-		return 1
-	}
-	[[ -z "$title" ]] && title="Index of $(basename "$dir")"
+                return 0 ;;
+            (-*) echo "Unknown option: $1" >&2; return 1 ;;
+            (*) dir="$1"; shift ;;
+        esac
+    done
+    dir=$(cd "$dir" && pwd) || { echo "Directory '$dir' not found" >&2; return 1; }
+    [[ -z "$title" ]] && title="Index of $(basename "$dir")"
 
-	_get_icon () {
-		local filename="$1"
-		local icon="📄"
-		case "${filename##*.}" in
-			(jpg|jpeg|png|gif|svg|webp) icon="🖼️"  ;;
-			(mp3|wav|ogg|m4a) icon="🎵"  ;;
-			(mp4|avi|mkv|mov) icon="🎬"  ;;
-			(pdf) icon="📕"  ;;
-			(txt|md) icon="📝"  ;;
-			(zip|tar|gz|rar) icon="📦"  ;;
-			(html|htm) icon="🌐"  ;;
-			(js) icon="⚡"  ;;
-			(py) icon="🐍"  ;;
-		esac
-		echo "$icon"
-	}
+    _get_icon() {
+        local filename="$1"
+        local icon="📄"
+        case "${filename##*.}" in
+            (jpg|jpeg|png|gif|svg|webp) icon="🖼️" ;;
+            (mp3|wav|ogg|m4a) icon="🎵" ;;
+            (mp4|avi|mkv|mov) icon="🎬" ;;
+            (pdf) icon="📕" ;;
+            (txt|md) icon="📝" ;;
+            (zip|tar|gz|rar) icon="📦" ;;
+            (html|htm) icon="🌐" ;;
+            (js) icon="⚡" ;;
+            (py) icon="🐍" ;;
+        esac
+        echo "$icon"
+    }
 
-	_gen_html () {
-		local d="$1"
-		local t="$2"
-		local h="$3"
-		local f="$d/index.html"
+    _gen_html() {
+        local d="$1" t="$2" h="$3"
+        local f="$d/index.html"
+        local hide_args=()
+        [[ "$h" = false ]] && hide_args=(! -name ".*")
 
-		# Build find filter arguments
-		local hide_args=()
-		[[ "$h" = false ]] && hide_args=(! -name ".*")
-
-		cat > "$f" <<EOF
+        cat > "$f" <<EOF
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>$t</title><style>body{font-family:system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#333}
 h1{color:#2c3e50;border-bottom:2px solid #3498db;padding-bottom:.5rem}.file-list{list-style:none;padding:0}
 .file-list li{margin:.5rem 0;padding:.5rem}.file-list a{text-decoration:none;color:#3498db;display:flex;align-items:center}
 .file-list a:hover{text-decoration:underline}.icon{margin-right:.5rem}</style></head><body><h1>$t</h1><ul class="file-list">
 EOF
-		[[ "$d" != "/" ]] && echo '<li><a href="../"><span class="icon">↩️</span>../</a></li>' >> "$f"
+        [[ "$d" != "/" ]] && echo '<li><a href="../"><span class="icon">↩️</span>../</a></li>' >> "$f"
 
-		# List directories
-		find -L "$d" -maxdepth 1 -type d ! -path "$d" "${hide_args[@]}" -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
-		do
-			local bn=$(basename "$item")
-			[[ "$bn" != "." && "$bn" != ".." ]] && echo "<li><a href=\"$bn/\"><span class=\"icon\">📁</span>$bn/</a></li>" >> "$f"
-		done
+        find -L "$d" -maxdepth 1 -type d ! -path "$d" "${hide_args[@]}" -print0 2>/dev/null | sort -z | while IFS= read -r -d '' item; do
+            local bn=$(basename "$item")
+            [[ "$bn" != "." && "$bn" != ".." ]] && echo "<li><a href=\"$bn/\"><span class=\"icon\">📁</span>$bn/</a></li>" >> "$f"
+        done
 
-		# List files
-		find -L "$d" -maxdepth 1 -type f "${hide_args[@]}" -print0 2> /dev/null | sort -z | while IFS= read -r -d '' item
-		do
-			local bn=$(basename "$item")
-			if [[ "$bn" != "index.html" ]]
-			then
-				local icon=$(_get_icon "$bn")
-				echo "<li><a href=\"$bn\"><span class=\"icon\">$icon</span>$bn</a></li>" >> "$f"
-			fi
-		done
+        find -L "$d" -maxdepth 1 -type f "${hide_args[@]}" -print0 2>/dev/null | sort -z | while IFS= read -r -d '' item; do
+            local bn=$(basename "$item")
+            if [[ "$bn" != "index.html" ]]; then
+                local icon=$(_get_icon "$bn")
+                echo "<li><a href=\"$bn\"><span class=\"icon\">$icon</span>$bn</a></li>" >> "$f"
+            fi
+        done
 
-		echo "</ul><div style=\"text-align:center;margin-top:2rem;color:#666;font-size:.9em\">Generated $(date)</div></body></html>" >> "$f"
-		echo "Generated: $f"
-	}
+        echo "</ul><div style=\"text-align:center;margin-top:2rem;color:#666;font-size:.9em\">Generated $(date)</div></body></html>" >> "$f"
+        echo "Generated: $f"
+    }
 
-	_gen_html "$dir" "$title" "$show_hidden"
+    _gen_html "$dir" "$title" "$show_hidden"
 
-	if [[ "$recursive" == true ]]
-	then
-		local path_filter=()
-		[[ "$show_hidden" = false ]] && path_filter=(! -path "*/.*")
-		find -L "$dir" -type d ! -path "$dir" "${path_filter[@]}" -print0 2> /dev/null | while IFS= read -r -d '' subdir
-		do
-			_gen_html "$subdir" "Index of $(basename "$subdir")" "$show_hidden"
-		done
-	fi
+    if [[ "$recursive" == true ]]; then
+        local path_filter=()
+        [[ "$show_hidden" = false ]] && path_filter=(! -path "*/.*")
+        find -L "$dir" -type d ! -path "$dir" "${path_filter[@]}" -print0 2>/dev/null | while IFS= read -r -d '' subdir; do
+            _gen_html "$subdir" "Index of $(basename "$subdir")" "$show_hidden"
+        done
+    fi
 }
 
 dob-tz() {
@@ -204,16 +185,14 @@ dob-tz() {
     local epoch base_date
 
     if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
-        echo "Usage: dob-tz [TIME] [TIMEZONE] - Convert time to Local/Eastern/UTC/CET/Custom (e.g., timeconv '2:30 PM' Tokyo)"
+        echo "Usage: dob-tz [TIME] [TIMEZONE] - Convert time to Local/Eastern/UTC/CET/Custom"
         return 0
     fi
 
-    # Function to find timezone
     find_timezone() {
         local search_term="$1"
         local tz_dirs=("/usr/share/zoneinfo" "/System/Library/TimeZones")
 
-        # First try exact match
         for dir in $tz_dirs; do
             [[ -d "$dir" ]] || continue
             if TZ="$search_term" date >/dev/null 2>&1; then
@@ -222,7 +201,6 @@ dob-tz() {
             fi
         done
 
-        # Then try partial match (case insensitive)
         for dir in $tz_dirs; do
             [[ -d "$dir" ]] || continue
             local matches=($(find "$dir" -type f -path "*${search_term}*" 2>/dev/null | head -5))
@@ -235,7 +213,6 @@ dob-tz() {
             done
         done
 
-        # Try case-insensitive search in common timezones
         local -a common_timezones=(
             "Asia/Tokyo" "Asia/Shanghai" "Asia/Hong_Kong" "Asia/Singapore" "Asia/Seoul"
             "Europe/London" "Europe/Paris" "Europe/Berlin" "Europe/Rome" "Europe/Madrid"
@@ -325,8 +302,6 @@ dob-cid() {
     fi
 }
 
-alias llmw='llm --tool Patch --tool Todo --cl 0'
-
 dob-spelling() {
     local template_file="$(llm templates path)/spelling.yml"
 
@@ -340,72 +315,149 @@ dob-spelling() {
 
     llm -t spelling --cl 0 -p filename "$@"
 }
-# Stop Python Cache droppings
+
+###
+# GPG/SSH agent setup
+###
+gpg-connect-agent /bye >/dev/null 2>&1
+GPG_TTY=$(tty)
+export GPG_TTY
+
+unset SSH_AGENT_PID
+if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+    echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
+fi
+
+###
+# Python cache
+###
 case "${OSTYPE}" in
     darwin*)
         folder="${HOME}/Library/Caches/Python"
         if [[ ! -d "${folder}" ]]; then mkdir -p "${folder}"; fi
         export PYTHONPYCACHEPREFIX="${folder}"
         ;;
-    linux-*)
+    linux*)
         folder="${HOME}/.cache/Python"
         if [[ ! -d "${folder}" ]]; then mkdir -p "${folder}"; fi
         export PYTHONPYCACHEPREFIX="${folder}"
         ;;
-    *)
-        printf "WARNING: unsupported operating system '%s'; "`
-              `'not setting PYTHONPYCACHEPREFIX' "${OSTYPE}" >&2
-        return 1
-        ;;
 esac
 
-# 10ms for key sequences
-KEYTIMEOUT=1
-
 ###
-# LOCAL SETTINGS
+# Platform-specific configuration
 ###
-
-# BEGIN-INSERT-OTHER-ZSHRC
-if [ -f $HOME/.zshrc-$SHORTHOST ]
-then
-    . $HOME/.zshrc-$SHORTHOST
-fi
-# END-INSERT-OTHER-ZSHRC
-
-###
-# AUTOCOMPLETION
-###
-
-# Load Bash's autocompletion scripts
-autoload -U +X bashcompinit && bashcompinit
-
-# Load my autocompletion scripts
-if [[ -d ~/.zshcomplete ]]; then
-	fpath=(~/.zshcomplete $fpath)
-	autoload -U ~/.zshcomplete/*(:t)
+if [[ "$OSTYPE" == darwin* ]]; then
+    [[ -f ~/.zshrc_macos ]] && source ~/.zshrc_macos
+else
+    [[ -f ~/.zshrc_linux ]] && source ~/.zshrc_linux
 fi
 
-# Make for verbose autocompletion hints
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*:descriptions' format '%B%d%b'
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*' group-name ''
+###
+# Guix as package manager (on any platform)
+###
+if command -v guix >/dev/null 2>&1; then
+    export GUIX_LOCPATH=${GUIX_LOCPATH:-$HOME/.guix-profile/lib/locale}
+    fpath=(~/.config/guix/current/share/zsh/site-functions/ "${fpath[@]}")
 
-# Initialize autocompletion
-zstyle :compinstall filename '$HOME/.zshrc'
-autoload -U compinit
-compinit -i
+    guixinstall() {
+        local commit
+        vared -c -p "Why are you installing $1? " commit
+        if guix package -i $1; then
+            cat >>~/ChangeLog<<EOF
 
-zstyle ':completion:*' file-sort date
+$(date -Imin)  $DEBFULLNAME  <$DEBEMAIL>
+
+	* $commit
+
+	% guix package -i $1
+EOF
+        else
+            echo "Not logged!"
+        fi
+    }
+
+    guixupgrade() {
+        (
+            cd ~/Public/src/guix/
+            git pull
+            guix pull --disable-authentication --allow-downgrades
+            donotupgrade=$(guix package --upgrade --dry-run |& awk '/following derivation/{flag=1;next} /would be downloaded/{flag=0;}  flag { sub(/^[^-]*-/,"") ; sub("-[0-9].*$",""); print }' | tr '\n' ' ')
+            echo guix package -u $(echo $donotupgrade | sed 's/^\| \([^$]\)/ --do-not-upgrade \1/g')
+            guix package $(echo $donotupgrade | sed 's/^\| \([^$]\)/ --do-not-upgrade \1/g') --upgrade
+        )
+    }
+fi
+
+###
+# PLUGINS (zsh_unplugged)
+###
+ZPLUGINDIR=${ZPLUGINDIR:-${HOME}/.config/zsh/plugins}
+
+function plugin-load {
+    local repo plugdir initfile initfiles=()
+    for repo in $@; do
+        plugdir=$ZPLUGINDIR/${repo:t}
+        initfile=$plugdir/${repo:t}.plugin.zsh
+        if [[ ! -d $plugdir ]]; then
+            echo "Cloning $repo..."
+            git clone -q --depth 1 https://github.com/$repo $plugdir
+        fi
+        if [[ ! -e $initfile ]]; then
+            initfiles=($plugdir/*.{plugin.zsh,zsh-theme,zsh,sh}(N))
+            (( $#initfiles )) || continue
+            ln -sf $initfiles[1] $initfile
+        fi
+        fpath+=$plugdir
+        . $initfile
+    done
+}
+
+repos=(
+    zsh-users/zsh-syntax-highlighting
+    zsh-users/zsh-history-substring-search
+    zsh-users/zsh-completions
+)
+plugin-load $repos
+
+# fasd
+if [[ -x ~/.local/bin/fasd ]]; then
+    eval "$(~/.local/bin/fasd --init auto)"
+    bindkey '^X^A' fasd-complete
+    bindkey '^X^F' fasd-complete-f
+    bindkey '^X^D' fasd-complete-d
+    alias c='fasd_cd -d'
+    alias cc='fasd_cd -d -i'
+    alias v='f -e ${EDITOR:-nvim}'
+fi
+
+# history-substring-search keybindings
+bindkey -M vicmd 'k' history-substring-search-up
+bindkey -M vicmd 'j' history-substring-search-down
+zmodload zsh/terminfo
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+###
+# Machine-specific configuration
+###
+if [[ -f $HOME/.zshrc-$SHORTHOST ]]; then
+    source $HOME/.zshrc-$SHORTHOST
+fi
+
+###
+# Misc
+###
 
 # Fix for TRAMP
-[ $TERM = "dumb" ] && unsetopt zle && PS1='$ '
+[[ $TERM = "dumb" ]] && unsetopt zle && PS1='$ '
 
 # Wasmer
-export WASMER_DIR="/Users/danny/.wasmer"
-[ -s "$WASMER_DIR/wasmer.sh" ] && source "$WASMER_DIR/wasmer.sh"
+export WASMER_DIR="$HOME/.wasmer"
+[[ -s "$WASMER_DIR/wasmer.sh" ]] && source "$WASMER_DIR/wasmer.sh"
 
 # Video summarization directory
 [[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]] && export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/
+
+export PATH="$HOME/.local/bin:$PATH"
