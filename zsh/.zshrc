@@ -317,19 +317,6 @@ dob-spelling() {
 }
 
 ###
-# GPG/SSH agent setup
-###
-gpg-connect-agent /bye >/dev/null 2>&1
-GPG_TTY=$(tty)
-export GPG_TTY
-
-unset SSH_AGENT_PID
-if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
-    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-    echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
-fi
-
-###
 # Python cache
 ###
 case "${OSTYPE}" in
@@ -352,6 +339,21 @@ if [[ "$OSTYPE" == darwin* ]]; then
     [[ -f ~/.zshrc_macos ]] && source ~/.zshrc_macos
 else
     [[ -f ~/.zshrc_linux ]] && source ~/.zshrc_linux
+fi
+
+###
+# GPG/SSH agent setup (after platform config so gpgconf is in PATH)
+###
+if command -v gpgconf >/dev/null 2>&1; then
+    gpg-connect-agent /bye >/dev/null 2>&1
+    GPG_TTY=$(tty)
+    export GPG_TTY
+
+    unset SSH_AGENT_PID
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+        echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
+    fi
 fi
 
 ###
