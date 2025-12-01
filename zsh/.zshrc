@@ -468,3 +468,6 @@ export WASMER_DIR="$HOME/.wasmer"
 [[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]] && export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# Theme setup
+command -v theme.sh >/dev/null 2>&1 && theme.sh "${THEMESH:-zaibatsu}"
