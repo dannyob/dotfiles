@@ -35,6 +35,10 @@ setopt auto_cd               # Allow directories to be typed without 'cd'
 setopt auto_pushd            # Always push directories
 setopt cdable_vars           # cd to stuff added with 'hash -d'
 unsetopt promptcr            # Stops prompt overwriting non-cr'd results
+
+HISTSIZE=100000                   # Lines of history in memory
+SAVEHIST=100000                   # Lines saved to file
+setopt extended_history          # Save timestamp and duration
 setopt hist_verify           # Echo back history substitutions
 setopt share_history         # Multiple zsh shells share their history
 setopt list_packed           # Compact listings of shell history
@@ -350,10 +354,11 @@ if command -v gpgconf >/dev/null 2>&1; then
     export GPG_TTY
 
     unset SSH_AGENT_PID
-    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+    # Only use GPG agent if not using forwarded SSH agent
+    if [[ -z "$SSH_AUTH_SOCK" ]] || [[ "$SSH_AUTH_SOCK" == *"gpg"* ]]; then
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-        echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
     fi
+    echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
 fi
 
 ###
