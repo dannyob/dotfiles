@@ -1,6 +1,6 @@
 emulate sh -c 'source /etc/profile'
 emulate sh -c 'source ~/.profile'
-declare -x SHORTHOST=`hostname`
+declare -x SHORTHOST=`hostname -s`
 declare -x PATH=$HOME/go/bin:$HOME/.cargo/bin:$HOME/.local/bin:$HOME/.deno/bin:$HOME/.config/emacs/bin:$PATH
 declare -x MAILDIR=$HOME/Private/mail
 declare -x XDG_DATA_DIRS=$XDG_DATA_DIRS:/usr/local/share/:/usr/share/
