@@ -26,7 +26,7 @@ set timeoutlen=1000 ttimeoutlen=0
 set backspace=indent,eol,start
 
 " Super indent!
-set copyindent cindent smartindent
+set copyindent smartindent
 
 " ~ is an operator to me
 set tildeop
