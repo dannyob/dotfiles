@@ -349,16 +349,31 @@ fi
 # GPG/SSH agent setup (after platform config so gpgconf is in PATH)
 ###
 if command -v gpgconf >/dev/null 2>&1; then
-    gpg-connect-agent /bye >/dev/null 2>&1
     GPG_TTY=$(tty)
     export GPG_TTY
+
+    # Get socket path and check if agent is likely responsive
+    _gpg_socket="$(gpgconf --list-dirs agent-socket 2>/dev/null)"
+    if [[ -S "$_gpg_socket" ]]; then
+        # Socket exists - use timeout to avoid blocking on unresponsive agent
+        # gtimeout on macOS (coreutils), timeout on Linux
+        _timeout_cmd="${commands[gtimeout]:-${commands[timeout]:-}}"
+        if [[ -n "$_timeout_cmd" ]]; then
+            "$_timeout_cmd" 1s gpg-connect-agent /bye >/dev/null 2>&1
+            echo UPDATESTARTUPTTY | "$_timeout_cmd" 1s gpg-connect-agent >/dev/null 2>&1
+        else
+            # No timeout available - run in background to avoid blocking
+            { gpg-connect-agent /bye >/dev/null 2>&1; } &!
+            { echo UPDATESTARTUPTTY | gpg-connect-agent >/dev/null 2>&1; } &!
+        fi
+    fi
+    unset _gpg_socket _timeout_cmd
 
     unset SSH_AGENT_PID
     # Only use GPG agent if not using forwarded SSH agent
     if [[ -z "$SSH_AUTH_SOCK" ]] || [[ "$SSH_AUTH_SOCK" == *"gpg"* ]]; then
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
     fi
-    echo UPDATESTARTUPTTY | gpg-connect-agent > /dev/null 2>&1
 fi
 
 ###
