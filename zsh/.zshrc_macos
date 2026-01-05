@@ -75,6 +75,8 @@ dob-chrome-rdp() {
   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir=$HOME/Private/rdp-chrome/
 }
 
+alias acorn='open -a Acorn'
+
 # Activate venv with secrets support
 activ() {
     # Save pre-existing environment variables
@@ -108,9 +110,19 @@ activ() {
         echo "Warning: No secrets file $secrets_file" >&2
     fi
 
-    # Activate the virtual environment
-    if ! source .venv/bin/activate; then
-        echo "Error: Failed to activate the virtual environment." >&2
+    # Special Almanack special-pleading
+    if [ -f "bin/a-activate" ]; then
+        if ! source "bin/a-activate"; then
+            echo "Error: Failed to activate a-activate." >&2
+            return 1
+        fi
+    elif [ -f ".venv/bin/activate" ]; then
+        if ! source .venv/bin/activate; then
+            echo "Error: Failed to activate standard venv." >&2
+            return 1
+        fi
+    else
+        echo "Error: No activation script found." >&2
         return 1
     fi
 
