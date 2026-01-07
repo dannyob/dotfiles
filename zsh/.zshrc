@@ -328,6 +328,105 @@ dob-todo() {
     (cd "$life_dir" && claude -p "$@")
 }
 
+# Activate venv with secrets support
+activ() {
+    # Save pre-existing environment variables
+    orig_vars=$(env | sed 's/=.*$//')
+
+    # Deactivate existing virtual environment if one is active
+    if type deactivate >/dev/null 2>&1; then
+        deactivate
+    fi
+
+    # Check if .venv directory exists
+    if [ ! -d ".venv" ]; then
+        echo "Error: No .venv directory found in the current directory." >&2
+        return 1
+    fi
+
+    # Set VENV_ROOT environment variable
+    export VENV_ROOT="$(pwd)"
+
+    # Get the current directory name
+    current_dir=$(basename "$VENV_ROOT")
+
+    # Decrypt and source the secrets file
+    secrets_file="$HOME/Private/secrets/$current_dir/env.gpg"
+    if [ -f "$secrets_file" ]; then
+        if ! gpg --quiet --decrypt "$secrets_file" | source /dev/stdin; then
+            echo "Error: Failed to decrypt or source the secrets file." >&2
+            return 1
+        fi
+    else
+        echo "Warning: No secrets file $secrets_file" >&2
+    fi
+
+    # Special Almanack special-pleading
+    if [ -f "bin/a-activate" ]; then
+        if ! source "bin/a-activate"; then
+            echo "Error: Failed to activate a-activate." >&2
+            return 1
+        fi
+    elif [ -f ".venv/bin/activate" ]; then
+        if ! source .venv/bin/activate; then
+            echo "Error: Failed to activate standard venv." >&2
+            return 1
+        fi
+    else
+        echo "Error: No activation script found." >&2
+        return 1
+    fi
+
+    # Save the original cd function
+    if [ -n "$(declare -f cd)" ]; then
+        eval "original_cd() $(declare -f cd)"
+    fi
+
+    # Redefine the cd function
+    cd() {
+        if [ "$#" -eq 0 ]; then
+            builtin cd "$VENV_ROOT"
+        else
+            builtin cd "$@"
+        fi
+    }
+
+    # Record new environment variables
+    export VENV_NEWVARS=$(comm -13 <(echo "$orig_vars" | sort) <(env | sed 's/=.*$//' | sort) | tr '\n' '\0')
+
+    # Define custom deactiv function
+    deactiv() {
+        # Unset all new variables
+        while IFS= read -r -d '' var; do
+            if [[ "$var" != "VENV_NEWVARS" ]]; then
+                unset "$var"
+            fi
+        done <<< "$VENV_NEWVARS"
+
+        # Restore original cd function
+        if type original_cd >/dev/null 2>&1; then
+            eval "cd() $(declare -f original_cd)"
+            unset -f original_cd
+        else
+            unset -f cd
+        fi
+
+        # Unset VENV_ROOT and VENV_NEWVARS
+        unset VENV_ROOT
+        unset VENV_NEWVARS
+
+        # Call the original deactivate function
+        if type deactivate >/dev/null 2>&1; then
+            deactivate
+        else
+            echo "Warning: Could not find the deactivate function" >&2
+        fi
+
+        # Unset this custom deactiv function
+        unset -f deactiv
+    }
+}
+
 ###
 # Python cache
 ###
