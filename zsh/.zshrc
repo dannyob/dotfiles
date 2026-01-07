@@ -320,6 +320,14 @@ dob-spelling() {
     llm -t spelling --cl 0 -p filename "$@"
 }
 
+dob-todo() {
+    command -v life >/dev/null || { echo "Error: life executable not found"; return 1; }
+    local life_dir
+    life_dir=$(life path | awk -F': ' '/^Life directory:/ { print $2 }')
+    [[ -d "$life_dir" ]] || { echo "Error: life directory not found: $life_dir"; return 1; }
+    (cd "$life_dir" && claude -p "$@")
+}
+
 ###
 # Python cache
 ###
