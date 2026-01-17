@@ -153,6 +153,8 @@ set termguicolors
 set guicursor=n-c:block,i-ci-ve:ver40,r-cr-v:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
 
 call plug#begin()
+" My dumb stuff
+Plug 'dannyob/md-age-vim'
 " Plug 'eraserhd/parinfer-rust'
 Plug 'jpalardy/vim-slime', { 'branch' : 'main' }
 Plug 'tomtom/quickfixsigns_vim'
@@ -173,13 +175,19 @@ Plug 'gioele/vim-autoswap'
 Plug 'unblevable/quick-scope'
 Plug 'mbbill/undotree'
 
+" Testing
+Plug 'dhruvasagar/vim-testify'
+
 " PGP you know me
 Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
+" A new Age
+let g:md_age_identity = '-j gpg'
+
 " Dirty Emacs Experimentation
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+"Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+"Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 " Plug 'nvim-orgmode/orgmode'
 
 " Lisp 'n' Guile 'n' Guix
