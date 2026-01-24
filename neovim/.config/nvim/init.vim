@@ -181,8 +181,13 @@ Plug 'dhruvasagar/vim-testify'
 " PGP you know me
 Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
-" A new Age
-let g:md_age_identity = '-j gpg'
+" A new Age - use age key from pass if available, otherwise fall back to gpg
+let s:age_key = trim(system('a-pass age/almanack-priv 2>/dev/null'))
+if s:age_key =~# '^AGE-SECRET-KEY'
+  let g:md_age_identity = '-i <(a-pass age/almanack-priv)'
+else
+  let g:md_age_identity = '-g gpg'
+endif
 
 " Dirty Emacs Experimentation
 
