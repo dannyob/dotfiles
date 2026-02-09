@@ -1,0 +1,254 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
+"""Pick the best LLM model for a task.
+
+Uses the gh:dannyob/pickmodel template to route your task to the
+optimal model based on token count, task description, and cost preference.
+"""
+
+import argparse
+import re
+import subprocess
+import sys
+
+
+TEMPLATE = "gh:dannyob/pickmodel"
+
+# Providers in preference order: direct vendor first, openrouter last
+PROVIDER_PRIORITY = [
+    "OpenAI Chat",
+    "Anthropic Messages",
+    "Claude Max",
+    "GeminiPro",
+    "Mistral",
+    "Grok",
+    "Perplexity",
+    "MlxModel",
+    "OpenAI Completion",
+    "OpenRouter",
+]
+
+
+def get_installed_models():
+    """Parse `llm models` into a list of (provider, model_id, aliases)."""
+    try:
+        result = subprocess.run(
+            ["llm", "models"], capture_output=True, text=True, check=True
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return []
+
+    models = []
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        if not line or ": " not in line:
+            continue
+        provider, rest = line.split(": ", 1)
+        # Parse "model-id (aliases: a, b, c)" or just "model-id"
+        m = re.match(r"^(\S+)(?:\s+\(aliases:\s+(.+)\))?$", rest)
+        if m:
+            model_id = m.group(1)
+            aliases = [a.strip() for a in m.group(2).split(",")] if m.group(2) else []
+            models.append((provider, model_id, aliases))
+    return models
+
+
+def resolve_model(recommended, installed_models):
+    """Resolve a recommended alias to the best installed model ID.
+
+    Prefers vendor-direct models over OpenRouter.
+    Returns (model_id, provider) or (recommended, None) if not found.
+    """
+    recommended_lower = recommended.lower().strip()
+
+    # Build a lookup: for each name/alias, collect (provider, model_id) pairs
+    candidates = []
+    for provider, model_id, aliases in installed_models:
+        all_names = [model_id.lower()] + [a.lower() for a in aliases]
+        if recommended_lower in all_names:
+            candidates.append((provider, model_id))
+
+    if not candidates:
+        # Try substring match: the recommended alias might be a short form
+        # e.g. "claude-sonnet-4.5" matching "anthropic/claude-sonnet-4-5"
+        # Normalize: strip provider prefix, collapse dots/dashes
+        def normalize(s):
+            return re.sub(r"[.\-_/]", "", s.lower())
+
+        rec_norm = normalize(recommended)
+        for provider, model_id, aliases in installed_models:
+            for name in [model_id] + aliases:
+                if normalize(name) == rec_norm:
+                    candidates.append((provider, model_id))
+                    break
+
+    if not candidates:
+        return recommended, None
+
+    # Sort by provider priority
+    def priority(item):
+        provider = item[0]
+        try:
+            return PROVIDER_PRIORITY.index(provider)
+        except ValueError:
+            return len(PROVIDER_PRIORITY)
+
+    candidates.sort(key=priority)
+    return candidates[0][1], candidates[0][0]
+
+
+def extract_alias(output):
+    """Extract the model alias from the LLM's response."""
+    for line in output.splitlines():
+        if line.startswith("**Model**:"):
+            return line.split(":", 1)[1].strip().strip("`")
+    # Fallback: first non-empty line
+    for line in output.splitlines():
+        if line.strip():
+            return line.strip()
+    return None
+
+
+def prompt_if_missing(value, name, default=None, help_text=None):
+    """Prompt interactively for a value if not provided and stdin is a tty."""
+    if value is not None:
+        return value
+    if not sys.stdin.isatty():
+        return default
+
+    prompt_str = f"{name}"
+    if default:
+        prompt_str += f" [{default}]"
+    if help_text:
+        prompt_str += f"  ({help_text})"
+    prompt_str += ": "
+
+    try:
+        answer = input(prompt_str).strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return default
+    return answer if answer else default
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Pick the best LLM model for a task.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""\
+cost preference examples:
+  cheap                cheapest option that can handle the task
+  normal               standard quality, don't overspend (default)
+  no expense spared    absolute best model regardless of cost
+  free                 local models only, no API calls
+
+usage examples:
+  pick-model "summarize this article" --tokens 5000 --cost cheap
+  pick-model "write a Python web scraper"
+  pick-model "translate to French" -t 80000 -c "no expense spared"
+  pick-model --raw "fix this regex"
+  echo "explain quantum entanglement" | pick-model
+
+  # use -M to get an llm-compatible flag:
+  llm $(pick-model -M "summarize this") < article.txt
+  llm $(pick-model -M "debug this" -c best) < code.py
+""",
+    )
+    parser.add_argument(
+        "question",
+        nargs="?",
+        default=None,
+        help="the task to be performed (prompted if omitted)",
+    )
+    parser.add_argument(
+        "--tokens", "-t",
+        default=None,
+        help="total input tokens (default: unknown)",
+    )
+    parser.add_argument(
+        "--cost", "-c",
+        default=None,
+        help='cost preference: "cheap", "normal", "no expense spared", "free" (default: normal)',
+    )
+
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument(
+        "--raw", "-r",
+        action="store_true",
+        help="output just the model alias (for scripting)",
+    )
+    output_group.add_argument(
+        "--model-flag", "-M",
+        action="store_true",
+        help='output "-m <model>" ready to splice into an llm command',
+    )
+    parser.add_argument(
+        "--selector", "-s",
+        default=None,
+        help="override the model used for the selection decision itself",
+    )
+    args = parser.parse_args()
+
+    machine_output = args.raw or args.model_flag
+
+    # Read question from stdin if piped, otherwise prompt
+    if args.question is None:
+        if not sys.stdin.isatty():
+            args.question = sys.stdin.read().strip()
+            if not args.question:
+                parser.error("no task provided")
+        else:
+            args.question = prompt_if_missing(
+                None, "Task", help_text="what do you need the model to do?"
+            )
+            if not args.question:
+                parser.error("no task provided")
+
+    args.tokens = prompt_if_missing(args.tokens, "Tokens", default="unknown")
+    args.cost = prompt_if_missing(args.cost, "Cost", default="normal",
+                                  help_text="cheap / normal / no expense spared / free")
+
+    # Build llm command
+    cmd = ["llm", "-t", TEMPLATE, "-p", "tokens", args.tokens, "-p", "cost", args.cost]
+    if args.selector:
+        cmd.extend(["-m", args.selector])
+
+    try:
+        result = subprocess.run(
+            cmd, input=args.question,
+            text=True, check=True,
+            stdout=subprocess.PIPE if machine_output else None,
+            stderr=subprocess.DEVNULL if machine_output else None,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"llm failed: {e.stderr.strip() if e.stderr else 'unknown error'}", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError:
+        print("Error: 'llm' not found. Install with: brew install llm", file=sys.stderr)
+        sys.exit(1)
+
+    if machine_output:
+        alias = extract_alias(result.stdout)
+        if not alias:
+            print("pick-model: could not parse model from response", file=sys.stderr)
+            sys.exit(1)
+
+        if args.model_flag:
+            # Resolve against installed models, preferring vendor-direct
+            installed = get_installed_models()
+            model_id, provider = resolve_model(alias, installed)
+            if provider:
+                print(f"-m {model_id}")
+            else:
+                # Not found in installed models; emit as-is and warn
+                print(f"-m {alias}")
+                print(f"pick-model: warning: '{alias}' not found in installed models", file=sys.stderr)
+        else:
+            print(alias)
+
+
+if __name__ == "__main__":
+    main()
