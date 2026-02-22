@@ -182,12 +182,17 @@ Plug 'dhruvasagar/vim-testify'
 " PGP you know me
 Plug 'jamessan/vim-gnupg', { 'branch' : 'main' }
 
-" A new Age - use age key from pass if available, otherwise fall back to gpg
-let s:age_key = trim(system('a-pass age/almanack-priv 2>/dev/null'))
-if s:age_key =~# '^AGE-SECRET-KEY'
-  let g:md_age_identity = '-i <(a-pass age/almanack-priv)'
+" A new Age - use age key from pass if $ALMANACK_ROOT is set, otherwise fall back to gpg
+if exists('$ALMANACK_ROOT')
+  let s:pass_cmd = 'PASSWORD_STORE_DIR=' . $ALMANACK_ROOT . '/secrets/ pass age/almanack-priv'
+  let s:age_key = trim(system(s:pass_cmd . ' 2>/dev/null'))
+  if s:age_key =~# '^AGE-SECRET-KEY' || s:age_key =~# '^-----BEGIN OPENSSH PRIVATE KEY-----'
+    let g:md_age_identity = '-i <(' . s:pass_cmd . ')'
+  else
+    let g:md_age_identity = '-j gpg'
+  endif
 else
-  let g:md_age_identity = '-g gpg'
+  let g:md_age_identity = '-j gpg'
 endif
 
 " Dirty Emacs Experimentation
