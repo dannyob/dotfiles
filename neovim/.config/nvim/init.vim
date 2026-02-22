@@ -174,6 +174,7 @@ Plug 'vim-scripts/utl.vim'
 Plug 'gioele/vim-autoswap'
 Plug 'unblevable/quick-scope'
 Plug 'mbbill/undotree'
+Plug 'dannyob/hutt', { 'rtp': 'nvim' }
 
 " Testing
 Plug 'dhruvasagar/vim-testify'
@@ -208,6 +209,10 @@ Plug 'junegunn/rainbow_parentheses.vim'
 call plug#end()
 
 " Plugin Setup
+
+" dannyob/hutt compose integration
+lua pcall(function() require('hutt').setup() end)
+
 " jpalardy/vim-slime
 " see slime-kitty
 let g:slime_target = "neovim"
