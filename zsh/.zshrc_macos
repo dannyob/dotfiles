@@ -75,6 +75,41 @@ dob-chrome-rdp() {
   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir=$HOME/Private/rdp-chrome/
 }
 
+# c/o https://www.samuelliedtke.com/blog/til-convert-markdown-to-rich-text-and-copy-to-clipboard-on-macos
+function md2rich() {
+  # Detect if input is piped; otherwise, use clipboard content
+  if [ -p /dev/stdin ]; then
+    input=$(cat)
+  else
+    input=$(pbpaste)
+  fi
+
+  # Convert Markdown to HTML
+  html=$(echo "$input" | pandoc -f markdown -t html)
+
+  # Optional: Pretty print Markdown
+  echo "Pretty printed Markdown:"
+  echo "------------------------"
+  if command -v rich >/dev/null 2>&1; then
+    echo "$input" | rich - -m
+  else
+    echo "$input"
+  fi
+  echo "------------------------"
+
+  # Convert HTML to hex string
+  hex=$(echo -n "$html" | hexdump -ve '1/1 "%.2x"')
+
+  # Prepare AppleScript to set clipboard with HTML data
+  applescript_cmd=$(printf 'set the clipboard to {text:" ", «class HTML»:«data HTML%s»}' "$hex")
+
+  # Execute AppleScript
+  echo "$applescript_cmd" | osascript -
+
+  # Notify user
+  echo "Rich text has been copied to the clipboard. ✨"
+}
+
 alias acorn='open -a Acorn'
 
 ###
