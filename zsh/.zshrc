@@ -3,6 +3,18 @@ declare -x SHORTHOST=${SHORTHOST:=$(hostname -s)}
 [[ $SHORTHOST == *.local ]] && SHORTHOST=${SHORTHOST%.local}
 
 ###
+# Editor
+###
+if (( $+commands[nvim] )); then
+    export EDITOR=nvim
+elif (( $+commands[vim] )); then
+    export EDITOR=vim
+else
+    export EDITOR=vi
+fi
+export VISUAL=$EDITOR
+
+###
 # Me!
 ###
 declare -x DEBEMAIL=danny@spesh.com
@@ -590,6 +602,8 @@ export WASMER_DIR="$HOME/.wasmer"
 [[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]] && export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/
 
 export PATH="$HOME/.local/bin:$PATH"
+
+source $HOME/.zshrc-private
 
 # Theme setup
 command -v theme.sh >/dev/null 2>&1 && theme.sh "${THEMESH:-zaibatsu}"
