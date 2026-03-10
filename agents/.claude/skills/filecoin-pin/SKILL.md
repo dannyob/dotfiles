@@ -1,11 +1,15 @@
 ---
 name: filecoin-pin
 description: Use when storing files or CAR files on Filecoin, setting up wallets for Filecoin storage, checking storage status, managing storage providers, or using the filecoin-pin CLI. Also use when user mentions Filecoin pinning, PDP proofs, or USDFC payments for storage.
+license: Apache-2.0 OR MIT
+metadata:
+  author: filecoin-project
+  version: "0.18"
 ---
 
 # Filecoin Pin CLI
 
-Store files on Filecoin with verifiable proofs via the `filecoin-pin` CLI. Credentials stored in `pass`.
+Store files on Filecoin with verifiable proofs via the `filecoin-pin` CLI.
 
 ## Quick Reference
 
@@ -17,13 +21,18 @@ Store files on Filecoin with verifiable proofs via the `filecoin-pin` CLI. Crede
 | Payment status | `filecoin-pin payments status` |
 | List data sets | `filecoin-pin data-set ls` |
 | Inspect data set | `filecoin-pin data-set show <id>` |
+| Terminate data set | `filecoin-pin data-set terminate <id>` |
 | List providers | `filecoin-pin provider list` |
-| Store on specific SP | `filecoin-pin import <file> --provider-id <id>` |
+| Store on specific SPs | `filecoin-pin import <file> --provider-ids 1,4` |
 
-All commands need `PRIVATE_KEY` in env. Load with:
+All commands need `PRIVATE_KEY` in env. Load it from your secret store:
 
 ```bash
-export PRIVATE_KEY=$(pass filecoin-pin/calibnet/private-key)
+# Examples — use whichever secret manager your environment provides:
+export PRIVATE_KEY=$(pass filecoin-pin/calibnet/private-key)          # pass (Unix)
+export PRIVATE_KEY=$(op read "op://Vault/filecoin-pin/private-key")   # 1Password CLI
+export PRIVATE_KEY=$(security find-generic-password -s filecoin-pin -w) # macOS Keychain
+export PRIVATE_KEY=$(vault kv get -field=key secret/filecoin-pin)     # HashiCorp Vault
 ```
 
 ## First-Time Setup
@@ -34,7 +43,9 @@ export PRIVATE_KEY=$(pass filecoin-pin/calibnet/private-key)
 cast wallet new
 ```
 
-### 2. Store credentials in pass
+### 2. Store credentials
+
+Save the private key and wallet address in your preferred secret manager. For example, with `pass`:
 
 ```bash
 echo '0x...' | pass insert -e filecoin-pin/calibnet/private-key
@@ -49,7 +60,7 @@ echo '0x...' | pass insert -e filecoin-pin/calibnet/wallet-address
 ### 4. Setup payments
 
 ```bash
-export PRIVATE_KEY=$(pass filecoin-pin/calibnet/private-key)
+export PRIVATE_KEY=<load from your secret store>
 filecoin-pin payments setup --auto
 ```
 
@@ -63,35 +74,51 @@ filecoin-pin add myfile.txt --auto-fund
 filecoin-pin import myfile.car --auto-fund
 ```
 
-## Redundancy (Multiple Providers)
+## Redundancy (Multiple Copies)
 
-List available providers, then upload to a specific one:
+By default, `add` and `import` create **2 copies** across different storage providers for durability. Each copy is independently verified on-chain. Data is only uploaded once regardless of copy count.
 
 ```bash
+# Default: 2 copies across different providers
+filecoin-pin add myfile.txt --auto-fund
+
+# Explicit copy count
+filecoin-pin add myfile.txt --auto-fund --count 3
+
+# Single copy (no redundancy)
+filecoin-pin import myfile.car --auto-fund --count 1
+
+# Target specific providers (comma-separated)
+filecoin-pin import myfile.car --auto-fund --provider-ids 1,4
+
+# Target existing data sets (comma-separated)
+filecoin-pin import myfile.car --auto-fund --data-set-ids 10,20
+
+# List available providers
 filecoin-pin provider list
-filecoin-pin import myfile.car --auto-fund --provider-id 4
 ```
 
-Each upload to a different provider creates a separate data set.
+Note: `--provider-ids` and `--data-set-ids` are mutually exclusive. The old `--provider-id` (singular) still works for single-provider override.
 
-## Pass Storage Layout
+## Credential Storage
+
+Keep private keys out of shell history and dotfiles. Use a secret manager and load into env only when needed. Suggested layout (adapt paths to your tool):
 
 ```
 filecoin-pin/calibnet/
   private-key       # 0x... wallet private key
   wallet-address    # 0x... wallet address
   data-set-id       # First data set ID
-  data-set-id-2     # Second data set ID (if redundant)
   piece-cid         # Piece CID from upload
   root-cid          # IPFS root CID
 ```
 
 ## Networks
 
-Default is `calibration` (testnet). For mainnet: `--network mainnet` or `--mainnet`.
+Default is `calibration` (testnet). For mainnet: `--network mainnet` or `--mainnet`. For local devnet: `--network devnet`.
 
 ## Common Issues
 
 - **"No USDFC tokens found"**: USDFC faucet transaction hasn't confirmed yet. Wait ~30s and retry.
-- **Auth errors**: `PRIVATE_KEY` env var not set. Reload from pass.
+- **Auth errors**: `PRIVATE_KEY` env var not set. Reload from your secret store.
 - **Global CLI outdated**: `npm i -g filecoin-pin@latest`
