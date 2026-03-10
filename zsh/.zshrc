@@ -3,18 +3,6 @@ declare -x SHORTHOST=${SHORTHOST:=$(hostname -s)}
 [[ $SHORTHOST == *.local ]] && SHORTHOST=${SHORTHOST%.local}
 
 ###
-# Editor
-###
-if (( $+commands[nvim] )); then
-    export EDITOR=nvim
-elif (( $+commands[vim] )); then
-    export EDITOR=vim
-else
-    export EDITOR=vi
-fi
-export VISUAL=$EDITOR
-
-###
 # Me!
 ###
 declare -x DEBEMAIL=danny@spesh.com
@@ -463,6 +451,18 @@ if [[ "$OSTYPE" == darwin* ]]; then
 else
     [[ -f ~/.zshrc_linux ]] && source ~/.zshrc_linux
 fi
+
+###
+# Editor (after platform config so homebrew nvim is in PATH)
+###
+if (( $+commands[nvim] )); then
+    export EDITOR=nvim
+elif (( $+commands[vim] )); then
+    export EDITOR=vim
+else
+    export EDITOR=vi
+fi
+export VISUAL=$EDITOR
 
 ###
 # GPG/SSH agent setup (after platform config so gpgconf is in PATH)
