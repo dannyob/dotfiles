@@ -4,6 +4,9 @@
 
 # Homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# imagemagick-full (homebrew keg-only)
+[[ -d /opt/homebrew/opt/imagemagick-full/bin ]] && export PATH="/opt/homebrew/opt/imagemagick-full/bin:$PATH"
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
 fi
