@@ -1,0 +1,395 @@
+#compdef llm
+
+# Hand-written zsh completion for the `llm` CLI (Simon Willison's llm).
+# The Click auto-generated completion does not work because llm uses
+# click_default_group.DefaultGroup, which breaks Click's get_completions.
+# So we drive completion ourselves, pulling models/templates dynamically
+# from `llm models list` and `llm templates list`.
+
+_llm_models() {
+    local -a models
+    models=( ${(f)"$(command llm models list 2>/dev/null \
+        | sed -E 's/^[^:]+: //; s/ \(aliases: /,/; s/\)$//; s/, /,/g' \
+        | tr ',' '\n' | sed '/^$/d')"} )
+    _wanted models expl 'model' compadd -a models
+}
+
+_llm_templates() {
+    local -a templates
+    templates=( ${(f)"$(command llm templates list 2>/dev/null \
+        | awk -F: '{sub(/[ \t]+$/, "", $1); print $1}')"} )
+    _wanted templates expl 'template' compadd -a templates
+}
+
+_llm_tools() {
+    local -a tools
+    tools=( ${(f)"$(command llm tools list 2>/dev/null \
+        | awk '/^[a-zA-Z_]/ {print $1}')"} )
+    _wanted tools expl 'tool' compadd -a tools
+}
+
+# Fragments accept: loader prefix (e.g. github:, docs:), a saved alias,
+# a hash, or a file path. Loader prefixes come from `llm fragments loaders`.
+_llm_fragments() {
+    local -a loaders aliases
+    loaders=( ${(f)"$(command llm fragments loaders 2>/dev/null \
+        | awk '/^[a-z][a-z0-9_-]*:$/ {print}')"} )
+    aliases=( ${(f)"$(command llm fragments list 2>/dev/null \
+        | awk '/^  aliases:/ && !/\[\]/ {
+                  sub(/^  aliases: */, "")
+                  gsub(/[][,]/, " ")
+                  for (i = 1; i <= NF; i++) print $i
+              }')"} )
+    _alternative \
+        "loaders:loader prefix:compadd -S '' -- ${(j: :)loaders}" \
+        "aliases:fragment alias:compadd -a aliases" \
+        'files:file:_files'
+}
+
+# Just the saved alias names (for `fragments show/remove`).
+_llm_fragment_aliases() {
+    local -a aliases
+    aliases=( ${(f)"$(command llm fragments list 2>/dev/null \
+        | awk '/^  aliases:/ && !/\[\]/ {
+                  sub(/^  aliases: */, "")
+                  gsub(/[][,]/, " ")
+                  for (i = 1; i <= NF; i++) print $i
+              }')"} )
+    _wanted aliases expl 'fragment alias' compadd -a aliases
+}
+
+_llm_aliases() {
+    local -a aliases
+    aliases=( ${(f)"$(command llm aliases list 2>/dev/null | awk '{print $1}')"} )
+    _wanted aliases expl 'alias' compadd -a aliases
+}
+
+_llm_keys() {
+    local -a keys
+    keys=( ${(f)"$(command llm keys list 2>/dev/null)"} )
+    _wanted keys expl 'key name' compadd -a keys
+}
+
+_llm_schema_ids() {
+    local -a ids
+    ids=( ${(f)"$(command llm schemas list 2>/dev/null | awk '/^- id:/ {print $3}')"} )
+    _wanted schemas expl 'schema id' compadd -a ids
+}
+
+_llm_collections() {
+    local -a colls
+    colls=( ${(f)"$(command llm collections list 2>/dev/null \
+        | awk '/^- name:/ {print $3}')"} )
+    _wanted collections expl 'collection' compadd -a colls
+}
+
+_llm_embed_models() {
+    local -a models
+    models=( ${(f)"$(command llm embed-models list 2>/dev/null \
+        | sed -E 's/^[^:]+: //; s/ \(aliases: /,/; s/\)$//; s/, /,/g' \
+        | tr ',' '\n' | sed '/^$/d')"} )
+    _wanted models expl 'embedding model' compadd -a models
+}
+
+_llm_plugin_names() {
+    local -a plugs
+    plugs=( ${(f)"$(command llm plugins 2>/dev/null \
+        | python3 -c 'import json,sys; print("\n".join(p["name"] for p in json.load(sys.stdin)))' 2>/dev/null)"} )
+    _wanted plugins expl 'plugin' compadd -a plugs
+}
+
+_llm_subcommands() {
+    local -a cmds
+    cmds=(
+        'prompt:Execute a prompt'
+        'chat:Hold an ongoing chat with a model'
+        'aliases:Manage model aliases'
+        'cmd:Generate and execute shell commands'
+        'collections:Manage collections of embeddings'
+        'embed:Embed text and store or return the result'
+        'embed-models:Manage available embedding models'
+        'embed-multi:Store embeddings for multiple strings at once'
+        'fragments:Manage stored fragments'
+        'install:Install packages into the LLM environment'
+        'keys:Manage stored API keys'
+        'logs:Explore logged prompts and responses'
+        'models:Manage available models'
+        'plugins:List installed plugins'
+        'schemas:Manage stored schemas'
+        'similar:Return top N similar IDs from a collection'
+        'templates:Manage stored prompt templates'
+        'tools:Manage tools available to models'
+        'uninstall:Uninstall packages from the LLM environment'
+    )
+    _describe -t commands 'llm command' cmds
+}
+
+# Options shared between top-level (default `prompt`) and explicit `prompt`/`chat`.
+_llm_prompt_options=(
+    '(-s --system)'{-s,--system}'[System prompt to use]:prompt'
+    '(-m --model)'{-m,--model}'[Model to use]:model:_llm_models'
+    '(-d --database)'{-d,--database}'[Path to log database]:file:_files'
+    '(-q --query)'{-q,--query}'[Use first model matching these strings]:query'
+    '*'{-a,--attachment}'[Attachment path, URL, or -]:attachment:_files'
+    '*--at[Attachment with explicit mimetype]:file:_files:mimetype:'
+    '*--attachment-type[Attachment with explicit mimetype]:file:_files:mimetype:'
+    '*'{-T,--tool}'[Tool to make available to the model]:tool:_llm_tools'
+    '*--functions[Python code/file defining tool functions]:code'
+    '(--td --tools-debug)'{--td,--tools-debug}'[Show full details of tool executions]'
+    '(--ta --tools-approve)'{--ta,--tools-approve}'[Manually approve every tool execution]'
+    '(--cl --chain-limit)'{--cl,--chain-limit}'[Chained tool response limit (0 = unlimited)]:n'
+    '*'{-o,--option}'[Model option key/value]:key: :value'
+    '*--schema[JSON schema, filepath, or ID]:schema:_llm_schema_ids'
+    '*--schema-multi[JSON schema for multiple results]:schema:_llm_schema_ids'
+    '*'{-f,--fragment}'[Fragment to add to the prompt]:fragment:_llm_fragments'
+    '*'{--sf,--system-fragment}'[Fragment to add to system prompt]:fragment:_llm_fragments'
+    '(-t --template)'{-t,--template}'[Template to use]:template:_llm_templates'
+    '*'{-p,--param}'[Template parameter]:name: :value'
+    '--no-stream[Do not stream output]'
+    '(-n --no-log)'{-n,--no-log}'[Do not log to database]'
+    '--log[Log prompt and response to the database]'
+    '(-c --continue)'{-c,--continue}'[Continue the most recent conversation]'
+    '(--cid --conversation)'{--cid,--conversation}'[Continue conversation with given ID]:cid'
+    '*--key[API key to use]:key'
+    '--save[Save prompt with this template name]:name'
+    '--async[Run prompt asynchronously]'
+    '(-u --usage)'{-u,--usage}'[Show token usage]'
+    '(-x --extract)'{-x,--extract}'[Extract first fenced code block]'
+    '(--xl --extract-last)'{--xl,--extract-last}'[Extract last fenced code block]'
+    '(- *)'{-h,--help}'[Show help and exit]'
+)
+
+_llm() {
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    _arguments -C \
+        '(- *)--version[Show version and exit]' \
+        $_llm_prompt_options \
+        '1: :->cmd_or_prompt' \
+        '*::arg:->args'
+
+    case $state in
+        cmd_or_prompt)
+            _llm_subcommands
+            ;;
+        args)
+            case $words[1] in
+                prompt|chat)
+                    _arguments $_llm_prompt_options
+                    ;;
+                models)
+                    _arguments \
+                        '1:subcommand:(list default options)' \
+                        '*: :->models_args'
+                    case $state in
+                        models_args)
+                            case $words[2] in
+                                default) _arguments '1:model:_llm_models' ;;
+                                options)
+                                    _arguments \
+                                        '1:subcommand:(list show set clear)' \
+                                        '*: :->options_args'
+                                    case $state in
+                                        options_args)
+                                            case $words[3] in
+                                                show|clear) _arguments '1:model:_llm_models' ;;
+                                                set) _arguments '1:model:_llm_models' '2:key' '3:value' ;;
+                                            esac
+                                            ;;
+                                    esac
+                                    ;;
+                                list) _arguments '*'{-m,--model}'[Filter by model]:model:_llm_models' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                templates)
+                    _arguments \
+                        '1:subcommand:(list show edit path loaders)' \
+                        '*: :->templates_args'
+                    case $state in
+                        templates_args)
+                            case $words[2] in
+                                show|edit) _arguments '1:template:_llm_templates' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                logs)
+                    _arguments \
+                        '1:subcommand:(list path on off status backup)' \
+                        '*: :->logs_args'
+                    case $state in
+                        logs_args)
+                            case $words[2] in
+                                list)
+                                    _arguments \
+                                        '(-n --count)'{-n,--count}'[Number of entries]:n' \
+                                        '(-m --model)'{-m,--model}'[Filter by model]:model:_llm_models' \
+                                        '(-q --query)'{-q,--query}'[Search query]:query' \
+                                        '(-c --current)'{-c,--current}'[Current conversation only]' \
+                                        '--cid[Conversation ID]:cid' \
+                                        '(-r --response)'{-r,--response}'[Just last response]' \
+                                        '(-x --extract)'{-x,--extract}'[Extract first fenced block]' \
+                                        '(-u --usage)'{-u,--usage}'[Show token usage]' \
+                                        '(-t --truncate)'{-t,--truncate}'[Truncate long strings]' \
+                                        '--json[JSON output]' \
+                                        '--schema[Filter by schema]:schema:_llm_schema_ids' \
+                                        '--data[Show structured data]' \
+                                        '--data-key[Data key]:key' \
+                                        '--data-array[Output JSON array]' \
+                                        '(-d --database)'{-d,--database}'[Database file]:file:_files'
+                                    ;;
+                                backup) _arguments '1:backup file:_files' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                keys)
+                    _arguments \
+                        '1:subcommand:(list path get set)' \
+                        '*: :->keys_args'
+                    case $state in
+                        keys_args)
+                            case $words[2] in
+                                get|set) _arguments '1:key name:_llm_keys' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                aliases)
+                    _arguments \
+                        '1:subcommand:(list path set remove)' \
+                        '*: :->aliases_args'
+                    case $state in
+                        aliases_args)
+                            case $words[2] in
+                                set) _arguments '1:alias' '2:model:_llm_models' ;;
+                                remove) _arguments '1:alias:_llm_aliases' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                fragments)
+                    _arguments \
+                        '1:subcommand:(list loaders set show remove)' \
+                        '*: :->fragments_args'
+                    case $state in
+                        fragments_args)
+                            case $words[2] in
+                                set) _arguments '1:alias' '2:fragment:_llm_fragments' ;;
+                                show) _arguments '1:alias or hash:_llm_fragment_aliases' ;;
+                                remove) _arguments '1:alias:_llm_fragment_aliases' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                schemas)
+                    _arguments \
+                        '1:subcommand:(list show dsl)' \
+                        '*: :->schemas_args'
+                    case $state in
+                        schemas_args)
+                            case $words[2] in
+                                show) _arguments '1:schema id:_llm_schema_ids' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                tools)
+                    _arguments \
+                        '1:subcommand:(list)'
+                    ;;
+                collections)
+                    _arguments \
+                        '1:subcommand:(list delete path)' \
+                        '*: :->collections_args'
+                    case $state in
+                        collections_args)
+                            case $words[2] in
+                                delete) _arguments '1:collection:_llm_collections' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                embed)
+                    _arguments \
+                        '(-m --model)'{-m,--model}'[Embedding model]:model:_llm_embed_models' \
+                        '(-i --input)'{-i,--input}'[File to embed]:file:_files' \
+                        '(-c --content)'{-c,--content}'[Content to embed]:content' \
+                        '--store[Store text in database]' \
+                        '--binary[Treat input as binary]' \
+                        '--metadata[JSON metadata]:json' \
+                        '(-f --format)'{-f,--format}'[Output format]:format:(json blob base64 hex)' \
+                        '(-d --database)'{-d,--database}'[Database file]:file:_files' \
+                        '1:collection:_llm_collections' \
+                        '2:id'
+                    ;;
+                embed-multi)
+                    _arguments \
+                        '(-m --model)'{-m,--model}'[Embedding model]:model:_llm_embed_models' \
+                        '--format[Input format]:format:(json csv tsv nl)' \
+                        '--store[Store text in database]' \
+                        '--prefix[ID prefix]:prefix' \
+                        '--prepend[String to prepend]:prefix' \
+                        '(-d --database)'{-d,--database}'[Database file]:file:_files' \
+                        '1:collection:_llm_collections' \
+                        '2:input file:_files'
+                    ;;
+                'embed-models')
+                    _arguments \
+                        '1:subcommand:(list default)' \
+                        '*: :->embed_models_args'
+                    case $state in
+                        embed_models_args)
+                            case $words[2] in
+                                default) _arguments '1:model:_llm_embed_models' ;;
+                                list) _arguments '(-q --query)'{-q,--query}'[Filter by query]:query' ;;
+                            esac
+                            ;;
+                    esac
+                    ;;
+                similar)
+                    _arguments \
+                        '(-i --input)'{-i,--input}'[File to embed for comparison]:file:_files' \
+                        '(-c --content)'{-c,--content}'[Content to embed]:content' \
+                        '--binary[Treat input as binary]' \
+                        '(-n --number)'{-n,--number}'[Number of results]:n' \
+                        '(-p --plain)'{-p,--plain}'[Plain text output]' \
+                        '(-d --database)'{-d,--database}'[Database file]:file:_files' \
+                        '--prefix[Filter IDs by prefix]:prefix' \
+                        '1:collection:_llm_collections' \
+                        '2:id'
+                    ;;
+                plugins)
+                    _arguments \
+                        '--all[Include built-in plugins]' \
+                        '--hook[Filter by hook name]:hook'
+                    ;;
+                install)
+                    _arguments \
+                        '(-U --upgrade)'{-U,--upgrade}'[Upgrade packages]' \
+                        '(-e --editable)'{-e,--editable}'[Install editable from path]:path:_files -/' \
+                        '--force-reinstall[Reinstall even if up-to-date]' \
+                        '--no-cache-dir[Disable cache]' \
+                        '--pre[Include pre-release versions]' \
+                        '*:package'
+                    ;;
+                uninstall)
+                    _arguments \
+                        '(-y --yes)'{-y,--yes}'[Skip confirmation]' \
+                        '*:package:_llm_plugin_names'
+                    ;;
+                cmd)
+                    # llm-cmd plugin: free-form command request
+                    ;;
+                *)
+                    _files
+                    ;;
+            esac
+            ;;
+    esac
+}
+
+_llm "$@"

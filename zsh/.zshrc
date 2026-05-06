@@ -561,6 +561,11 @@ EOF
 fi
 
 ###
+# Local zsh completions (~/.local/share/zsh/site-functions/)
+###
+fpath=(~/.local/share/zsh/site-functions "${fpath[@]}")
+
+###
 # PLUGINS (zsh_unplugged)
 ###
 ZPLUGINDIR=${ZPLUGINDIR:-${HOME}/.config/zsh/plugins}
