@@ -473,6 +473,77 @@ case "${OSTYPE}" in
 esac
 
 ###
+# llm plugin management (uv tool-based)
+###
+# Update llm and reinstall plugins via `uv tool`.
+# Any plugin currently installed editable is re-applied via --with-editable
+# from its own metadata, so its source path is preserved automatically.
+# llm-uv-tool is excluded so we don't reinstate the wrapper.
+# Extra args are added as `--with <pkg>` to install new plugins.
+function dob-update-llm-plugins {
+    local llm_python="$(uv tool dir)/llm/bin/python"
+
+    echo "Discovering editable plugins..."
+    local editable_paths
+    editable_paths=$("$llm_python" <<'PY'
+import json
+from importlib.metadata import distributions
+for dist in distributions():
+    name = dist.metadata["Name"]
+    if not name:
+        continue
+    src = None
+    direct_url = dist._path / "direct_url.json"
+    if direct_url.exists():
+        try:
+            info = json.loads(direct_url.read_text())
+            if info.get("dir_info", {}).get("editable"):
+                src = info["url"].removeprefix("file://")
+        except Exception:
+            pass
+    elif dist._path.name.endswith(".egg-info"):
+        candidate = dist._path.parent.resolve()
+        if (candidate / "pyproject.toml").exists() or (candidate / "setup.py").exists():
+            src = str(candidate)
+    if src:
+        print(f"{name}\t{src}")
+PY
+    )
+
+    echo "Discovering currently installed plugins..."
+    local plugins
+    plugins=$(llm plugins | jq -r '.[].name' | grep -vE '^(llm-uv-tool)$')
+
+    echo "Reinstalling llm with all plugins..."
+    local args=(uv tool install --force llm)
+
+    # Track which plugins are editable so we don't double-add them as --with.
+    # Note: avoid the name `path` here — in zsh it is tied to $PATH.
+    local -A editable_map
+    while IFS=$'\t' read -r pkg src; do
+        [[ -n "$pkg" ]] && editable_map[$pkg]="$src"
+    done <<< "$editable_paths"
+
+    for pkg src in "${(@kv)editable_map}"; do
+        echo "  editable: $pkg -> $src"
+        args+=(--with-editable "$src")
+    done
+
+    while IFS= read -r plugin; do
+        [[ -n "$plugin" && -z "${editable_map[$plugin]}" ]] && args+=(--with "$plugin")
+    done <<< "$plugins"
+
+    for plugin in "$@"; do
+        args+=(--with "$plugin")
+    done
+
+    "${args[@]}"
+
+    echo "Done. Current plugins:"
+    llm plugins
+}
+
+###
 # Platform-specific configuration
 ###
 if [[ "$OSTYPE" == darwin* ]]; then

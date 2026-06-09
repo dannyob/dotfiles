@@ -55,24 +55,6 @@ function dob-toplink {
   echo "[$title]($url)"
 }
 
-# Update llm and reinstall plugins after homebrew upgrade
-function dob-update-llm-plugins {
-    echo "Getting current plugins..."
-    local plugins=$(llm plugins | jq -r '.[].name')
-
-    echo "Updating llm..."
-    brew upgrade llm
-
-    echo "Reinstalling plugins..."
-    echo $plugins | while read plugin; do
-        echo "Installing $plugin..."
-        llm install -U $plugin
-    done
-
-    echo "Done! Current plugins:"
-    llm plugins
-}
-
 # Launch Chrome with remote debugging
 dob-chrome-rdp() {
   /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 --user-data-dir=$HOME/Private/rdp-chrome/
