@@ -11,7 +11,7 @@ dependencies = [
 {{PROJECT_NAME}} = "{{PACKAGE_NAME}}.cli:cli"
 
 [build-system]
-requires = ["uv_build>=0.9.6,<0.10.0"]
+requires = ["uv_build>=0.9.6,<0.14"]
 build-backend = "uv_build"
 
 [tool.pytest.ini_options]
