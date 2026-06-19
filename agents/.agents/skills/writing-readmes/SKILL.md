@@ -62,7 +62,7 @@ A `## Features` section before any demo is a red flag - delete it and let the de
 
 ## Anti-Patterns Specific to READMEs
 
-For prose-level AI tells (em-dashes, "delve," negative parallelism, bold-first bullets), see `~/.claude/TROPES.md`. The list below is the README-specific layer on top of those.
+For prose-level AI tells (em-dashes, "delve," negative parallelism, bold-first bullets), see the bundled `assets/TROPES.md` (latest at <https://tropes.fyi/>). The list below is the README-specific layer on top of those.
 
 - **Adjective-stack opening** - "A powerful, modern, comprehensive solution for..." → say what it does instead
 - **Features section before any demo** - delete or move below Quickstart
@@ -162,4 +162,4 @@ Two READMEs are bundled in `examples/` next to this skill, each with a header an
 - **examples/uv-README.md** - one-sentence positioning, demo before features, concrete numeric claims ("10-100x faster than pip") instead of adjectives, named positioning against alternatives.
 - **examples/htmx-README.md** - voice over polish, motivation as specific questions, paste-and-run quickstart, honest aside about a wrongly-named package, dry "they are all OK" tone, ends with a haiku.
 
-For the prose-level AI tells underneath all of this (em-dashes, "delve," negative parallelism, bold-first bullets), see `~/.claude/TROPES.md`.
+For the prose-level AI tells underneath all of this (em-dashes, "delve," negative parallelism, bold-first bullets), see the bundled `assets/TROPES.md` (latest at <https://tropes.fyi/>).
