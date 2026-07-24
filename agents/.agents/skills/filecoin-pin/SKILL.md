@@ -68,11 +68,15 @@ filecoin-pin payments setup --auto
 
 ```bash
 # File or directory (wraps in UnixFS CAR automatically)
-filecoin-pin add myfile.txt --auto-fund
+filecoin-pin add myfile.txt --network calibration --auto-fund
 
 # Pre-built CAR file (preserves existing CID/structure)
-filecoin-pin import myfile.car --auto-fund
+filecoin-pin import myfile.car --network calibration --auto-fund
 ```
+
+The rest of this skill's examples omit `--network` for brevity, but the CLI
+default is mainnet — see the Networks note below and add `--network calibration`
+for any testnet run.
 
 ## Redundancy (Multiple Copies)
 
@@ -115,7 +119,17 @@ filecoin-pin/calibnet/
 
 ## Networks
 
-Default is `calibration` (testnet). For mainnet: `--network mainnet` or `--mainnet`. For local devnet: `--network devnet`.
+As of CLI v1.1.1 the default network is **`mainnet`**, which spends real FIL and
+USDFC. Always pass `--network calibration` explicitly for testnet work; do not
+rely on the default. (`filecoin-pin payments status` with no `--network` reports
+mainnet.) For local devnet: `--network devnet`.
+
+## Auto-fund
+
+`--auto-fund` deposits USDFC into Filecoin Pay without a confirmation prompt to
+cover the upload's runway (e.g. a small file can trigger a ~2.4 USDFC deposit).
+On mainnet that is real money. Omit the flag to fund manually, or check the
+projected cost with `filecoin-pin payments status` first.
 
 ## Common Issues
 
