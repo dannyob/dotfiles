@@ -1,0 +1,170 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = []
+# ///
+"""Open Gmail messages in Superhuman.
+
+Superhuman's own "copy link" builder is:
+
+    https://mail.superhuman.com/search/rfc822msgid:<urlencoded RFC822 Message-ID>
+
+and the desktop app registers the `superhuman://` scheme, mapping
+`superhuman://<path>` onto the same web path. So all we need is the RFC822
+Message-ID of a mail, which gog can dig out of Gmail.
+
+Targets can be:
+
+  * an RFC822 message-id     <CAF...@mail.gmail.com>   (used as-is)
+  * a Gmail thread/message id  19f95deca01f2db3        (resolved via gog)
+  * anything else                from:jane newer_than:2d
+                               (treated as a Gmail search query)
+
+Examples:
+
+    superhuman-open 'from:jane@example.com newer_than:7d'
+    superhuman-open --max 5 --print 'is:unread subject:invoice'
+    gog --readonly gmail search 'newer_than:1d' --json |
+        jq -r '.threads[].id' | xargs superhuman-open
+"""
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.parse
+
+GMAIL_ID = re.compile(r"^[0-9a-f]{12,20}$")
+KEYRING_PASS_ENTRY = "gogcli/keyring-passphrase"
+
+
+GOG_ENV = None    # augmented environment, once we know we need one
+PASS_TRIED = False  # don't nag pass/gpg again if it didn't work the first time
+
+
+def needs_passphrase(stderr):
+    return "GOG_KEYRING_PASSWORD" in stderr or "keyring file backend" in stderr
+
+
+def passphrase_env():
+    """Only called if gog says its file keyring is locked."""
+    out = subprocess.run(["pass", "show", KEYRING_PASS_ENTRY],
+                         capture_output=True, text=True)
+    if out.returncode != 0 or not out.stdout.strip():
+        return None
+    return dict(os.environ, GOG_KEYRING_PASSWORD=out.stdout.splitlines()[0])
+
+
+def gog(args, account=None, quiet=False):
+    """Run gog, unlocking its keyring from pass only if gog asks us to.
+
+    On a machine where gog reaches its credentials by some other route (an
+    already-exported GOG_KEYRING_PASSWORD, the system keychain, a service
+    account) we never touch pass at all.
+    """
+    global GOG_ENV, PASS_TRIED
+    cmd = ["gog", "--readonly", "--no-input"]
+    if account:
+        cmd += ["--account", account]
+    cmd += args + ["--json"]
+    out = subprocess.run(cmd, capture_output=True, text=True, env=GOG_ENV)
+    if out.returncode != 0 and not PASS_TRIED and needs_passphrase(out.stderr):
+        PASS_TRIED = True
+        GOG_ENV = passphrase_env()
+        if GOG_ENV is None:
+            print(f"gog keyring is locked and `pass show {KEYRING_PASS_ENTRY}` "
+                  "failed; set GOG_KEYRING_PASSWORD", file=sys.stderr)
+            return None
+        out = subprocess.run(cmd, capture_output=True, text=True, env=GOG_ENV)
+    if out.returncode != 0:
+        if not quiet:
+            print(out.stderr.strip(), file=sys.stderr)
+        return None
+    try:
+        return json.loads(out.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def header(msg, name):
+    for h in msg.get("payload", {}).get("headers", []):
+        if h.get("name", "").lower() == name:
+            return h.get("value", "")
+    return ""
+
+
+def msgid_for_id(gmail_id, account=None):
+    """Message-ID for a Gmail thread id (last message) or message id."""
+    data = gog(["gmail", "thread", "get", gmail_id], account, quiet=True)
+    if data and data.get("thread", {}).get("messages"):
+        return header(data["thread"]["messages"][-1], "message-id")
+    data = gog(["gmail", "get", gmail_id, "--format", "metadata",
+                "--headers", "Message-ID"], account)
+    if data:
+        mid = data.get("headers", {}).get("message_id")
+        if mid:
+            return mid
+        return header(data.get("message", {}), "message-id")
+    return None
+
+
+def looks_like_msgid(target):
+    if target.startswith("<") and target.endswith(">"):
+        return True
+    # A Gmail query has spaces or an operator colon; a message-id has neither.
+    return "@" in target and not re.search(r"[\s:]", target)
+
+
+def resolve(target, account=None, max_results=1):
+    """Yield RFC822 message-ids for a target."""
+    if looks_like_msgid(target):
+        yield target
+    elif GMAIL_ID.match(target):
+        yield msgid_for_id(target, account)
+    else:
+        data = gog(["gmail", "search", target, "--max", str(max_results)], account)
+        for thread in (data or {}).get("threads", []):
+            yield msgid_for_id(thread["id"], account)
+
+
+def url_for(msgid, web=False):
+    msgid = msgid.strip().lstrip("<").rstrip(">")
+    quoted = urllib.parse.quote(msgid, safe="")
+    base = "https://mail.superhuman.com/" if web else "superhuman://"
+    return f"{base}search/rfc822msgid:{quoted}"
+
+
+def main():
+    p = argparse.ArgumentParser(
+        description="Open Gmail messages in Superhuman",
+        epilog="Targets: message-id, Gmail thread/message id, or Gmail search query.",
+    )
+    p.add_argument("target", nargs="+")
+    p.add_argument("-a", "--account", help="Google account for gog")
+    p.add_argument("-m", "--max", type=int, default=1,
+                   help="max search hits per query target (default 1)")
+    p.add_argument("-p", "--print", dest="print_only", action="store_true",
+                   help="print URLs instead of opening them")
+    p.add_argument("-w", "--web", action="store_true",
+                   help="use the https:// web link rather than the desktop app")
+    args = p.parse_args()
+
+    found = 0
+    for target in args.target:
+        for msgid in resolve(target, args.account, args.max):
+            if not msgid:
+                print(f"no Message-ID found for: {target}", file=sys.stderr)
+                continue
+            found += 1
+            url = url_for(msgid, args.web)
+            if args.print_only:
+                print(url)
+            else:
+                subprocess.run(["open", url], check=True)
+    return 0 if found else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,116 +1,209 @@
 ---
 name: gog
-description: Google Workspace CLI for Gmail, Calendar, Drive, Contacts, Sheets, and Docs.
-homepage: https://gogcli.sh
-metadata:
-  {
-    "openclaw":
-      {
-        "emoji": "🎮",
-        "requires": { "bins": ["gog"] },
-        "install":
-          [
-            {
-              "id": "brew",
-              "kind": "brew",
-              "formula": "steipete/tap/gogcli",
-              "bins": ["gog"],
-              "label": "Install gog (brew)",
-            },
-          ],
-      },
-  }
+description: "gog CLI: safe Google Workspace automation, JSON, auth, scoped reads/writes."
 ---
 
 # gog
 
-Use `gog` for Gmail/Calendar/Drive/Contacts/Sheets/Docs. Requires OAuth setup.
+Use `gog` when built-in Google connectors are missing a feature, when shell
+automation needs stable JSON, or when you need to inspect local Google auth
+state before acting.
 
-Setup (once)
+## Fast Path
 
-- `gog auth credentials /path/to/client_secret.json`
-- `gog auth add you@gmail.com --services gmail,calendar,drive,contacts,docs,sheets`
-- `gog auth list`
+```bash
+gog --version
+gog auth list --check --json --no-input
+gog auth doctor --check --json --no-input
+GOG_HELP=agent gog --help
+gog schema --json
+```
 
-Common commands
+`GOG_HELP=agent` makes root help emit a compact automation contract and common
+read-only recipes; commands and behavior stay unchanged. Machine output,
+non-interactive behavior, stable exit codes, command guards, and
+untrusted-content wrapping apply across the CLI. `schema` exposes command
+syntax, stable exit codes, and effective safety state for automation.
 
-- Gmail search: `gog gmail search 'newer_than:7d' --max 10`
-- Gmail messages search (per email, ignores threading): `gog gmail messages search "in:inbox from:ryanair.com" --max 20 --account you@example.com`
-- Gmail send (plain): `gog gmail send --to a@b.com --subject "Hi" --body "Hello"`
-- Gmail send (multi-line): `gog gmail send --to a@b.com --subject "Hi" --body-file ./message.txt`
-- Gmail send (stdin): `gog gmail send --to a@b.com --subject "Hi" --body-file -`
-- Gmail send (HTML): `gog gmail send --to a@b.com --subject "Hi" --body-html "<p>Hello</p>"`
-- Gmail draft: `gog gmail drafts create --to a@b.com --subject "Hi" --body-file ./message.txt`
-- Gmail send draft: `gog gmail drafts send <draftId>`
-- Gmail reply: `gog gmail send --to a@b.com --subject "Re: Hi" --body "Reply" --reply-to-message-id <msgId>`
-- Calendar list events: `gog calendar events <calendarId> --from <iso> --to <iso>`
-- Calendar create event: `gog calendar create <calendarId> --summary "Title" --from <iso> --to <iso>`
-- Calendar create with color: `gog calendar create <calendarId> --summary "Title" --from <iso> --to <iso> --event-color 7`
-- Calendar update event: `gog calendar update <calendarId> <eventId> --summary "New Title" --event-color 4`
-- Calendar show colors: `gog calendar colors`
-- Drive search: `gog drive search "query" --max 10`
-- Contacts: `gog contacts list --max 20`
-- Sheets get: `gog sheets get <sheetId> "Tab!A1:D10" --json`
-- Sheets update: `gog sheets update <sheetId> "Tab!A1:B2" --values-json '[["A","B"],["1","2"]]' --input USER_ENTERED`
-- Sheets append: `gog sheets append <sheetId> "Tab!A:C" --values-json '[["x","y","z"]]' --insert INSERT_ROWS`
-- Sheets clear: `gog sheets clear <sheetId> "Tab!A2:Z"`
-- Sheets metadata: `gog sheets metadata <sheetId> --json`
-- Docs export: `gog docs export <docId> --format txt --out /tmp/doc.txt`
-- Docs cat: `gog docs cat <docId>`
+For JSON output projection, `--fields` is accepted as an alias for `--select` on
+commands that do not define their own API field-mask `--fields`; commands with a
+local field-mask flag keep that command-specific meaning.
 
-Calendar Colors
+Pick the account explicitly for API work:
 
-- Use `gog calendar colors` to see all available event colors (IDs 1-11)
-- Add colors to events with `--event-color <id>` flag
-- Event color IDs (from `gog calendar colors` output):
-  - 1: #a4bdfc
-  - 2: #7ae7bf
-  - 3: #dbadff
-  - 4: #ff887c
-  - 5: #fbd75b
-  - 6: #ffb878
-  - 7: #46d6db
-  - 8: #e1e1e1
-  - 9: #5484ed
-  - 10: #51b749
-  - 11: #dc2127
+```bash
+gog --readonly --account user@example.com gmail search 'newer_than:7d' --json --wrap-untrusted
+```
 
-Email Formatting
+Prefer `--json --wrap-untrusted` for agent parsing when reading Google content.
+Human hints and progress should stay on stderr; stdout is for data.
 
-- Prefer plain text. Use `--body-file` for multi-paragraph messages (or `--body-file -` for stdin).
-- Same `--body-file` pattern works for drafts and replies.
-- `--body` does not unescape `\n`. If you need inline newlines, use a heredoc or `$'Line 1\n\nLine 2'`.
-- Use `--body-html` only when you need rich formatting.
-- HTML tags: `<p>` for paragraphs, `<br>` for line breaks, `<strong>` for bold, `<em>` for italic, `<a href="url">` for links, `<ul>`/`<li>` for lists.
-- Example (plain text via stdin):
+## Safety Rules
 
-  ```bash
-  gog gmail send --to recipient@example.com \
-    --subject "Meeting Follow-up" \
-    --body-file - <<'EOF'
-  Hi Name,
+- Do not print access tokens, refresh tokens, OAuth client secrets, or keyring
+  passwords.
+- If `GOG_KEYRING_PASSWORD` is provided by a shell startup file or service
+  environment, use the matching shell/entrypoint so `gog` can unlock the file
+  keyring non-interactively. Do not print the value.
+- In headless/service agents, verify the service environment, not just the login
+  shell. `GOG_KEYRING_BACKEND=file`, `GOG_KEYRING_PASSWORD`, and `HOME` must be
+  present in the process that launches `gog`.
+- Use `--no-input` in automation so auth/keyring prompts fail clearly.
+- Use `--dry-run` first where commands support it.
+- Use `--readonly` for tasks that must not mutate Google data; remove it only
+  for the exact write the user approved.
+- Destructive commands require `--force`; do not add it unless the user asked
+  for that exact mutation.
+- Use `--gmail-no-send` or `GOG_GMAIL_NO_SEND=1` unless sending mail is the
+  requested task.
+- For shared agent environments, prefer a baked readonly or agent-safe binary
+  from `docs/safety-profiles.md`.
 
-  Thanks for meeting today. Next steps:
-  - Item one
-  - Item two
+Runtime command guards:
 
-  Best regards,
-  Your Name
-  EOF
-  ```
+```bash
+gog --readonly --enable-commands gmail.search,gmail.get --gmail-no-send \
+  --account user@example.com gmail search 'from:example@example.com' --json
 
-- Example (HTML list):
-  ```bash
-  gog gmail send --to recipient@example.com \
-    --subject "Meeting Follow-up" \
-    --body-html "<p>Hi Name,</p><p>Thanks for meeting today. Here are the next steps:</p><ul><li>Item one</li><li>Item two</li></ul><p>Best regards,<br>Your Name</p>"
-  ```
+gog --enable-commands drive.ls,docs.cat --disable-commands drive.delete \
+  --account user@example.com drive ls --max 10 --json
+```
 
-Notes
+## Auth
 
-- Set `GOG_ACCOUNT=you@gmail.com` to avoid repeating `--account`.
-- For scripting, prefer `--json` plus `--no-input`.
-- Sheets values can be passed via `--values-json` (recommended) or as inline rows.
-- Docs supports export/cat/copy. In-place edits require a Docs API client (not in gog).
-- Confirm before sending mail or creating events.
-- `gog gmail search` returns one row per thread; use `gog gmail messages search` when you need every individual email returned separately.
+OAuth setup is partly interactive. An agent can inspect and diagnose it, but a
+human normally completes browser consent:
+
+```bash
+gog auth credentials list
+gog auth add user@example.com --services all-user --force-consent
+gog auth remove user@example.com
+```
+
+Default for existing human/user OAuth reauth: preserve broad service access.
+Before reauth, run `gog auth list --check --json --no-input` and inspect the
+account's existing `services`. When replacing an expired or revoked token, do
+not silently reduce scope; prefer `--services all-user --force-consent` unless
+the user explicitly asks for narrower scopes.
+
+Use narrow services only for throwaway/test accounts, service-specific bot
+accounts, explicit user requests, or scoped security experiments. Safety should
+normally be enforced at command time with `--enable-commands`,
+`--disable-commands`, `--gmail-no-send`, dry-runs, and account selection, not by
+under-scoping durable user auth.
+
+Service accounts are Workspace-only and mainly fit Admin, Groups, Keep, and
+domain-wide delegation flows; they do not solve consumer `@gmail.com` OAuth.
+
+For OpenClaw/systemd setups, run the diagnostic through the actual agent
+entrypoint after restarting the service:
+
+```bash
+openclaw agent --agent main --message \
+  'Run: gog auth doctor --check --no-input && gog gmail search "newer_than:1d" --max 1 --json'
+```
+
+If this fails with `keyring.password` while the same `gog auth doctor` works in
+the shell, fix the service or agent environment before reauthenticating.
+
+Remote Mac OAuth pattern:
+
+1. Start the OAuth flow in remote tmux on the target Mac, for example
+   `gog auth add user@example.com --services all-user --force-consent --timeout 15m`.
+2. Open the printed OAuth URL on that same Mac's Chrome with `open -a "Google Chrome"`.
+3. Drive the Google page on the target Mac with AppleScript/DOM clicks; keep the
+   browser on the target host unless the user explicitly asks for a tunnel/local
+   browser handoff.
+4. If tmux asks for the file-keyring passphrase, source it from the remote
+   login environment via `zsh -lc` and paste it into tmux without printing it.
+5. Verify through `zsh -lc 'gog auth list --check --json --no-input'`.
+
+## Common Reads
+
+```bash
+gog --readonly --account user@example.com gmail search 'newer_than:3d' --max 10 --json --wrap-untrusted
+gog --readonly --account user@example.com gmail get <messageId> --sanitize-content --json --wrap-untrusted
+gog --readonly --account user@example.com gmail thread get <threadId> --sanitize-content --json --wrap-untrusted
+
+gog --readonly --account user@example.com calendar events --today --json --wrap-untrusted
+gog --readonly --account user@example.com drive ls --max 20 --json --wrap-untrusted
+gog --readonly --account user@example.com docs cat <documentId> --json --wrap-untrusted
+gog --readonly --account user@example.com sheets get <spreadsheetId> Sheet1!A1:D20 --json --wrap-untrusted
+gog --readonly --account user@example.com contacts list --max 20 --json --wrap-untrusted
+```
+
+For Gmail body inspection, prefer `--sanitize-content` unless the user
+explicitly needs raw payloads.
+
+## Writes
+
+Before writes, identify the account, object id, and exact mutation. Prefer
+commands that support `--dry-run`, and clean up disposable live-test objects.
+
+```bash
+gog --account user@example.com docs write <documentId> --append --text '...'
+gog --account user@example.com docs write <documentId> --tab "Data" --markdown --replace --file data.md
+gog --account user@example.com docs update <documentId> --tab "Data" --markdown --file block.md
+gog --account user@example.com docs update <documentId> --tab "Data" --replace-range START:END --text 'replacement'
+gog --account user@example.com docs update <documentId> --tab "Data" --markdown --replace-range START:END --file block.md
+gog --account user@example.com sheets update <spreadsheetId> Sheet1!A1 --values-json '[["hello"]]'
+gog --account user@example.com sheets batch-update <spreadsheetId> --data-json @updates.json
+gog --account user@example.com drive upload ./file.txt --parent <folderId> --json
+```
+
+For Google Docs tab work:
+
+- Use `docs list-tabs <documentId> --json` to discover tab titles/IDs before targeting a tab.
+- Use `docs write --markdown --replace --tab <tab>` for whole-tab formatted replacement.
+- Use `docs update --markdown --tab <tab>` for formatted insertion/append without replacing the whole tab.
+- Use `docs update --replace-range START:END` for precise plain-text replacement; add `--markdown` to replace that exact range with formatted markdown.
+- `START:END` is a Google Docs UTF-16 API range. Resolve it from `docs cat --raw`, `docs raw`, or another `documents.get` readback; do not guess indexes.
+- `--replace-range` and `--index` are mutually exclusive.
+
+When testing creation commands, name artifacts with a clear temporary prefix and
+delete or trash them after verification.
+
+`gmail batch delete` permanently deletes messages and requires the broader
+`https://mail.google.com/` OAuth scope. Prefer `gmail trash`; when permanent
+deletion is required, follow the exact reauthorization command printed by `gog`.
+
+For larger Sheets writes, prefer `sheets batch-update` over loops of
+`sheets update`; it sends multiple value ranges in one Sheets API request and
+accepts inline JSON or `@file` input.
+
+For normal Gmail replies, use the first-class commands instead of rebuilding
+reply MIME through `gmail send`:
+
+```bash
+gog --account user@example.com gmail reply <messageId> --body-file reply.txt
+gog --account user@example.com gmail reply-all <messageId> --body-file reply.txt \
+  --bcc introducer@example.com --remove former-participant@example.com
+```
+
+They inherit the subject, quote by default, preserve display names and inline
+images, and treat `--to`/`--cc`/`--bcc` as additive placement or moves. Use
+`--no-quote` to omit the original.
+
+## Discovery
+
+Use generated command docs and schema instead of guessing flags:
+
+```bash
+gog <service> --help
+gog <service> <command> --help
+gog schema <service> <command> --json
+```
+
+Docs:
+
+- `docs/index.md`
+- `docs/commands/README.md`
+- `docs/agent-skills.md`
+- `docs/safety-profiles.md`
+
+Repo paths:
+
+- CLI entrypoint: `cmd/gog/`
+- Command implementations: `internal/cmd/`
+- OAuth/keyring: `internal/googleauth/`, `internal/authclient/`, `internal/secrets/`
+- Generated command docs: `docs/commands/`
