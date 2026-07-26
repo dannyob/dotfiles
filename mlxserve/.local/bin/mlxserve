@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+# mlxserve — start/stop the local mlx_lm OpenAI-compatible server with saved defaults.
+#
+# Defaults live here; override per-invocation with env vars, e.g.
+#   MLX_PORT=39000 mlxserve start
+#   MLX_MODEL=mlx-community/Qwen3.6-35B-A3B-4bit mlxserve restart
+#
+# `mlxserve install` writes a launchd agent (so the server comes up at login and
+# restarts on crash) and switches this box from tmux mode to launchd mode.
+# `mlxserve uninstall` removes it and reverts to tmux mode.
+
+set -euo pipefail
+
+MLX_MODEL="${MLX_MODEL:-Youssofal/Qwen3.6-35B-A3B-Abliterated-Heretic-MLX-4bit}"
+MLX_PORT="${MLX_PORT:-38471}"
+MLX_MAX_TOKENS="${MLX_MAX_TOKENS:-32768}"
+MLX_TEMPLATE_ARGS="${MLX_TEMPLATE_ARGS:-{\"enable_thinking\":false}}"
+MLX_SESSION="${MLX_SESSION:-mlx}"
+MLX_LOG="${MLX_LOG:-$HOME/mlxserver.log}"
+
+# If a launchd agent is installed, launchd owns the process and we drive it via
+# launchctl. Otherwise fall back to a tmux session.
+MLX_LABEL="${MLX_LABEL:-com.spesh.mlxserve}"
+MLX_PLIST="$HOME/Library/LaunchAgents/$MLX_LABEL.plist"
+if [ -f "$MLX_PLIST" ]; then MODE=launchd; else MODE=tmux; fi
+
+export PATH="/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+
+die() { echo "mlxserve: $*" >&2; exit 1; }
+
+port_busy() { lsof -nP -iTCP:"$MLX_PORT" -sTCP:LISTEN >/dev/null 2>&1; }
+
+responding() { curl -sf -m 2 "http://localhost:$MLX_PORT/v1/models" >/dev/null 2>&1; }
+
+wait_port_free() {
+	local i
+	for i in $(seq 1 30); do
+		port_busy || return 0
+		sleep 1
+	done
+	return 1
+}
+
+wait_responding() {
+	local i
+	for i in $(seq 1 60); do
+		responding && { echo "up on port $MLX_PORT after ${i}s  ($MLX_MODEL)"; return 0; }
+		sleep 1
+	done
+	return 1
+}
+
+cmd_start() {
+	command -v mlx_lm.server >/dev/null || die "mlx_lm.server not found on PATH"
+
+	if responding; then
+		echo "already running on port $MLX_PORT"
+		return 0
+	fi
+
+	if [ "$MODE" = launchd ]; then
+		launchctl bootstrap "gui/$(id -u)" "$MLX_PLIST" 2>/dev/null ||
+			launchctl kickstart "gui/$(id -u)/$MLX_LABEL" >/dev/null 2>&1 ||
+			die "launchctl could not start $MLX_LABEL"
+		wait_responding && return 0
+		echo "failed to start — last log lines:" >&2
+		tail -15 "$MLX_LOG" >&2 2>/dev/null || true
+		return 1
+	fi
+
+	command -v tmux >/dev/null || die "tmux not found on PATH"
+	# A dead session or lingering socket both block a clean bind.
+	tmux kill-session -t "$MLX_SESSION" 2>/dev/null || true
+	wait_port_free || die "port $MLX_PORT still in use by another process"
+
+	tmux new-session -d -s "$MLX_SESSION" \
+		"mlx_lm.server \
+			--model '$MLX_MODEL' \
+			--port '$MLX_PORT' \
+			--max-tokens '$MLX_MAX_TOKENS' \
+			--chat-template-args '$MLX_TEMPLATE_ARGS' \
+			2>&1 | tee '$MLX_LOG'"
+
+	local i
+	for i in $(seq 1 60); do
+		responding && { echo "up on port $MLX_PORT after ${i}s  ($MLX_MODEL)"; return 0; }
+		tmux has-session -t "$MLX_SESSION" 2>/dev/null || break
+		sleep 1
+	done
+	echo "failed to start — last log lines:" >&2
+	tail -15 "$MLX_LOG" >&2 2>/dev/null || true
+	return 1
+}
+
+cmd_stop() {
+	if [ "$MODE" = launchd ]; then
+		# bootout removes the job entirely, so KeepAlive won't resurrect it.
+		launchctl bootout "gui/$(id -u)/$MLX_LABEL" 2>/dev/null && echo "stopped" || echo "not running"
+	else
+		tmux kill-session -t "$MLX_SESSION" 2>/dev/null && echo "stopped" || echo "not running"
+	fi
+	wait_port_free || echo "warning: port $MLX_PORT still held" >&2
+}
+
+cmd_status() {
+	if responding; then
+		if [ "$MODE" = launchd ]; then
+			echo "running   port=$MLX_PORT  launchd=$MLX_LABEL"
+		else
+			echo "running   port=$MLX_PORT  session=$MLX_SESSION"
+		fi
+		curl -s "http://localhost:$MLX_PORT/v1/models" |
+			python3 -c 'import json,sys; [print("  model:",m["id"]) for m in json.load(sys.stdin)["data"][:12]]' 2>/dev/null || true
+	else
+		echo "not running (port $MLX_PORT)"
+		return 1
+	fi
+}
+
+# The launchd agent runs `mlxserve fg`, so it inherits every default and env
+# override above instead of duplicating the argument list in XML. ProcessType
+# Interactive keeps App Nap from throttling a latency-sensitive server; KeepAlive
+# only on non-zero exit means a deliberate `bootout` stays dead but a crash
+# restarts (after ThrottleInterval).
+cmd_install() {
+	command -v mlx_lm.server >/dev/null ||
+		die "mlx_lm.server not found on PATH — install it first (brew install mlx-lm, or uv tool install mlx-lm)"
+
+	local self="$HOME/.local/bin/mlxserve"
+	[ -x "$self" ] || self="$(command -v mlxserve || true)"
+	[ -n "$self" ] || die "can't locate the mlxserve launcher to point the agent at"
+
+	# Retire any running instance (launchd or tmux) so the agent can bind the port.
+	launchctl bootout "gui/$(id -u)/$MLX_LABEL" 2>/dev/null || true
+	tmux kill-session -t "$MLX_SESSION" 2>/dev/null || true
+	wait_port_free || die "port $MLX_PORT still held; free it and retry"
+
+	mkdir -p "$(dirname "$MLX_PLIST")"
+	cat > "$MLX_PLIST" <<-PLIST
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+	<plist version="1.0">
+	<dict>
+		<key>Label</key><string>$MLX_LABEL</string>
+		<key>ProgramArguments</key>
+		<array>
+			<string>$self</string>
+			<string>fg</string>
+		</array>
+		<key>RunAtLoad</key><true/>
+		<key>KeepAlive</key>
+		<dict>
+			<key>SuccessfulExit</key><false/>
+		</dict>
+		<key>ThrottleInterval</key><integer>30</integer>
+		<key>ProcessType</key><string>Interactive</string>
+		<key>StandardOutPath</key><string>$MLX_LOG</string>
+		<key>StandardErrorPath</key><string>$MLX_LOG</string>
+	</dict>
+	</plist>
+	PLIST
+
+	plutil -lint "$MLX_PLIST" >/dev/null || die "generated plist failed plutil -lint: $MLX_PLIST"
+	launchctl bootstrap "gui/$(id -u)" "$MLX_PLIST" || die "launchctl bootstrap failed"
+	echo "installed launchd agent $MLX_LABEL -> $MLX_PLIST"
+	wait_responding || { echo "agent loaded but server not up yet — watch: mlxserve log" >&2; return 1; }
+}
+
+cmd_uninstall() {
+	[ -f "$MLX_PLIST" ] || { echo "no launchd agent installed ($MLX_PLIST)"; return 0; }
+	launchctl bootout "gui/$(id -u)/$MLX_LABEL" 2>/dev/null || true
+	rm -f "$MLX_PLIST"
+	wait_port_free || echo "warning: port $MLX_PORT still held" >&2
+	echo "uninstalled launchd agent $MLX_LABEL — now runs via tmux (mlxserve start)"
+}
+
+case "${1:-start}" in
+	start)     cmd_start ;;
+	stop)      cmd_stop ;;
+	restart)   cmd_stop; cmd_start ;;
+	status)    cmd_status ;;
+	install)   cmd_install ;;
+	uninstall) cmd_uninstall ;;
+	log)       tail -f "$MLX_LOG" ;;
+	attach)
+		[ "$MODE" = launchd ] && die "running under launchd; use 'mlxserve log' instead"
+		tmux attach -t "$MLX_SESSION" ;;
+	fg)        exec mlx_lm.server --model "$MLX_MODEL" --port "$MLX_PORT" \
+			--max-tokens "$MLX_MAX_TOKENS" --chat-template-args "$MLX_TEMPLATE_ARGS" ;;
+	*)         echo "usage: mlxserve {start|stop|restart|status|install|uninstall|log|attach|fg}" >&2; exit 2 ;;
+esac
