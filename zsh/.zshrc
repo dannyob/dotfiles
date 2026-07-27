@@ -605,5 +605,10 @@ export PATH="$HOME/.local/bin:$PATH"
 
 source $HOME/.zshrc-private
 
-# Theme setup
-command -v theme.sh >/dev/null 2>&1 && theme.sh "${THEMESH:-zaibatsu}"
+# Theme setup. THEMESH is the single source of truth for the current terminal
+# theme; export it so subshells inherit it and don't reset to a different theme.
+# Only apply it in interactive shells — otherwise non-interactive shells (e.g. a
+# tool/command runner sourcing this file) re-emit theme escape codes and clobber
+# whatever the interactive terminal was showing.
+export THEMESH="${THEMESH:-zaibatsu}"
+[[ -o interactive ]] && command -v theme.sh >/dev/null 2>&1 && theme.sh "$THEMESH"
