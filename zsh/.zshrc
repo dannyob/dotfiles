@@ -328,6 +328,35 @@ dob-todo() {
     (cd "$life_dir" && claude -p "$@")
 }
 
+# Share a directory over a temporary trycloudflare.com URL (no auth: anyone with the URL can read it).
+# Ctrl-C stops both the tunnel and the local server.
+dob-share-dir() {
+    local dir="${1:-.}" port="${2:-8321}"
+    [[ -d "$dir" ]] || { echo "Usage: dob-share-dir [DIRECTORY] [PORT]" >&2; return 1; }
+    command -v cloudflared >/dev/null || { echo "Error: cloudflared not found (brew install cloudflared)" >&2; return 1; }
+    dir="${dir:A}"
+
+    python3 -m http.server "$port" --bind 127.0.0.1 --directory "$dir" &
+    local server_pid=$!
+    {
+        echo "Sharing $dir (server pid $server_pid, port $port); Ctrl-C to stop"
+        local line url="" online=""
+        cloudflared tunnel --url "http://localhost:$port" 2>&1 | while IFS= read -r line; do
+            if [[ -z "$url" && "$line" =~ 'https://[a-z0-9-]+\.trycloudflare\.com' && "$MATCH" != https://api.* ]]; then
+                url="$MATCH"
+                echo "URL: $url (waiting for tunnel...)"
+            elif [[ -z "$online" && "$line" == *"Registered tunnel connection"* ]]; then
+                online=1
+                echo "Online: $url"
+            elif [[ "$line" == *" ERR "* ]]; then
+                echo "${line#* }" >&2
+            fi
+        done
+    } always {
+        kill "$server_pid" 2>/dev/null
+    }
+}
+
 # Activate venv with secrets support
 activ() {
     # Save pre-existing environment variables
