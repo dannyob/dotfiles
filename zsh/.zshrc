@@ -666,6 +666,11 @@ repos=(
 )
 plugin-load $repos
 
+# Start the completion system now that the plugins and
+# ~/.local/share/zsh/site-functions are on fpath. -i skips any directory
+# compaudit considers insecure (e.g. group-writable) instead of prompting.
+autoload -Uz compinit && compinit -i
+
 # fasd
 if [[ -x ~/.local/bin/fasd ]]; then
     eval "$(~/.local/bin/fasd --init auto)"
