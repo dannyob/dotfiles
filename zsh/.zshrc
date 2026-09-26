@@ -627,8 +627,11 @@ fi
 export WASMER_DIR="$HOME/.wasmer"
 [[ -s "$WASMER_DIR/wasmer.sh" ]] && source "$WASMER_DIR/wasmer.sh"
 
-# Video summarization directory
-[[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]] && export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/
+# Video summarization directory, and the public URL it is served at
+if [[ -d "$HOME/Public/dannyob.eth/video/sumvideo" ]]; then
+    export SUMVIDEO_DIR=$HOME/Public/dannyob.eth/video/sumvideo/
+    export SUMVIDEO_BASE_URL=https://danny.spesh.com/video/sumvideo/
+fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
