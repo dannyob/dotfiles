@@ -390,19 +390,18 @@ activ() {
         echo "Warning: No secrets file $secrets_file" >&2
     fi
 
-    # Special Almanack special-pleading
-    if [ -f "bin/a-activate" ]; then
-        if ! source "bin/a-activate"; then
-            echo "Error: Failed to activate a-activate." >&2
-            return 1
-        fi
-    elif [ -f ".venv/bin/activate" ]; then
-        if ! source .venv/bin/activate; then
-            echo "Error: Failed to activate standard venv." >&2
-            return 1
-        fi
-    else
+    # Source the project's own activation script if it has one
+    # (bin/a-activate is Almanack's), else the plain venv
+    local script
+    for script in bin/activate bin/a-activate .venv/bin/activate; do
+        [ -f "$script" ] && break
+    done
+    if [ ! -f "$script" ]; then
         echo "Error: No activation script found." >&2
+        return 1
+    fi
+    if ! source "$script"; then
+        echo "Error: Failed to source $script." >&2
         return 1
     fi
 
