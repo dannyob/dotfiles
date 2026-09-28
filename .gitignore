@@ -8,3 +8,7 @@
 /emacs/.doom.d/custom.el
 /neovim/.local/share/nvim/.netrwhist
 /neovim/.local/share/nvim/plugged/
+
+# Per-host crontabs for boat hold local details; kept out of the public repo.
+/cron/.config/loadcron/danny/boat
+/cron/.config/loadcron/danny/nuuboat
