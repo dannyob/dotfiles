@@ -101,3 +101,8 @@ alias acorn='open -a Acorn'
 # Tailscale
 ###
 [[ -f "/Applications/Tailscale.app/Contents/MacOS/Tailscale" ]] && alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+
+###
+# LM Studio CLI (lms), if installed
+###
+[[ -d "$HOME/.lmstudio/bin" ]] && export PATH="$PATH:$HOME/.lmstudio/bin"
