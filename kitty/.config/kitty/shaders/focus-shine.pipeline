@@ -1,0 +1,7 @@
+startgroup
+    animation_start os-window-focus-in
+    animation_stop 700
+    animation_curve ease-in-out
+    animation_step 16
+    shaders focus-shine
+endgroup
