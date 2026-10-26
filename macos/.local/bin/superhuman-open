@@ -95,11 +95,21 @@ def header(msg, name):
     return ""
 
 
+def last_sent(messages):
+    """Last message that isn't an unsent draft.
+
+    A draft's Message-ID isn't searchable in Superhuman, so a thread whose
+    newest entry is your half-written reply would otherwise open nothing.
+    """
+    sent = [m for m in messages if "DRAFT" not in m.get("labelIds", [])]
+    return (sent or messages)[-1]
+
+
 def msgid_for_id(gmail_id, account=None):
-    """Message-ID for a Gmail thread id (last message) or message id."""
+    """Message-ID for a Gmail thread id (last sent message) or message id."""
     data = gog(["gmail", "thread", "get", gmail_id], account, quiet=True)
     if data and data.get("thread", {}).get("messages"):
-        return header(data["thread"]["messages"][-1], "message-id")
+        return header(last_sent(data["thread"]["messages"]), "message-id")
     data = gog(["gmail", "get", gmail_id, "--format", "metadata",
                 "--headers", "Message-ID"], account)
     if data:
