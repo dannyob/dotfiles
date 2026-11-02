@@ -1,0 +1,131 @@
+#compdef passage
+#autoload
+
+# Copyright (C) 2012 - 2014:
+#    Johan Venant <jvenant@invicem.pro>
+#    Brian Mattern <rephorm@rephorm.com>
+#    Jason A. Donenfeld <Jason@zx2c4.com>.
+# All Rights Reserved.
+# This file is licensed under the GPLv2+. Please see COPYING for more information.
+
+
+# If you use multiple repositories, you can configure completion like this:
+#
+# compdef _passage workpass
+# zstyle ':completion::complete:workpass::' prefix "$HOME/work/pass"
+# workpass() {
+#   PASSAGE_DIR=$HOME/work/pass passage $@
+# }
+
+
+_passage () {
+	local cmd
+	if (( CURRENT > 2)); then
+		cmd=${words[2]}
+		# Set the context for the subcommand.
+		curcontext="${curcontext%:*:*}:passage-$cmd"
+		# Narrow the range of words we are looking at to exclude `pass'
+		(( CURRENT-- ))
+		shift words
+		# Run the completion for the subcommand
+		case "${cmd}" in
+			ls|list|edit)
+				_passage_complete_entries_with_subdirs
+				;;
+			insert)
+				_arguments : \
+					"-e[echo password to console]" \
+					"--echo[echo password to console]" \
+					"-m[multiline]" \
+					"--multiline[multiline]"
+				_passage_complete_entries_with_subdirs
+				;;
+			generate)
+				_arguments : \
+					"-n[don't include symbols in password]" \
+					"--no-symbols[don't include symbols in password]" \
+					"-c[copy password to the clipboard]" \
+					"--clip[copy password to the clipboard]" \
+					"-f[force overwrite]" \
+					"--force[force overwrite]" \
+					"-i[replace first line]" \
+					"--in-place[replace first line]"
+				_passage_complete_entries_with_subdirs
+				;;
+			cp|copy|mv|rename)
+				_arguments : \
+					"-f[force rename]" \
+					"--force[force rename]"
+					_passage_complete_entries_with_subdirs
+				;;
+			rm)
+				_arguments : \
+					"-f[force deletion]" \
+					"--force[force deletion]" \
+					"-r[recursively delete]" \
+					"--recursive[recursively delete]"
+					_passage_complete_entries_with_subdirs
+				;;
+			git)
+				local -a subcommands
+				subcommands=(
+					"init:Initialize git repository"
+					"push:Push to remote repository"
+					"pull:Pull from remote repository"
+					"config:Show git config"
+					"log:Show git log"
+					"reflog:Show git reflog"
+				)
+				_describe -t commands 'passage git' subcommands
+				;;
+			show|*)
+				_passage_cmd_show
+				;;
+		esac
+	else
+		local -a subcommands
+		subcommands=(
+			"ls:List passwords"
+			"find:Find password files or directories based on pattern"
+			"grep:Search inside decrypted password files for matching pattern"
+			"show:Decrypt and print a password"
+			"insert:Insert a new password"
+			"generate:Generate a new password using pwgen"
+			"edit:Edit a password with \$EDITOR"
+			"mv:Rename the password"
+			"cp:Copy the password"
+			"rm:Remove the password"
+			"git:Call git on the password store"
+			"version:Output version information"
+			"help:Output help message"
+		)
+		_describe -t commands 'passage' subcommands
+		_arguments : \
+			"--version[Output version information]" \
+			"--help[Output help message]"
+		_passage_cmd_show
+	fi
+}
+
+_passage_cmd_show () {
+	_arguments : \
+		"-c[put it on the clipboard]" \
+		"--clip[put it on the clipboard]"
+	_passage_complete_entries
+}
+_passage_complete_entries_helper () {
+	local IFS=$'\n'
+	local prefix
+	zstyle -s ":completion:${curcontext}:" prefix prefix || prefix="${PASSAGE_DIR:-$HOME/.passage/store}"
+	_values -C 'passwords' ${$(find -L "$prefix" \( -name .git -o -name .age-recipients \) -prune -o $@ -print 2>/dev/null | sed -e "s#${prefix}/\{0,1\}##" -e 's#\.age##' -e 's#\\#\\\\#g' -e 's#:#\\:#g' | sort):-""}
+}
+
+_passage_complete_entries_with_subdirs () {
+	_passage_complete_entries_helper
+}
+
+_passage_complete_entries () {
+	_passage_complete_entries_helper -type f
+}
+
+_passage
