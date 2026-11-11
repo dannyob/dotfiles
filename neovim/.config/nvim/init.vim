@@ -27,6 +27,12 @@ set backspace=indent,eol,start
 
 " Super indent!
 set copyindent smartindent
+" ...but not in prose, where smartindent indents after lines starting with
+" 'if', 'while', 'for' etc. (cinwords)
+augroup prose_indent
+  autocmd!
+  autocmd FileType markdown,text setlocal nosmartindent
+augroup END
 
 " ~ is an operator to me
 set tildeop
