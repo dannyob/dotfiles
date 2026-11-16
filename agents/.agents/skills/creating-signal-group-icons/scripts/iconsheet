@@ -1,0 +1,94 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pillow>=10.1"]
+# ///
+"""Show square images as Signal will: cropped to a circle, large and at icon size.
+
+    iconsheet OUT.png IMAGE [IMAGE ...]
+    iconsheet --flatten '#0B1024' IMAGE [IMAGE ...]
+
+The first form writes one comparison sheet: each image cropped to its
+inscribed circle at 600px, a 96px copy underneath, and the file's name
+(without extension, upper-cased) as its label. It warns about any image
+that isn't square or has transparent pixels; on the sheet, transparency
+shows as grey.
+
+The second form fills each image's transparent pixels with a colour, in
+place, so that it can be used as an icon.
+"""
+import sys
+from pathlib import Path
+
+from PIL import Image, ImageDraw, ImageFont
+
+BIG, SMALL, GAP, STRIP = 600, 96, 20, 130
+GREY = (128, 128, 128)
+
+
+def transparent(image):
+    return image.mode == "RGBA" and image.getextrema()[3][0] < 255
+
+
+def over(image, colour):
+    ground = Image.new("RGB", image.size, colour)
+    ground.paste(image, mask=image.getchannel("A"))
+    return ground
+
+
+def circle(image, size):
+    image = image.resize((size, size), Image.LANCZOS)
+    mask = Image.new("L", (size * 4, size * 4), 0)
+    ImageDraw.Draw(mask).ellipse((0, 0, size * 4 - 1, size * 4 - 1), fill=255)
+    out = Image.new("RGB", (size, size), "black")
+    out.paste(image, mask=mask.resize((size, size), Image.LANCZOS))
+    return out
+
+
+def flatten(colour, paths):
+    for path in paths:
+        image = Image.open(path).convert("RGBA")
+        if transparent(image):
+            over(image, colour).save(path)
+            print(f"{path}: filled with {colour}")
+        else:
+            print(f"{path}: already opaque")
+
+
+def sheet(out, paths):
+    font = ImageFont.load_default(size=54)
+    page = Image.new("RGB", (len(paths) * (BIG + GAP) + GAP, GAP + BIG + STRIP), "black")
+    draw = ImageDraw.Draw(page)
+    for n, path in enumerate(paths):
+        image = Image.open(path).convert("RGBA")
+        if image.width != image.height:
+            print(f"warning: {path} is {image.width}x{image.height}, not square")
+        if transparent(image):
+            print(f"warning: {path} has transparent pixels (grey on the sheet); "
+                  "regenerate with background=opaque, or iconsheet --flatten COLOUR")
+        image = over(image, GREY)
+        x = GAP + n * (BIG + GAP)
+        page.paste(circle(image, BIG), (x, GAP))
+        y = GAP + BIG + (STRIP - SMALL) // 2
+        page.paste(circle(image, SMALL), (x + BIG // 2 - SMALL - 10, y))
+        draw.text((x + BIG // 2 + 20, y + SMALL // 2), Path(path).stem.upper(),
+                  font=font, fill="white", anchor="lm")
+    page.save(out)
+    print(out)
+
+
+def main():
+    args = sys.argv[1:]
+    if len(args) >= 3 and args[0] == "--flatten":
+        flatten(args[1], args[2:])
+    elif len(args) >= 2 and not args[0].startswith("-"):
+        if Path(args[0]).exists() and Path(args[0]).stem.split("-")[0] != "sheet":
+            sys.exit(f"{args[0]} exists and isn't named sheet*.png; "
+                     "the first argument is the sheet to write")
+        sheet(args[0], args[1:])
+    else:
+        sys.exit(__doc__)
+
+
+if __name__ == "__main__":
+    main()

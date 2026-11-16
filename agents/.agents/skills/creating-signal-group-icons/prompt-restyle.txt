@@ -1,0 +1,13 @@
+Redraw reference image 1 as a much more cartoonish illustration, restyled in the visual identity shown in reference image 2. It will be a group chat profile picture, cropped to a circle and often shown very small.
+
+Reference image 1 is the composition to keep: three friends crowding into an extreme fisheye selfie, the same three people in the same positions with the same expressions and the same hand reaching toward the lens. Reference images 3, 4 and 5 are photos of the three people (3: the man with red hair, a ginger beard and round glasses, lower left, smiling warmly; 4: the butch person with the shaved head, black-framed glasses and denim jacket, top, grinning, not feminised; 5: the woman with the silver bob, lower right, laughing fiercely). Each must stay clearly recognisable.
+
+More cartoonish means: simpler and bolder. Bigger heads, exaggerated features and expressions, thick confident outlines, large flat areas of colour with at most one hard-edged shadow tone, no fine hatching, no realistic skin texture, no rendered wrinkles or pores, hair drawn as a few big graphic shapes. Think of a cel from an animated series or a bold editorial cartoon rather than a painted caricature. Push the fisheye bulge further.
+
+Reference image 2 is the organisation's mark and its colours: a white outlined cable running into a white outlined triangle, from which three thick glowing rays fan out, cyan (#3EE8FF), violet (#A08CFF) and magenta (#FF6BB5), on a deep navy ground (#0B1024). Use that identity throughout:
+- The background is that deep navy, not yellow, with the three glowing rays (cyan, violet, magenta, in that order) fanning out huge behind the group, bent by the fisheye lens, like neon tubes.
+- Each person is rim-lit by one ray: cyan light on the edge of the bearded man, violet on the person with the shaved head, magenta on the woman with the silver bob. Faces keep natural, warm skin colours; the neon only catches their edges, glasses and hair.
+- Outlines are dark navy rather than black. The man's cardigan and the woman's top are navy.
+- The mark itself appears once, drawn accurately and exactly as in reference image 2 (white outlined cable and triangle with the three coloured rays): as a round embroidered patch on the shoulder of the denim jacket, large enough to recognise.
+
+Keep all three heads inside the circle inscribed in the square. Fill the whole square with the navy background: fully opaque, no transparency, no vignette, no drawn circle or border. No text or lettering anywhere.

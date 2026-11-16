@@ -1,0 +1,83 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["httpx"]
+# ///
+"""Generate images through OpenRouter's Image API.
+
+    OPENROUTER_API_KEY=... genimg MODEL PROMPT_FILE OUT_STEM [REF ...] [-- key=value ...]
+
+Writes OUT_STEM.png (or .jpg/.webp, whatever the model returns) and prints
+the path and the cost in dollars. REFs are local image files, sent in order
+as reference images 1, 2, 3...; the prompt refers to them by those numbers.
+Everything after `--` goes into the request as it stands, for example
+`quality=high background=opaque`; a value that starts with `{` or `[` is
+read as JSON, as in `provider='{"data_collection":"deny"}'`. The picture is
+square unless you pass `aspect_ratio=...`.
+
+It refuses to overwrite an existing output file.
+"""
+import base64
+import json
+import mimetypes
+import os
+import sys
+from pathlib import Path
+
+import httpx
+
+URL = "https://openrouter.ai/api/v1/images"
+EXT = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp"}
+
+
+def data_url(path):
+    mime = mimetypes.guess_type(path)[0] or "image/jpeg"
+    return f"data:{mime};base64,{base64.b64encode(Path(path).read_bytes()).decode()}"
+
+
+def main():
+    args = sys.argv[1:]
+    extra = {}
+    if "--" in args:
+        i = args.index("--")
+        extra = dict(kv.split("=", 1) for kv in args[i + 1:])
+        extra = {k: json.loads(v) if v[:1] in "{[" else v for k, v in extra.items()}
+        args = args[:i]
+    if len(args) < 3 or "OPENROUTER_API_KEY" not in os.environ:
+        sys.exit(__doc__)
+    model, prompt_file, stem, *refs = args
+    taken = [p for p in Path(stem).parent.glob(Path(stem).name + ".*") if p.suffix[1:] in EXT.values()]
+    if taken:
+        sys.exit(f"{taken[0]} exists; choose another OUT_STEM")
+    Path(stem).parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "model": model,
+        "prompt": Path(prompt_file).read_text(),
+        "aspect_ratio": "1:1",
+        **extra,
+    }
+    if refs:
+        payload["input_references"] = [
+            {"type": "image_url", "image_url": {"url": data_url(r)}} for r in refs
+        ]
+    r = httpx.post(
+        URL,
+        headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}"},
+        json=payload,
+        timeout=300,
+    )
+    if r.status_code != 200:
+        sys.exit(f"{model}: HTTP {r.status_code}: {r.text[:1500]}")
+    body = r.json()
+    if not body.get("data"):
+        sys.exit(f"{model}: no image: {json.dumps(body)[:1500]}")
+    for n, image in enumerate(body["data"]):
+        ext = EXT.get(image.get("media_type"), "png")
+        out = Path(f"{stem}{'' if n == 0 else f'-{n}'}.{ext}")
+        out.write_bytes(base64.b64decode(image["b64_json"]))
+        print(out)
+    print("cost:", body.get("usage", {}).get("cost"))
+
+
+if __name__ == "__main__":
+    main()

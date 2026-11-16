@@ -1,0 +1,13 @@
+Draw a square cartoon illustration of three friends crowding into a selfie taken with a fisheye lens. It will be used as a group chat profile picture, cropped to a circle and often shown very small.
+
+The six reference photos show the three people. Keep each one clearly recognisable as a cartoon caricature of the person in their photos.
+
+- Person A (reference photos 1 and 2): a man with short curly red hair, a full ginger beard and round wire glasses. Draw him bare-headed (no hat), in a green cardigan. His expression is warm and friendly: an open, kind smile.
+- Person B (reference photos 3 and 4): a butch person with a shaved head and heavy black-framed glasses, in a denim jacket covered in enamel pins. Expression: a confident, amused grin. Do not feminise them.
+- Person C (reference photos 5 and 6): a woman with a silver bob and bright red lipstick, in a striped top. Expression: laughing out loud, head tipped slightly, with a fierce glint, as if she has just won an argument.
+
+Composition: an extreme fisheye view from very close, as if all three are leaning over the camera and jostling to fit in the frame. Faces are large and bulge toward the lens, noses and foreheads nearest, shoulders and the background curving away toward the edges. Person A is at lower left, Person B at the top centre, Person C at lower right, heads overlapping a little and tilted toward the centre. One of them reaches a hand toward the lens. Keep all three faces inside the circle inscribed in the square; the corners hold background only. Push the fisheye distortion hard: the faces nearest the lens swell, and the yellow background visibly wraps around them.
+
+Style: bold modern cartoon, confident black ink outlines of varying weight, flat saturated colours with one simple layer of shading, exaggerated but affectionate caricature. It should read clearly at 48 pixels across. Background: a plain warm sunny yellow-orange, curved by the lens, with nothing else in it.
+
+Fill the whole square with the background: fully opaque, no transparency, no vignette. No text, no lettering, no logos, no border, no drawn circle or lens frame, no camera or phone visible.
